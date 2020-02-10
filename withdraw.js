@@ -57,7 +57,6 @@ function handle_change_share() {
 async function handle_remove_liquidity() {
     var share = $('#liquidity-share');
     var share_val = share.val();
-    var deadline = Math.floor((new Date()).getTime() / 1000) + trade_timeout;
     var amounts = $("[id^=currency_]").toArray().map(x => $(x).val());
     for (let i = 0; i < N_COINS; i++)
         amounts[i] = Math.floor(amounts[i] / c_rates[i]); // -> c-tokens
@@ -66,13 +65,15 @@ async function handle_remove_liquidity() {
     var txhash;
     var default_account = (await web3.eth.getAccounts())[0];
     if (share_val == '---') {
-        await swap.methods.remove_liquidity_imbalance(amounts, deadline).send({'from': default_account});
+        var token_amount = await swap.methods.calc_token_amount(amounts, false).call();
+        token_amount = BigInt(Math.floor(token_amount * 1.01)).toString()
+        await swap.methods.remove_liquidity_imbalance(amounts, token_amount).send({'from': default_account});
     }
     else {
         var amount = BigInt(Math.floor(share_val / 100 * token_balance)).toString();
         if (share_val == 100)
             amount = await swap_token.methods.balanceOf(default_account).call();
-        await swap.methods.remove_liquidity(amount, deadline, min_amounts).send({'from': default_account});
+        await swap.methods.remove_liquidity(amount, min_amounts).send({'from': default_account});
     }
 
     await update_balances();

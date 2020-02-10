@@ -1,7 +1,9 @@
-var N_COINS = 2;
-var coin_precisions = [1e18, 1e6];
-var swap_address = '0x2e60CF74d81ac34eB21eEff58Db4D385920ef419';
-var token_address = '0x3740fb63ab7a09891d7c0d4299442A551D06F5fD';
+var N_COINS = 3;
+var coin_precisions = [1e18, 1e6, 1e6];
+var use_lending = [true, true, false];
+var tethered = [false, false, true];
+var swap_address = '0x52EA46506B9CC5Ef470C5bf89f17Dc28bB35D85C';
+var token_address = '0x9fC689CCaDa600B6DF723D9E47D84d76664a1F23';
 var infura_url = 'https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b';
 
 var swap_abi = [
@@ -78,8 +80,13 @@ var swap_abi = [
     "indexed": true
    },
    {
-    "type": "uint256[2]",
+    "type": "uint256[3]",
     "name": "token_amounts",
+    "indexed": false
+   },
+   {
+    "type": "uint256[3]",
+    "name": "fees",
     "indexed": false
    },
    {
@@ -105,12 +112,39 @@ var swap_abi = [
     "indexed": true
    },
    {
-    "type": "uint256[2]",
+    "type": "uint256[3]",
     "name": "token_amounts",
     "indexed": false
    },
    {
-    "type": "uint256[2]",
+    "type": "uint256[3]",
+    "name": "fees",
+    "indexed": false
+   },
+   {
+    "type": "uint256",
+    "name": "token_supply",
+    "indexed": false
+   }
+  ],
+  "anonymous": false,
+  "type": "event"
+ },
+ {
+  "name": "RemoveLiquidityImbalance",
+  "inputs": [
+   {
+    "type": "address",
+    "name": "provider",
+    "indexed": true
+   },
+   {
+    "type": "uint256[3]",
+    "name": "token_amounts",
+    "indexed": false
+   },
+   {
+    "type": "uint256[3]",
     "name": "fees",
     "indexed": false
    },
@@ -168,17 +202,17 @@ var swap_abi = [
     "unit": "sec"
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "A",
     "indexed": false
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "fee",
     "indexed": false
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "admin_fee",
     "indexed": false
    }
@@ -190,17 +224,17 @@ var swap_abi = [
   "name": "NewParameters",
   "inputs": [
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "A",
     "indexed": false
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "fee",
     "indexed": false
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "admin_fee",
     "indexed": false
    }
@@ -212,11 +246,11 @@ var swap_abi = [
   "outputs": [],
   "inputs": [
    {
-    "type": "address[2]",
+    "type": "address[3]",
     "name": "_coins"
    },
    {
-    "type": "address[2]",
+    "type": "address[3]",
     "name": "_underlying_coins"
    },
    {
@@ -224,11 +258,11 @@ var swap_abi = [
     "name": "_pool_token"
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "_A"
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "_fee"
    }
   ],
@@ -248,26 +282,48 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 1083195
+  "gas": 1327351
+ },
+ {
+  "name": "calc_token_amount",
+  "outputs": [
+   {
+    "type": "uint256",
+    "name": "out"
+   }
+  ],
+  "inputs": [
+   {
+    "type": "uint256[3]",
+    "name": "amounts"
+   },
+   {
+    "type": "bool",
+    "name": "deposit"
+   }
+  ],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 5171741
  },
  {
   "name": "add_liquidity",
   "outputs": [],
   "inputs": [
    {
-    "type": "uint256[2]",
+    "type": "uint256[3]",
     "name": "amounts"
    },
    {
     "type": "uint256",
-    "unit": "sec",
-    "name": "deadline"
+    "name": "min_mint_amount"
    }
   ],
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 2266965
+  "gas": 7905846
  },
  {
   "name": "get_dy",
@@ -294,7 +350,34 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2540055
+  "gas": 3016651
+ },
+ {
+  "name": "get_dx",
+  "outputs": [
+   {
+    "type": "uint256",
+    "name": "out"
+   }
+  ],
+  "inputs": [
+   {
+    "type": "int128",
+    "name": "i"
+   },
+   {
+    "type": "int128",
+    "name": "j"
+   },
+   {
+    "type": "uint256",
+    "name": "dy"
+   }
+  ],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 3016657
  },
  {
   "name": "get_dy_underlying",
@@ -321,7 +404,34 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2540024
+  "gas": 3016494
+ },
+ {
+  "name": "get_dx_underlying",
+  "outputs": [
+   {
+    "type": "uint256",
+    "name": "out"
+   }
+  ],
+  "inputs": [
+   {
+    "type": "int128",
+    "name": "i"
+   },
+   {
+    "type": "int128",
+    "name": "j"
+   },
+   {
+    "type": "uint256",
+    "name": "dy"
+   }
+  ],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 3016500
  },
  {
   "name": "exchange",
@@ -342,17 +452,12 @@ var swap_abi = [
    {
     "type": "uint256",
     "name": "min_dy"
-   },
-   {
-    "type": "uint256",
-    "unit": "sec",
-    "name": "deadline"
    }
   ],
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 1000000
+  "gas": 6109460
  },
  {
   "name": "exchange_underlying",
@@ -373,17 +478,12 @@ var swap_abi = [
    {
     "type": "uint256",
     "name": "min_dy"
-   },
-   {
-    "type": "uint256",
-    "unit": "sec",
-    "name": "deadline"
    }
   ],
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 1000000
+  "gas": 6125699
  },
  {
   "name": "remove_liquidity",
@@ -394,60 +494,54 @@ var swap_abi = [
     "name": "_amount"
    },
    {
-    "type": "uint256",
-    "unit": "sec",
-    "name": "deadline"
-   },
-   {
-    "type": "uint256[2]",
+    "type": "uint256[3]",
     "name": "min_amounts"
    }
   ],
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 1220465
+  "gas": 197574
  },
  {
   "name": "remove_liquidity_imbalance",
   "outputs": [],
   "inputs": [
    {
-    "type": "uint256[2]",
+    "type": "uint256[3]",
     "name": "amounts"
    },
    {
     "type": "uint256",
-    "unit": "sec",
-    "name": "deadline"
+    "name": "max_burn_amount"
    }
   ],
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 2346381
+  "gas": 7905313
  },
  {
   "name": "commit_new_parameters",
   "outputs": [],
   "inputs": [
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "amplification"
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "new_fee"
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "new_admin_fee"
    }
   ],
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 146017
+  "gas": 145897
  },
  {
   "name": "apply_new_parameters",
@@ -456,7 +550,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 133362
+  "gas": 133512
  },
  {
   "name": "revert_new_parameters",
@@ -465,7 +559,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 21685
+  "gas": 21835
  },
  {
   "name": "commit_transfer_ownership",
@@ -479,7 +573,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 74362
+  "gas": 74512
  },
  {
   "name": "apply_transfer_ownership",
@@ -488,7 +582,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 60418
+  "gas": 60568
  },
  {
   "name": "revert_transfer_ownership",
@@ -497,7 +591,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 21775
+  "gas": 21925
  },
  {
   "name": "withdraw_admin_fees",
@@ -506,7 +600,25 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 12403
+  "gas": 18169
+ },
+ {
+  "name": "kill_me",
+  "outputs": [],
+  "inputs": [],
+  "constant": false,
+  "payable": false,
+  "type": "function",
+  "gas": 37878
+ },
+ {
+  "name": "unkill_me",
+  "outputs": [],
+  "inputs": [],
+  "constant": false,
+  "payable": false,
+  "type": "function",
+  "gas": 22015
  },
  {
   "name": "coins",
@@ -525,7 +637,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2040
+  "gas": 2190
  },
  {
   "name": "underlying_coins",
@@ -544,7 +656,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2070
+  "gas": 2220
  },
  {
   "name": "balances",
@@ -563,13 +675,13 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2100
+  "gas": 2250
  },
  {
   "name": "A",
   "outputs": [
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "out"
    }
   ],
@@ -577,13 +689,13 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 1931
+  "gas": 2081
  },
  {
   "name": "fee",
   "outputs": [
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "out"
    }
   ],
@@ -591,13 +703,13 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 1961
+  "gas": 2111
  },
  {
   "name": "admin_fee",
   "outputs": [
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "out"
    }
   ],
@@ -605,7 +717,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 1991
+  "gas": 2141
  },
  {
   "name": "owner",
@@ -619,7 +731,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2021
+  "gas": 2171
  },
  {
   "name": "admin_actions_deadline",
@@ -634,7 +746,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2051
+  "gas": 2201
  },
  {
   "name": "transfer_ownership_deadline",
@@ -649,13 +761,13 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2081
+  "gas": 2231
  },
  {
   "name": "future_A",
   "outputs": [
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "out"
    }
   ],
@@ -663,13 +775,13 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2111
+  "gas": 2261
  },
  {
   "name": "future_fee",
   "outputs": [
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "out"
    }
   ],
@@ -677,13 +789,13 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2141
+  "gas": 2291
  },
  {
   "name": "future_admin_fee",
   "outputs": [
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "out"
    }
   ],
@@ -691,7 +803,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2171
+  "gas": 2321
  },
  {
   "name": "future_owner",
@@ -705,7 +817,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2201
+  "gas": 2351
  }
 ];
 var ERC20_abi = [

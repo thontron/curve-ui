@@ -109,11 +109,15 @@ async function update_rates() {
         old_block: uint256 = cERC20(self.coins[i]).accrualBlockNumber()
         rate += rate * supply_rate * (block.number - old_block) / 10 ** 18
         */
-        var rate = parseInt(await coins[i].methods.exchangeRateStored().call()) / 1e18 / coin_precisions[i];
-        var supply_rate = parseInt(await coins[i].methods.supplyRatePerBlock().call());
-        var old_block = parseInt(await coins[i].methods.accrualBlockNumber().call());
-        var block = await web3.eth.getBlockNumber();
-        c_rates[i] = rate * (1 + supply_rate * (block - old_block) / 1e18);
+        if (tethered[i] & !use_lending[i])
+            c_rates[i] = 1 / coin_precisions[i]
+        else {
+            var rate = parseInt(await coins[i].methods.exchangeRateStored().call()) / 1e18 / coin_precisions[i];
+            var supply_rate = parseInt(await coins[i].methods.supplyRatePerBlock().call());
+            var old_block = parseInt(await coins[i].methods.accrualBlockNumber().call());
+            var block = await web3.eth.getBlockNumber();
+            c_rates[i] = rate * (1 + supply_rate * (block - old_block) / 1e18);
+        }
     }
 }
 

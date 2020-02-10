@@ -30,8 +30,9 @@ async function handle_add_liquidity() {
     for (let i = 0; i < N_COINS; i++)
         amounts[i] = BigInt(Math.floor(amounts[i] / c_rates[i])).toString(); // -> c-tokens
     await ensure_allowance();
-    var deadline = Math.floor((new Date()).getTime() / 1000) + trade_timeout;
-    await swap.methods.add_liquidity(amounts, deadline).send({
+    var token_amount = await swap.methods.calc_token_amount(amounts, true).call();
+    token_amount = BigInt(Math.floor(token_amount * 0.99)).toString()
+    await swap.methods.add_liquidity(amounts, token_amount).send({
         'from': default_account,
         'gas': 1300000});
     await handle_sync_balances();

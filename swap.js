@@ -85,14 +85,13 @@ async function handle_trade() {
     if (b >= 0.001) {
         var dx = Math.floor($('#from_currency').val() * coin_precisions[i]);
         var min_dy = Math.floor($('#to_currency').val() * 0.95 * coin_precisions[j]);
-        var deadline = Math.floor((new Date()).getTime() / 1000) + trade_timeout;
         dx = BigInt(dx).toString();
         if ($('#inf-approval').prop('checked'))
             await ensure_underlying_allowance(i, max_allowance)
         else
             await ensure_underlying_allowance(i, dx);
         min_dy = BigInt(min_dy).toString();
-        await swap.methods.exchange_underlying(i, j, dx, min_dy, deadline).send({
+        await swap.methods.exchange_underlying(i, j, dx, min_dy).send({
             'from': default_account,
             'gas': 1200000});
         await update_fee_info();
