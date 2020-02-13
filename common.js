@@ -116,7 +116,6 @@ function init_menu() {
 }
 
 async function update_rates() {
-    console.log(coins);
     for (let i = 0; i < N_COINS; i++) {
         if (tethered[i] & !use_lending[i])
             c_rates[i] = 1 / coin_precisions[i]
