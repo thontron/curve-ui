@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>🌀 Curve.fi :: Tethered</title>
+    <title>🌀 Curve.fi :: Yield</title>
     <link rel="stylesheet" href="tvision.css?v19012020" />
     <script src="/jquery.min.js"></script>
     <script src="/web3.min.js"></script>
@@ -18,7 +18,7 @@
       <a href="/withdraw.html">Withdraw</a>
       <a href="/stats.html">Stats</a>
       <a href="/faq.html">FAQ</a>
-      <a href="https://github.com/curvefi/curve-contract/tree/compound_plain_usdt">git@</a>
+      <a href="https://github.com/curvefi/curve-contract/tree/iearn_ytokens">git@</a>
     </div>
     <div id="screen">
         <div class="blue window">
@@ -31,16 +31,20 @@
                 <legend>Currencies:</legend>
                 <ul>
                     <li>
-                        <label for="currency_0">cDAI (in DAI)</label>
+                        <label for="currency_0">yDAI (in DAI)</label>
                         <input type="text" id="currency_0" name="from_cur" value="0.0">
                     </li>
                     <li>
-                        <label for="currency_1">cUSDC (in USDC)</label>
+                        <label for="currency_1">yUSDC (in USDC)</label>
                         <input type="text" id="currency_1" name="from_cur" value="0.0">
                     </li>
                     <li>
-                        <label for="currency_2">USDT</label>
+                        <label for="currency_2">yUSDT (in USDT)</label>
                         <input type="text" id="currency_2" name="from_cur" value="0.0">
+                    </li>
+                    <li>
+                        <label for="currency_3">yTUSD (in TUSD)</label>
+                        <input type="text" id="currency_3" name="from_cur" value="0.0">
                     </li>
                 </ul>
             </fieldset>
@@ -70,7 +74,8 @@
                         <li><b>DAI:</b> <span></span></li>
                         <li><b>USDC:</b> <span></span></li>
                         <li><b>USDT:</b> <span></span></li>
-                        <li><b>DAI+USDC+USDT:</b> <span></span></li>
+                        <li><b>TUSD:</b> <span></span></li>
+                        <li><b>DAI+USDC+USDT+TUSD:</b> <span></span></li>
                     </ul>
                     <p><b>Fee:</b> <span id='fee-info'></span>%</p>
                     <p><b>Admin fee:</b> <span id='admin-fee-info'></span>%</p>
@@ -81,7 +86,8 @@
                         <li><b>DAI:</b> <span></span></li>
                         <li><b>USDC:</b> <span></span></li>
                         <li><b>USDT:</b> <span></span></li>
-                        <li><b>DAI+USDC+USDT:</b> <span></span></li>
+                        <li><b>TUSD:</b> <span></span></li>
+                        <li><b>DAI+USDC+USDT+TUSD:</b> <span></span></li>
                     </ul>
                 </td>
             </tr>
