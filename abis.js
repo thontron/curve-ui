@@ -1,9 +1,9 @@
-var N_COINS = 3;
-var coin_precisions = [1e18, 1e6, 1e6];
-var use_lending = [true, true, false];
-var tethered = [false, false, true];
-var swap_address = '0x52EA46506B9CC5Ef470C5bf89f17Dc28bB35D85C';
-var token_address = '0x9fC689CCaDa600B6DF723D9E47D84d76664a1F23';
+var N_COINS = 4;
+var coin_precisions = [1e18, 1e6, 1e6, 1e18];
+var use_lending = [true, true, true, true];
+var tethered = [false, false, true, false];
+var swap_address = '0x7fe97bDc3B8B32e1CDc77d0666023Ececc44ecFD';
+var token_address = '0x7ffFA79Fe475565098951fd187148782337dfC7D';
 var infura_url = 'https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b';
 
 var swap_abi = [
@@ -80,12 +80,12 @@ var swap_abi = [
     "indexed": true
    },
    {
-    "type": "uint256[3]",
+    "type": "uint256[4]",
     "name": "token_amounts",
     "indexed": false
    },
    {
-    "type": "uint256[3]",
+    "type": "uint256[4]",
     "name": "fees",
     "indexed": false
    },
@@ -112,12 +112,12 @@ var swap_abi = [
     "indexed": true
    },
    {
-    "type": "uint256[3]",
+    "type": "uint256[4]",
     "name": "token_amounts",
     "indexed": false
    },
    {
-    "type": "uint256[3]",
+    "type": "uint256[4]",
     "name": "fees",
     "indexed": false
    },
@@ -139,12 +139,12 @@ var swap_abi = [
     "indexed": true
    },
    {
-    "type": "uint256[3]",
+    "type": "uint256[4]",
     "name": "token_amounts",
     "indexed": false
    },
    {
-    "type": "uint256[3]",
+    "type": "uint256[4]",
     "name": "fees",
     "indexed": false
    },
@@ -246,11 +246,11 @@ var swap_abi = [
   "outputs": [],
   "inputs": [
    {
-    "type": "address[3]",
+    "type": "address[4]",
     "name": "_coins"
    },
    {
-    "type": "address[3]",
+    "type": "address[4]",
     "name": "_underlying_coins"
    },
    {
@@ -282,7 +282,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 1327351
+  "gas": 1535185
  },
  {
   "name": "calc_token_amount",
@@ -294,7 +294,7 @@ var swap_abi = [
   ],
   "inputs": [
    {
-    "type": "uint256[3]",
+    "type": "uint256[4]",
     "name": "amounts"
    },
    {
@@ -305,14 +305,14 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 5171741
+  "gas": 6067881
  },
  {
   "name": "add_liquidity",
   "outputs": [],
   "inputs": [
    {
-    "type": "uint256[3]",
+    "type": "uint256[4]",
     "name": "amounts"
    },
    {
@@ -323,7 +323,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 7905846
+  "gas": 9327083
  },
  {
   "name": "get_dy",
@@ -350,7 +350,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 3016651
+  "gas": 3454227
  },
  {
   "name": "get_dx",
@@ -377,7 +377,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 3016657
+  "gas": 3454232
  },
  {
   "name": "get_dy_underlying",
@@ -404,7 +404,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 3016494
+  "gas": 3454087
  },
  {
   "name": "get_dx_underlying",
@@ -431,7 +431,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 3016500
+  "gas": 3454093
  },
  {
   "name": "exchange",
@@ -457,7 +457,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 6109460
+  "gas": 7030208
  },
  {
   "name": "exchange_underlying",
@@ -483,7 +483,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 6125699
+  "gas": 7046149
  },
  {
   "name": "remove_liquidity",
@@ -494,21 +494,21 @@ var swap_abi = [
     "name": "_amount"
    },
    {
-    "type": "uint256[3]",
+    "type": "uint256[4]",
     "name": "min_amounts"
    }
   ],
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 197574
+  "gas": 240409
  },
  {
   "name": "remove_liquidity_imbalance",
   "outputs": [],
   "inputs": [
    {
-    "type": "uint256[3]",
+    "type": "uint256[4]",
     "name": "amounts"
    },
    {
@@ -519,7 +519,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 7905313
+  "gas": 9326310
  },
  {
   "name": "commit_new_parameters",
@@ -541,7 +541,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 145897
+  "gas": 145867
  },
  {
   "name": "apply_new_parameters",
@@ -550,7 +550,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 133512
+  "gas": 133482
  },
  {
   "name": "revert_new_parameters",
@@ -559,7 +559,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 21835
+  "gas": 21805
  },
  {
   "name": "commit_transfer_ownership",
@@ -573,7 +573,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 74512
+  "gas": 74482
  },
  {
   "name": "apply_transfer_ownership",
@@ -582,7 +582,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 60568
+  "gas": 60538
  },
  {
   "name": "revert_transfer_ownership",
@@ -591,7 +591,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 21925
+  "gas": 21895
  },
  {
   "name": "withdraw_admin_fees",
@@ -600,7 +600,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 18169
+  "gas": 22667
  },
  {
   "name": "kill_me",
@@ -609,7 +609,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 37878
+  "gas": 37848
  },
  {
   "name": "unkill_me",
@@ -618,7 +618,7 @@ var swap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 22015
+  "gas": 21985
  },
  {
   "name": "coins",
@@ -637,7 +637,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2190
+  "gas": 2160
  },
  {
   "name": "underlying_coins",
@@ -656,7 +656,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2220
+  "gas": 2190
  },
  {
   "name": "balances",
@@ -675,7 +675,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2250
+  "gas": 2220
  },
  {
   "name": "A",
@@ -689,7 +689,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2081
+  "gas": 2051
  },
  {
   "name": "fee",
@@ -703,7 +703,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2111
+  "gas": 2081
  },
  {
   "name": "admin_fee",
@@ -717,7 +717,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2141
+  "gas": 2111
  },
  {
   "name": "owner",
@@ -731,7 +731,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2171
+  "gas": 2141
  },
  {
   "name": "admin_actions_deadline",
@@ -746,7 +746,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2201
+  "gas": 2171
  },
  {
   "name": "transfer_ownership_deadline",
@@ -761,7 +761,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2231
+  "gas": 2201
  },
  {
   "name": "future_A",
@@ -775,7 +775,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2261
+  "gas": 2231
  },
  {
   "name": "future_fee",
@@ -789,7 +789,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2291
+  "gas": 2261
  },
  {
   "name": "future_admin_fee",
@@ -803,7 +803,7 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2321
+  "gas": 2291
  },
  {
   "name": "future_owner",
@@ -817,9 +817,10 @@ var swap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2351
+  "gas": 2321
  }
 ];
+var yERC20_abi = [{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"payable":true,"stateMutability":"payable","type":"fallback"},{"constant":true,"inputs":[],"name":"aave","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"aaveToken","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"approveToken","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"apr","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"balance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"balanceAave","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"balanceCompound","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"balanceCompoundInToken","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"balanceDydx","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"balanceFulcrum","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"balanceFulcrumInToken","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"calcPoolValueInToken","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"compound","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"dToken","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue","type":"uint256"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"deposit","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"dydx","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"fulcrum","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getAave","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getAaveCore","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getPricePerFullShare","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue","type":"uint256"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"isOwner","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"pool","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"provider","outputs":[{"internalType":"enum yUSDT.Lender","name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"rebalance","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"recommend","outputs":[{"internalType":"enum yUSDT.Lender","name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"renounceOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"_new_APR","type":"address"}],"name":"set_new_APR","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"_new_COMPOUND","type":"address"}],"name":"set_new_COMPOUND","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"_new_DTOKEN","type":"uint256"}],"name":"set_new_DTOKEN","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"_new_FULCRUM","type":"address"}],"name":"set_new_FULCRUM","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"supplyAave","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"supplyCompound","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"supplyDydx","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"supplyFulcrum","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"token","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"_shares","type":"uint256"}],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}];
 var ERC20_abi = [
     {
         "constant": true,

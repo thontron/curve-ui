@@ -88,7 +88,7 @@ async function init_contracts() {
 
     for (let i = 0; i < N_COINS; i++) {
         var addr = await swap.methods.coins(i).call();
-        coins[i] = new web3.eth.Contract(cERC20_abi, addr);
+        coins[i] = new web3.eth.Contract(yERC20_abi, addr);
         var underlying_addr = await swap.methods.underlying_coins(i).call();
         underlying_coins[i] = new web3.eth.Contract(ERC20_abi, underlying_addr);
     }
@@ -102,21 +102,13 @@ function init_menu() {
 }
 
 async function update_rates() {
+    console.log(coins);
     for (let i = 0; i < N_COINS; i++) {
-        /*
-        rate: uint256 = cERC20(self.coins[i]).exchangeRateStored()
-        supply_rate: uint256 = cERC20(self.coins[i]).supplyRatePerBlock()
-        old_block: uint256 = cERC20(self.coins[i]).accrualBlockNumber()
-        rate += rate * supply_rate * (block.number - old_block) / 10 ** 18
-        */
         if (tethered[i] & !use_lending[i])
             c_rates[i] = 1 / coin_precisions[i]
         else {
-            var rate = parseInt(await coins[i].methods.exchangeRateStored().call()) / 1e18 / coin_precisions[i];
-            var supply_rate = parseInt(await coins[i].methods.supplyRatePerBlock().call());
-            var old_block = parseInt(await coins[i].methods.accrualBlockNumber().call());
-            var block = await web3.eth.getBlockNumber();
-            c_rates[i] = rate * (1 + supply_rate * (block - old_block) / 1e18);
+            var rate = parseInt(await coins[i].methods.getPricePerFullShare().call()) / 1e18 / coin_precisions[i];
+            c_rates[i] = rate;
         }
     }
 }
