@@ -80,7 +80,7 @@ function init_ui() {
     $("#add-liquidity").click(handle_add_liquidity);
 }
 
-window.addEventListener('load', async () => {
+window.addEventListener('DOMContentLoaded', async () => {
     init_menu();
 
     if (window.ethereum)
