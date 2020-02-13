@@ -27,13 +27,13 @@ async function ensure_allowance(_amounts) {
             if (current_allowance != 0)
                 await new Promise(resolve => {
                     coins[i].methods.approve(swap_address, 0)
-                    .send({'from': default_account})
+                    .send({'from': default_account, 'gas': 100000})
                     .once('transactionHash', function(hash) {resolve(true);});
                 });
 
             await new Promise(resolve => {
                 coins[i].methods.approve(swap_address, amounts[i])
-                .send({'from': default_account})
+                .send({'from': default_account, 'gas': 100000})
                 .once('transactionHash', function(hash) {resolve(true);});
             });
         }
@@ -54,13 +54,13 @@ async function ensure_underlying_allowance(i, _amount) {
     if (current_allowance != 0)
         await new Promise(resolve => {
             underlying_coins[i].methods.approve(swap_address, 0)
-            .send({'from': default_account})
+            .send({'from': default_account, 'gas': 100000})
             .once('transactionHash', function(hash) {resolve(true);});
         });
 
     return new Promise(resolve => {
         underlying_coins[i].methods.approve(swap_address, amount.toString())
-        .send({'from': default_account})
+        .send({'from': default_account, 'gas': 100000})
         .once('transactionHash', function(hash) {resolve(true);});
     })
 }
@@ -72,7 +72,7 @@ async function ensure_token_allowance() {
     if (parseInt(await swap_token.methods.allowance(default_account, swap_address).call()) == 0)
         return new Promise(resolve => {
             swap_token.methods.approve(swap_address, BigInt(max_allowance).toString())
-            .send({'from': default_account})
+            .send({'from': default_account, 'gas': 100000})
             .once('transactionHash', function(hash) {resolve(true);});
         })
     else
