@@ -12,18 +12,32 @@ var admin_fee;
 const trade_timeout = 1800;
 const max_allowance = BigInt(2) ** BigInt(256) - BigInt(1);
 
-async function ensure_allowance() {
+async function ensure_allowance(_amounts) {
     var default_account = (await web3.eth.getAccounts())[0];
-    var promises = new Array(N_COINS);
-    for (let i=0; i < N_COINS; i++)
-        if (parseInt(await coins[i].methods.allowance(default_account, swap_address).call()) < wallet_balances[i])
-            promises[i] = new Promise(resolve => {
-                coins[i].methods.approve(swap_address, max_allowance.toString())
+    var amounts;
+    if (_amounts == null) {
+        amounts = new Array(N_COINS);
+        for (let i=0; i < N_COINS; i++)
+            amounts[i] = max_allowance.toString();
+    } else
+        amounts = _amounts;
+    for (let i=0; i < N_COINS; i++) {
+        var current_allowance = parseInt(await coins[i].methods.allowance(default_account, swap_address).call());
+        if ((current_allowance < wallet_balances[i]) & (amounts[i] != 0)) {
+            if (current_allowance != 0)
+                await new Promise(resolve => {
+                    coins[i].methods.approve(swap_address, 0)
+                    .send({'from': default_account})
+                    .once('transactionHash', function(hash) {resolve(true);});
+                });
+
+            await new Promise(resolve => {
+                coins[i].methods.approve(swap_address, amounts[i])
                 .send({'from': default_account})
                 .once('transactionHash', function(hash) {resolve(true);});
             });
-    for (let i=0; i < N_COINS; i++)
-        await promises[i];
+        }
+    }
 }
 
 async function ensure_underlying_allowance(i, _amount) {
