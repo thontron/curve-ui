@@ -94,7 +94,7 @@ function init_ui() {
     $("#remove-liquidity").click(handle_remove_liquidity);
 }
 
-window.addEventListener('load', async () => {
+window.addEventListener('DOMContentLoaded', async () => {
     init_menu();
 
     if (window.ethereum)

@@ -116,7 +116,7 @@ async function init_ui() {
     $("#from_currency").on("input", highlight_input);
 }
 
-window.addEventListener('load', async () => {
+window.addEventListener('DOMContentLoaded', async () => {
     init_menu();
 
     if (window.ethereum)
