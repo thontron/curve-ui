@@ -40,7 +40,7 @@ body {
 }
 
 .window.half-width {
-  width: 50%;
+  width: 80%;
 }
 
 .window :link {
@@ -85,8 +85,8 @@ button,
 
 button.full-width,
 .button.full-width {
-	display: block;
-	text-align: center;
+  display: block;
+  text-align: center;
 }
 
 button:before,
@@ -202,7 +202,7 @@ li {
   text-align: center;
 }
 
-.top-menu-bar a {
+.top-menu-bar a, .top-menu-bar .icon-container {
   margin: 0 1em;
   text-decoration: none;
   color: black;
@@ -221,6 +221,14 @@ li {
 .top-menu-bar a.selected {
     background-color: #505050;
     color: #c0c0c0;
+}
+
+@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+  .top-menu-bar a, .top-menu-bar .icon-container {
+    display: block;
+    margin: 0;
+    padding: 0.5em 0;
+  }
 }
 
 div.add-liquidity input {
@@ -249,6 +257,27 @@ p.exchange-rate {
     font-weight: bold;
 }
 
+.info {
+  display: flex;
+}
+
+@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+  .info {
+    flex-direction: column;
+  }
+}
+
+.info > fieldset {
+  flex: 1;
+  padding: 1em;
+  border: 0;
+}
+
+.info > div,
+.info > div fieldset {
+  height: 100%;
+}
+
 div.info table {
     width: 100%;
 }
@@ -257,6 +286,58 @@ div.info table td {
     vertical-align: top;
 }
 
+@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+  div.info table td {
+    display: block;
+  }
+}
+
 #lp-info-container {
     display: none;
+}
+
+@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+  #lp-info-container {
+    margin-top: 1em;
+  }
+  .border-menu {
+    display: block;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .top-menu-bar a {
+    display: none;
+  }
+  #hamburger:checked ~ a {
+    display: block;
+  }
+}
+
+.icon-container {
+  height: 15px;
+  position: relative;
+}
+
+.border-menu { 
+    position: relative;         
+    border-radius: 2px; 
+    height: 10px; 
+    width: 10px;
+    cursor: pointer;
+    height: 20px;
+    padding: 6px;
+}
+.border-menu:before { 
+    border-bottom: 10px double black;
+    border-top: 3px solid black;    
+    content:"";
+    height: 4px; 
+    position: absolute; 
+    width:30px;
+}
+
+@media only screen and (min-device-width : 480px) {
+  .border-menu {
+    display: none;
+  }
 }

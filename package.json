@@ -1,0 +1,23 @@
+{
+  "name": "curve-ui",
+  "version": "1.0.0",
+  "description": "<p align=\"center\">   <img src=\"https://raw.githubusercontent.com/curvefi/curve-ui/feature/add-info/assets/curve-image.jpeg\" /> </p>",
+  "main": "abis.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pengiundev/curve-ui.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pengiundev/curve-ui/issues"
+  },
+  "homepage": "https://github.com/pengiundev/curve-ui#readme",
+  "dependencies": {
+    "@walletconnect/web3-provider": "^1.0.0-beta.47",
+    "web3connect": "^1.0.0-beta.32"
+  }
+}

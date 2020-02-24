@@ -68,7 +68,7 @@ async function ensure_token_allowance() {
 
 async function init_contracts() {
     web3.eth.net.getId((err, result) => {
-        if (result == 1) {
+/*        if (result == 1) {
             if (web3.currentProvider.constructor.name == 's') {
                 $('#error-window').text('Error: please use Metamask to do transactions');
                 $('#error-window').show();
@@ -76,8 +76,8 @@ async function init_contracts() {
             else
                 $('#error-window').hide();
         }
-        else
-        {
+        else*/
+        if(result != 1) {
             $('#error-window').text('Error: wrong network type. Please switch to mainnet');
             $('#error-window').show();
         }
@@ -121,11 +121,19 @@ async function update_fee_info() {
     var bal_info = $('#balances-info li span');
     await update_rates();
     var total = 0;
+    var promises = [];
     for (let i = 0; i < N_COINS; i++) {
-        balances[i] = parseInt(await swap.methods.balances(i).call());
+        promises.push(swap.methods.balances(i).call())
+/*        balances[i] = parseInt(await swap.methods.balances(i).call());
+        $(bal_info[i]).text((balances[i] * c_rates[i]).toFixed(2));
+        total += balances[i] * c_rates[i];*/
+    }
+    let resolves = await Promise.all(promises)
+    resolves.forEach((balance, i) => {
+        balances[i] = +balance;
         $(bal_info[i]).text((balances[i] * c_rates[i]).toFixed(2));
         total += balances[i] * c_rates[i];
-    }
+    })
     $(bal_info[N_COINS]).text(total.toFixed(2));
     fee = parseInt(await swap.methods.fee().call()) / 1e10;
     admin_fee = parseInt(await swap.methods.admin_fee().call()) / 1e10;
