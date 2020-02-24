@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/pengiundev/curve-ui#readme",
   "dependencies": {
+    "@burner-wallet/burner-connect-provider": "^0.1.1",
     "@walletconnect/web3-provider": "^1.0.0-beta.47",
+    "authereum": "0.0.4-beta.100",
     "web3connect": "^1.0.0-beta.32"
   }
 }

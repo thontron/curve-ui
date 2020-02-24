@@ -23,6 +23,9 @@ var chart_options = {
             formatter: function (val) {
                 return (Math.floor(val * 100) / 100).toFixed(2);
             }
+        },
+        max: function(max) {
+            return max+0.2
         }
     },
     tooltip: {
