@@ -93,8 +93,8 @@ async function handle_trade() {
             await ensure_underlying_allowance(i, dx);
         min_dy = BigInt(min_dy).toString();
         await swap.methods.exchange_underlying(i, j, dx, min_dy, deadline).send({
-            from: default_account,
-            gasLimit: '0x124f80',
+                from: default_account,
+                gas: 120000,
             });
         await update_fee_info();
         from_cur_handler();
