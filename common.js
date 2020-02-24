@@ -82,16 +82,7 @@ async function ensure_token_allowance() {
 
 async function init_contracts() {
     web3.eth.net.getId((err, result) => {
-        if (result == 1) {
-            if (web3.currentProvider.constructor.name == 's') {
-                $('#error-window').text('Error: please use Metamask to do transactions');
-                $('#error-window').show();
-            }
-            else
-                $('#error-window').hide();
-        }
-        else
-        {
+        if (result != 1) {
             $('#error-window').text('Error: wrong network type. Please switch to mainnet');
             $('#error-window').show();
         }
