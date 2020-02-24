@@ -93,8 +93,9 @@ async function handle_trade() {
             await ensure_underlying_allowance(i, dx);
         min_dy = BigInt(min_dy).toString();
         await swap.methods.exchange_underlying(i, j, dx, min_dy, deadline).send({
-            'from': default_account,
-            'gas': 1200000});
+            from: default_account,
+            gasLimit: '0x124f80',
+            });
         await update_fee_info();
         from_cur_handler();
     }
@@ -106,6 +107,8 @@ async function init_ui() {
 
     $("#from_cur_0").attr('checked', true);
     $("#to_cur_1").attr('checked', true);
+
+    $("#from_currency").attr('disabled', false)
 
     $('#from_currency').on('input', set_to_amount);
     $('#from_currency').click(function() {this.select()});

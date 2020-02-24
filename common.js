@@ -122,8 +122,10 @@ async function update_fee_info() {
     await update_rates();
     var total = 0;
     var promises = [];
+    let infuraProvider = new Web3(infura_url)
+    swapInfura = new infuraProvider.eth.Contract(swap_abi, swap_address);
     for (let i = 0; i < N_COINS; i++) {
-        promises.push(swap.methods.balances(i).call())
+        promises.push(swapInfura.methods.balances(i).call())
 /*        balances[i] = parseInt(await swap.methods.balances(i).call());
         $(bal_info[i]).text((balances[i] * c_rates[i]).toFixed(2));
         total += balances[i] * c_rates[i];*/
