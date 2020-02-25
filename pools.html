@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>🌀 Curve.fi :: Compounded</title>
+    <link rel="stylesheet" href="tvision.css?v19012020" />
+    <script src="/jquery.min.js"></script>
+    <script src="/common.js?v25022020"></script>
+    <script>
+        var activePoolLink = 0;
+        window.addEventListener('load', async () => {
+            init_menu();
+            $('.poolsdialog > div').eq(activePoolLink).addClass('selected')
+        });
+        document.addEventListener('keydown', e => {
+            if(e.code == 'ArrowUp' && activePoolLink != 0) {
+                $('.poolsdialog > div').eq(activePoolLink).removeClass('selected')
+                $('.poolsdialog > div').eq(--activePoolLink).addClass('selected')                
+            }
+            if(e.code == 'ArrowDown' && activePoolLink < 2) {
+                $('.poolsdialog > div').eq(activePoolLink).removeClass('selected')
+                $('.poolsdialog > div').eq(++activePoolLink).addClass('selected')    
+            }
+            if(e.code == 'Digit0') {
+                $('.poolsdialog > div').eq(activePoolLink).removeClass('selected')
+                activePoolLink = 0
+                $('.poolsdialog > div').eq(activePoolLink).addClass('selected')
+            }
+            if(e.code == 'Digit1') {
+                $('.poolsdialog > div').eq(activePoolLink).removeClass('selected')
+                activePoolLink = 1
+                $('.poolsdialog > div').eq(activePoolLink).addClass('selected')
+            }
+            if(e.code == 'Digit2') {
+                $('.poolsdialog > div').eq(activePoolLink).removeClass('selected')
+                activePoolLink = 2
+                $('.poolsdialog > div').eq(activePoolLink).addClass('selected')
+            }
+        })
+    </script>
+  </head>
+  <body>
+    <div class="top-menu-bar">
+      <label for="hamburger" class='border-menu'></label>
+      <input type="checkbox" id="hamburger"/>
+      
+      <div id='poolsdropdown'>
+        <a href='/pools.html'>Pools</a>
+        <div class='dropdown'>
+            <a href='#'>Compound</a>
+            <a href='#'>USDT</a>
+            <a href='#'>Y</a>
+        </div>
+      </div>
+      <a href="/">Buy and sell</a>
+      <a href="/deposit.html">Deposit</a>
+      <a href="/withdraw.html">Withdraw</a>
+      <a href="/stats.html">Stats</a>
+      <a href="/faq.html">FAQ</a>
+      <a href="https://github.com/curvefi/curve-contract/tree/compounded">git@</a>
+    </div>
+    <div id="screen">
+        <div class="blue window">
+            <h1>🌀 Curve</h1>
+        </div>
+
+        <div class="window white">
+            <fieldset class='poolsdialog'>
+                <legend>Curve pools</legend>
+                <div>
+                    <span>0</span>
+                    <a href='#'>Compound</a>
+                </div>
+                <div>
+                    <span>1</span>
+                    <a href='#'>USDT</a>
+                </div>
+                <div>
+                    <span>2</span>
+                    <a href='#'>Y</a>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+  </body>
+</html>
