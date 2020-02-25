@@ -140,6 +140,12 @@ input, textarea {
   max-width: 100%;
   font-size: 12pt;
 }
+
+input {
+  padding: 1px 0 1px 0;
+  border-radius: 0;
+}
+
 input:disabled {
   background: #505070;
   color: #d0d0d0;
@@ -202,23 +208,23 @@ li {
   text-align: center;
 }
 
-.top-menu-bar a, .top-menu-bar .icon-container {
+.top-menu-bar a, .poolsdialog a .top-menu-bar .icon-container {
   margin: 0 1em;
   text-decoration: none;
   color: black;
   padding: 0 1em;
 }
 
-.top-menu-bar a:visited {
+.top-menu-bar a:visited, .poolsdialog a:visited {
     color: black;
 }
 
-.top-menu-bar a:hover {
+.top-menu-bar a:hover, .poolsdialog div.selected {
     background-color: blue;
     color: white;
 }
 
-.top-menu-bar a.selected {
+.top-menu-bar a.selected, .poolsdialog div:hover {
     background-color: #505050;
     color: #c0c0c0;
 }
@@ -308,8 +314,12 @@ div.info table td {
   .top-menu-bar a {
     display: none;
   }
-  #hamburger:checked ~ a {
+  #hamburger:checked ~ a, #hamburger:checked ~ div, #hamburger:checked ~ div > a {
     display: block;
+  }
+  /*fix selector priority*/
+  .top-menu-bar.top-menu-bar #poolsdropdown:hover .dropdown {
+    display: none;
   }
 }
 
@@ -340,4 +350,59 @@ div.info table td {
   .border-menu {
     display: none;
   }
+}
+
+.poolsdialog legend {
+  text-align: center;
+}
+
+.poolsdialog a {
+  display: inline-block;
+}
+.poolsdialog > div {
+  cursor: pointer;
+}
+.poolsdialog > div > span{
+  padding-right: 2em;
+}
+/* fixing selector priority */
+.window .poolsdialog a:hover {
+  text-decoration: none;
+}
+
+.top-menu-bar > #poolsdropdown {
+  display: inline-block;
+  cursor: pointer;
+  position: relative;
+}
+
+.top-menu-bar #poolsdropdown:hover {
+  background-color: blue;
+  color: white;
+}
+
+.top-menu-bar #poolsdropdown:hover .dropdown {
+  display: block;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  min-width: 200px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #c0c0c0;
+  z-index: 1;
+  box-shadow: 0 0 0 3px silver, 1em 1em 3px 0 rgba(0,0,0,.5);
+}
+
+#poolsdropdown > a {
+  margin: 0;
+}
+
+.dropdown > a {
+  display: block;
+  margin: 0;
+  padding-left: 0.5em;
+  text-align: left;
 }

@@ -39,8 +39,14 @@ async function handle_add_liquidity() {
     update_fee_info();
 }
 
-function init_ui() {
+async function init_ui() {
+    let infapproval = true;
     for (let i = 0; i < N_COINS; i++) {
+        var default_account = (await web3.eth.getAccounts())[0];
+        if (BigInt(await underlying_coins[i].methods.allowance(default_account, swap_address).call()) <= max_allowance / BigInt(2)) {
+            infapproval = false;
+        }
+
         $('#currency_' + i).on('input', function() {
             var el = $('#currency_' + i);
             if (this.value > wallet_balances[i] * c_rates[i])
@@ -75,23 +81,21 @@ function init_ui() {
         });
     }
 
+    if(infapproval)
+        $('#inf-approval').prop('checked', true)
+    else 
+        $('#inf-approval').prop('checked', false)
+
+
+
     $('#sync-balances').change(handle_sync_balances);
     $('#max-balances').change(handle_sync_balances);
     $("#add-liquidity").click(handle_add_liquidity);
 }
 
 window.addEventListener('load', async () => {
-    init_menu();
+    await init();
 
-    if (window.ethereum)
-    {
-        window.web3 = new Web3(ethereum);
-        await ethereum.enable();
-    }
-    else
-        window.web3 = new Web3(infura_url);
-    await init_contracts();
-    init_ui();
     update_fee_info();
     await handle_sync_balances();
 });

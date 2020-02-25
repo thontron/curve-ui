@@ -1,4 +1,4 @@
-window.addEventListener('load', async () => {
+async function init() {
     init_menu();
 
     const WalletConnectProvider = window.WalletConnectProvider.default
@@ -65,4 +65,5 @@ window.addEventListener('load', async () => {
 
     await init_ui();
 
-});
+}
+window.addEventListener('load', init);
