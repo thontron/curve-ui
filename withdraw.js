@@ -95,16 +95,8 @@ function init_ui() {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-    init_menu();
-
-    if (window.ethereum)
-    {
-        window.web3 = new Web3(ethereum);
-        await ethereum.enable();
-    }
-    else
-        window.web3 = new Web3(infura_url);
-    await init_contracts();
+    await init();
+    
     await update_rates();
     await update_balances();
     init_ui();

@@ -115,17 +115,3 @@ async function init_ui() {
     from_cur_handler();
     $("#from_currency").on("input", highlight_input);
 }
-
-window.addEventListener('DOMContentLoaded', async () => {
-    init_menu();
-
-    if (window.ethereum)
-    {
-        window.web3 = new Web3(ethereum);
-        await ethereum.enable();
-    }
-    else
-        window.web3 = new Web3(infura_url);
-    await init_contracts();
-    await init_ui();
-});
