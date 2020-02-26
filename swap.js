@@ -108,8 +108,6 @@ async function init_ui() {
     $("#from_cur_0").attr('checked', true);
     $("#to_cur_1").attr('checked', true);
 
-    $("#from_currency").attr('disabled', false)
-
     $('#from_currency').on('input', set_to_amount);
     $('#from_currency').click(function() {this.select()});
 
@@ -122,4 +120,6 @@ async function init_ui() {
 
 window.addEventListener('load', async () => {
     await init();
+    await init_ui();
+    $("#from_currency").attr('disabled', false)
 });
