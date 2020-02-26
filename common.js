@@ -160,4 +160,3 @@ async function update_fee_info() {
         }
     }
 }
-
