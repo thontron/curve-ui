@@ -114,6 +114,7 @@ async function init_ui() {
 
     await update_fee_info();
     from_cur_handler();
+    $("#from_currency").attr('disabled', false)
     $("#from_currency").on("input", highlight_input);
 }
 
