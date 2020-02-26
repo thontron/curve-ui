@@ -46,7 +46,7 @@ async function from_cur_handler() {
     to_currency = $('input[type=radio][name=to_cur]:checked').val();
     var default_account = (await web3.eth.getAccounts())[0];
 
-    if (BigInt(await underlying_coins[from_currency].methods.allowance(default_account, swap_address).call()) > max_allowance / BigInt(2))
+    if (BigInt(await underlying_coins[from_currency].methods.allowance(default_account, newswap_address).call()) > max_allowance / BigInt(2))
         $('#inf-approval').prop('checked', true)
     else
         $('#inf-approval').prop('checked', false);

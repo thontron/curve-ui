@@ -14,8 +14,8 @@
     <script src="/web3providers/fortmatic.min.js"></script>
     <script src="/abis.js?v21012020_2"></script>
     <script src="/common.js?v25022020_2"></script>
-    <script src="/swap.js?v25022020_2"></script>
     <script src="/init.js?v25022020"></script>
+    <script src="/swap.js?v25022020_2"></script>
   </head>
   <body>
     <div class="top-menu-bar">
@@ -34,6 +34,7 @@
       <a href="/">Buy and sell</a>
       <a href="/deposit.html">Deposit</a>
       <a href="/withdraw.html">Withdraw</a>
+      <a href="/withdraw_old.html">Withdraw old</a>
       <a href="/stats.html">Stats</a>
       <a href="/faq.html">FAQ</a>
       <a href="https://github.com/curvefi/curve-contract/tree/pool_compound">git@</a>
@@ -50,7 +51,7 @@
                     <legend>From:</legend>
                     <ul>
                         <li>
-                            <input type="text" id="from_currency" name="from_currency">
+                            <input type="text" id="from_currency" disabled name="from_currency">
                         </li>
                         <li>
                             <input type="radio" id="from_cur_0" name="from_cur" value="0">

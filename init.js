@@ -60,8 +60,5 @@ async function init() {
         window.web3 = new Web3(infura_url);*/
     await init_contracts();
 
-    //remove the comment, commenting for faster testing
-    $("#from_currency").attr('disabled', true)
-
     await init_ui();
 }

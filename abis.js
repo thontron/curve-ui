@@ -1,8 +1,775 @@
 var N_COINS = 2;
 var coin_precisions = [1e18, 1e6];
 var swap_address = '0x2e60CF74d81ac34eB21eEff58Db4D385920ef419';
+var newswap_address = '0xA2B47E3D5c44877cca798226B7B8118F9BFb7A56';
+var newtoken_address = '0x3740fb63ab7a09891d7c0d4299442A551D06F5fD';
 var token_address = '0x3740fb63ab7a09891d7c0d4299442A551D06F5fD';
+var migration_address = '0xd133D1f0359dfEAdF1FA7bB655E2e1C76bE2f778';
 var infura_url = 'https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b';
+
+var migration_abi = [
+ {
+  "outputs": [],
+  "inputs": [
+   {
+    "type": "address",
+    "name": "_old"
+   },
+   {
+    "type": "address",
+    "name": "_old_token"
+   },
+   {
+    "type": "address",
+    "name": "_new"
+   },
+   {
+    "type": "address",
+    "name": "_new_token"
+   },
+   {
+    "type": "address[2]",
+    "name": "_coins"
+   }
+  ],
+  "constant": false,
+  "payable": false,
+  "type": "constructor"
+ },
+ {
+  "name": "migrate",
+  "outputs": [],
+  "inputs": [],
+  "constant": false,
+  "payable": false,
+  "type": "function",
+  "gas": 106812
+ },
+ {
+  "name": "coins",
+  "outputs": [
+   {
+    "type": "address",
+    "name": "out"
+   }
+  ],
+  "inputs": [
+   {
+    "type": "int128",
+    "name": "arg0"
+   }
+  ],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 1380
+ }
+]
+
+var newswap_abi = [
+ {
+  "name": "TokenExchange",
+  "inputs": [
+   {
+    "type": "address",
+    "name": "buyer",
+    "indexed": true
+   },
+   {
+    "type": "int128",
+    "name": "sold_id",
+    "indexed": false
+   },
+   {
+    "type": "uint256",
+    "name": "tokens_sold",
+    "indexed": false
+   },
+   {
+    "type": "int128",
+    "name": "bought_id",
+    "indexed": false
+   },
+   {
+    "type": "uint256",
+    "name": "tokens_bought",
+    "indexed": false
+   }
+  ],
+  "anonymous": false,
+  "type": "event"
+ },
+ {
+  "name": "TokenExchangeUnderlying",
+  "inputs": [
+   {
+    "type": "address",
+    "name": "buyer",
+    "indexed": true
+   },
+   {
+    "type": "int128",
+    "name": "sold_id",
+    "indexed": false
+   },
+   {
+    "type": "uint256",
+    "name": "tokens_sold",
+    "indexed": false
+   },
+   {
+    "type": "int128",
+    "name": "bought_id",
+    "indexed": false
+   },
+   {
+    "type": "uint256",
+    "name": "tokens_bought",
+    "indexed": false
+   }
+  ],
+  "anonymous": false,
+  "type": "event"
+ },
+ {
+  "name": "AddLiquidity",
+  "inputs": [
+   {
+    "type": "address",
+    "name": "provider",
+    "indexed": true
+   },
+   {
+    "type": "uint256[2]",
+    "name": "token_amounts",
+    "indexed": false
+   },
+   {
+    "type": "uint256",
+    "name": "invariant",
+    "indexed": false
+   },
+   {
+    "type": "uint256",
+    "name": "token_supply",
+    "indexed": false
+   }
+  ],
+  "anonymous": false,
+  "type": "event"
+ },
+ {
+  "name": "RemoveLiquidity",
+  "inputs": [
+   {
+    "type": "address",
+    "name": "provider",
+    "indexed": true
+   },
+   {
+    "type": "uint256[2]",
+    "name": "token_amounts",
+    "indexed": false
+   },
+   {
+    "type": "uint256[2]",
+    "name": "fees",
+    "indexed": false
+   },
+   {
+    "type": "uint256",
+    "name": "invariant",
+    "indexed": false
+   },
+   {
+    "type": "uint256",
+    "name": "token_supply",
+    "indexed": false
+   }
+  ],
+  "anonymous": false,
+  "type": "event"
+ },
+ {
+  "name": "CommitNewAdmin",
+  "inputs": [
+   {
+    "type": "uint256",
+    "name": "deadline",
+    "indexed": true,
+    "unit": "sec"
+   },
+   {
+    "type": "address",
+    "name": "admin",
+    "indexed": true
+   }
+  ],
+  "anonymous": false,
+  "type": "event"
+ },
+ {
+  "name": "NewAdmin",
+  "inputs": [
+   {
+    "type": "address",
+    "name": "admin",
+    "indexed": true
+   }
+  ],
+  "anonymous": false,
+  "type": "event"
+ },
+ {
+  "name": "CommitNewParameters",
+  "inputs": [
+   {
+    "type": "uint256",
+    "name": "deadline",
+    "indexed": true,
+    "unit": "sec"
+   },
+   {
+    "type": "int128",
+    "name": "A",
+    "indexed": false
+   },
+   {
+    "type": "int128",
+    "name": "fee",
+    "indexed": false
+   },
+   {
+    "type": "int128",
+    "name": "admin_fee",
+    "indexed": false
+   }
+  ],
+  "anonymous": false,
+  "type": "event"
+ },
+ {
+  "name": "NewParameters",
+  "inputs": [
+   {
+    "type": "int128",
+    "name": "A",
+    "indexed": false
+   },
+   {
+    "type": "int128",
+    "name": "fee",
+    "indexed": false
+   },
+   {
+    "type": "int128",
+    "name": "admin_fee",
+    "indexed": false
+   }
+  ],
+  "anonymous": false,
+  "type": "event"
+ },
+ {
+  "outputs": [],
+  "inputs": [
+   {
+    "type": "address[2]",
+    "name": "_coins"
+   },
+   {
+    "type": "address[2]",
+    "name": "_underlying_coins"
+   },
+   {
+    "type": "address",
+    "name": "_pool_token"
+   },
+   {
+    "type": "int128",
+    "name": "_A"
+   },
+   {
+    "type": "int128",
+    "name": "_fee"
+   }
+  ],
+  "constant": false,
+  "payable": false,
+  "type": "constructor"
+ },
+ {
+  "name": "get_virtual_price",
+  "outputs": [
+   {
+    "type": "uint256",
+    "name": "out"
+   }
+  ],
+  "inputs": [],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 1083195
+ },
+ {
+  "name": "add_liquidity",
+  "outputs": [],
+  "inputs": [
+   {
+    "type": "uint256[2]",
+    "name": "amounts"
+   },
+   {
+    "type": "uint256",
+    "unit": "sec",
+    "name": "deadline"
+   }
+  ],
+  "constant": false,
+  "payable": false,
+  "type": "function",
+  "gas": 2266965
+ },
+ {
+  "name": "get_dy",
+  "outputs": [
+   {
+    "type": "uint256",
+    "name": "out"
+   }
+  ],
+  "inputs": [
+   {
+    "type": "int128",
+    "name": "i"
+   },
+   {
+    "type": "int128",
+    "name": "j"
+   },
+   {
+    "type": "uint256",
+    "name": "dx"
+   }
+  ],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 2540055
+ },
+ {
+  "name": "get_dy_underlying",
+  "outputs": [
+   {
+    "type": "uint256",
+    "name": "out"
+   }
+  ],
+  "inputs": [
+   {
+    "type": "int128",
+    "name": "i"
+   },
+   {
+    "type": "int128",
+    "name": "j"
+   },
+   {
+    "type": "uint256",
+    "name": "dx"
+   }
+  ],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 2540024
+ },
+ {
+  "name": "exchange",
+  "outputs": [],
+  "inputs": [
+   {
+    "type": "int128",
+    "name": "i"
+   },
+   {
+    "type": "int128",
+    "name": "j"
+   },
+   {
+    "type": "uint256",
+    "name": "dx"
+   },
+   {
+    "type": "uint256",
+    "name": "min_dy"
+   },
+   {
+    "type": "uint256",
+    "unit": "sec",
+    "name": "deadline"
+   }
+  ],
+  "constant": false,
+  "payable": false,
+  "type": "function",
+  "gas": 1000000
+ },
+ {
+  "name": "exchange_underlying",
+  "outputs": [],
+  "inputs": [
+   {
+    "type": "int128",
+    "name": "i"
+   },
+   {
+    "type": "int128",
+    "name": "j"
+   },
+   {
+    "type": "uint256",
+    "name": "dx"
+   },
+   {
+    "type": "uint256",
+    "name": "min_dy"
+   },
+   {
+    "type": "uint256",
+    "unit": "sec",
+    "name": "deadline"
+   }
+  ],
+  "constant": false,
+  "payable": false,
+  "type": "function",
+  "gas": 1000000
+ },
+ {
+  "name": "remove_liquidity",
+  "outputs": [],
+  "inputs": [
+   {
+    "type": "uint256",
+    "name": "_amount"
+   },
+   {
+    "type": "uint256",
+    "unit": "sec",
+    "name": "deadline"
+   },
+   {
+    "type": "uint256[2]",
+    "name": "min_amounts"
+   }
+  ],
+  "constant": false,
+  "payable": false,
+  "type": "function",
+  "gas": 1220465
+ },
+ {
+  "name": "remove_liquidity_imbalance",
+  "outputs": [],
+  "inputs": [
+   {
+    "type": "uint256[2]",
+    "name": "amounts"
+   },
+   {
+    "type": "uint256",
+    "unit": "sec",
+    "name": "deadline"
+   }
+  ],
+  "constant": false,
+  "payable": false,
+  "type": "function",
+  "gas": 2346381
+ },
+ {
+  "name": "commit_new_parameters",
+  "outputs": [],
+  "inputs": [
+   {
+    "type": "int128",
+    "name": "amplification"
+   },
+   {
+    "type": "int128",
+    "name": "new_fee"
+   },
+   {
+    "type": "int128",
+    "name": "new_admin_fee"
+   }
+  ],
+  "constant": false,
+  "payable": false,
+  "type": "function",
+  "gas": 146017
+ },
+ {
+  "name": "apply_new_parameters",
+  "outputs": [],
+  "inputs": [],
+  "constant": false,
+  "payable": false,
+  "type": "function",
+  "gas": 133362
+ },
+ {
+  "name": "revert_new_parameters",
+  "outputs": [],
+  "inputs": [],
+  "constant": false,
+  "payable": false,
+  "type": "function",
+  "gas": 21685
+ },
+ {
+  "name": "commit_transfer_ownership",
+  "outputs": [],
+  "inputs": [
+   {
+    "type": "address",
+    "name": "_owner"
+   }
+  ],
+  "constant": false,
+  "payable": false,
+  "type": "function",
+  "gas": 74362
+ },
+ {
+  "name": "apply_transfer_ownership",
+  "outputs": [],
+  "inputs": [],
+  "constant": false,
+  "payable": false,
+  "type": "function",
+  "gas": 60418
+ },
+ {
+  "name": "revert_transfer_ownership",
+  "outputs": [],
+  "inputs": [],
+  "constant": false,
+  "payable": false,
+  "type": "function",
+  "gas": 21775
+ },
+ {
+  "name": "withdraw_admin_fees",
+  "outputs": [],
+  "inputs": [],
+  "constant": false,
+  "payable": false,
+  "type": "function",
+  "gas": 12403
+ },
+ {
+  "name": "coins",
+  "outputs": [
+   {
+    "type": "address",
+    "name": "out"
+   }
+  ],
+  "inputs": [
+   {
+    "type": "int128",
+    "name": "arg0"
+   }
+  ],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 2040
+ },
+ {
+  "name": "underlying_coins",
+  "outputs": [
+   {
+    "type": "address",
+    "name": "out"
+   }
+  ],
+  "inputs": [
+   {
+    "type": "int128",
+    "name": "arg0"
+   }
+  ],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 2070
+ },
+ {
+  "name": "balances",
+  "outputs": [
+   {
+    "type": "uint256",
+    "name": "out"
+   }
+  ],
+  "inputs": [
+   {
+    "type": "int128",
+    "name": "arg0"
+   }
+  ],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 2100
+ },
+ {
+  "name": "A",
+  "outputs": [
+   {
+    "type": "int128",
+    "name": "out"
+   }
+  ],
+  "inputs": [],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 1931
+ },
+ {
+  "name": "fee",
+  "outputs": [
+   {
+    "type": "int128",
+    "name": "out"
+   }
+  ],
+  "inputs": [],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 1961
+ },
+ {
+  "name": "admin_fee",
+  "outputs": [
+   {
+    "type": "int128",
+    "name": "out"
+   }
+  ],
+  "inputs": [],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 1991
+ },
+ {
+  "name": "owner",
+  "outputs": [
+   {
+    "type": "address",
+    "name": "out"
+   }
+  ],
+  "inputs": [],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 2021
+ },
+ {
+  "name": "admin_actions_deadline",
+  "outputs": [
+   {
+    "type": "uint256",
+    "unit": "sec",
+    "name": "out"
+   }
+  ],
+  "inputs": [],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 2051
+ },
+ {
+  "name": "transfer_ownership_deadline",
+  "outputs": [
+   {
+    "type": "uint256",
+    "unit": "sec",
+    "name": "out"
+   }
+  ],
+  "inputs": [],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 2081
+ },
+ {
+  "name": "future_A",
+  "outputs": [
+   {
+    "type": "int128",
+    "name": "out"
+   }
+  ],
+  "inputs": [],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 2111
+ },
+ {
+  "name": "future_fee",
+  "outputs": [
+   {
+    "type": "int128",
+    "name": "out"
+   }
+  ],
+  "inputs": [],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 2141
+ },
+ {
+  "name": "future_admin_fee",
+  "outputs": [
+   {
+    "type": "int128",
+    "name": "out"
+   }
+  ],
+  "inputs": [],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 2171
+ },
+ {
+  "name": "future_owner",
+  "outputs": [
+   {
+    "type": "address",
+    "name": "out"
+   }
+  ],
+  "inputs": [],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 2201
+ }
+];
 
 var swap_abi = [
  {
@@ -708,6 +1475,7 @@ var swap_abi = [
   "gas": 2201
  }
 ];
+
 var ERC20_abi = [
     {
         "constant": true,
