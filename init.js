@@ -64,6 +64,4 @@ async function init() {
     $("#from_currency").attr('disabled', true)
 
     await init_ui();
-
 }
-window.addEventListener('load', init);
