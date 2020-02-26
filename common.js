@@ -60,18 +60,10 @@ async function ensure_underlying_allowance(i, _amount) {
     if ((_amount == max_allowance) & (current_allowance > max_allowance / BigInt(2)))
         return false;  // It does get spent slowly, but that's ok
 
-    if (current_allowance != 0)
-        await new Promise(resolve => {
-            underlying_coins[i].methods.approve(swap_address, 0)
-            .send({'from': default_account})
-            .once('transactionHash', function(hash) {resolve(true);});
-        });
+    if ((current_allowance > 0) & (current_allowance < amount))
+        await approve(underlying_coins[i], 0, default_account);
 
-    return new Promise(resolve => {
-        underlying_coins[i].methods.approve(swap_address, amount.toString())
-        .send({'from': default_account})
-        .once('transactionHash', function(hash) {resolve(true);});
-    })
+    return await approve(underlying_coins[i], amount, default_account);
 }
 
 // XXX not needed anymore
