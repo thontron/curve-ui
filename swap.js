@@ -34,6 +34,7 @@ async function set_to_amount() {
         var dy = dy_.toFixed(2);
         $('#to_currency').val(dy);
         $('#exchange-rate').text((dy_ / dx_).toFixed(4));
+        $('#from_currency').prop('disabled', false);
     }
     else
         $('#from_currency').prop('disabled', true);
@@ -108,7 +109,6 @@ async function init_ui() {
     $("#from_cur_0").attr('checked', true);
     $("#to_cur_1").attr('checked', true);
 
-    $("#from_currency").attr('disabled', false)
 
     $('#from_currency').on('input', set_to_amount);
     $('#from_currency').click(function() {this.select()});
@@ -117,6 +117,7 @@ async function init_ui() {
 
     await update_fee_info();
     from_cur_handler();
+    $("#from_currency").attr('disabled', false)
     $("#from_currency").on("input", highlight_input);
 }
 
