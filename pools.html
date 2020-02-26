@@ -37,6 +37,9 @@
                 activePoolLink = 2
                 $('.poolsdialog > div').eq(activePoolLink).addClass('selected')
             }
+            if(e.code == 'Enter') {
+                window.location.href = $('.poolsdialog > div').eq(activePoolLink).find('a').attr('href')
+            }
         })
     </script>
   </head>
