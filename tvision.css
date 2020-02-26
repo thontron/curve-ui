@@ -219,14 +219,18 @@ li {
     color: black;
 }
 
-.top-menu-bar a:hover, .poolsdialog div.selected {
+.top-menu-bar a:hover, .poolsdialog div.selected, .poolsdialog div.selected a, .poolsdialog div.selected a:visited {
+    background-color: #505050;
+    color: #c0c0c0;
+}
+
+.top-menu-bar a.selected, .poolsdialog div:hover, .poolsdialog div:hover a, .poolsdialog div:hover a:visited {
     background-color: blue;
     color: white;
 }
 
-.top-menu-bar a.selected, .poolsdialog div:hover {
-    background-color: #505050;
-    color: #c0c0c0;
+.poolsdialog div a {
+    display: block;
 }
 
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {

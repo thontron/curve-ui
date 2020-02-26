@@ -34,6 +34,7 @@ async function set_to_amount() {
         var dy = dy_.toFixed(2);
         $('#to_currency').val(dy);
         $('#exchange-rate').text((dy_ / dx_).toFixed(4));
+        $('#from_currency').prop('disabled', false);
     }
     else
         $('#from_currency').prop('disabled', true);
@@ -115,3 +116,7 @@ async function init_ui() {
     from_cur_handler();
     $("#from_currency").on("input", highlight_input);
 }
+
+window.addEventListener('load', async () => {
+    await init();
+});

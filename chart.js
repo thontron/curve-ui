@@ -25,7 +25,7 @@ var chart_options = {
             }
         },
         max: function(max) {
-            return max+0.2
+            return max*1.01
         }
     },
     tooltip: {
