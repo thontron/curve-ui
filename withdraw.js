@@ -99,4 +99,5 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     await update_rates();
     await update_balances();
+    init_ui();
 });

@@ -41,7 +41,7 @@ async function handle_add_liquidity() {
     update_fee_info();
 }
 
-function init_ui() {
+async function init_ui() {
     let infapproval = true;
     for (let i = 0; i < N_COINS; i++) {
         var default_account = (await web3.eth.getAccounts())[0];
@@ -97,4 +97,5 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     update_fee_info();
     await handle_sync_balances();
+    await init_ui();
 });
