@@ -66,4 +66,3 @@ async function init() {
     await init_ui();
 
 }
-window.addEventListener('load', init);

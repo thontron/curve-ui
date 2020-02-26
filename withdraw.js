@@ -96,8 +96,7 @@ function init_ui() {
 
 window.addEventListener('DOMContentLoaded', async () => {
     await init();
-    
+
     await update_rates();
     await update_balances();
-    init_ui();
 });

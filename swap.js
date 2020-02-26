@@ -115,3 +115,7 @@ async function init_ui() {
     from_cur_handler();
     $("#from_currency").on("input", highlight_input);
 }
+
+window.addEventListener('load', async () => {
+    await init();
+});
