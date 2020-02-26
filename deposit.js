@@ -16,9 +16,8 @@ async function handle_sync_balances() {
             var val = Math.floor(wallet_balances[i] * c_rates[i] * 100) / 100;
             $('#currency_' + i).val(val);
         }
-    } else {
+    } else
         $(".currencies input").prop('disabled', false);
-    }
 
     for (let i = 0; i < N_COINS; i++)
         balances[i] = parseInt(await swap.methods.balances(i).call());
@@ -30,7 +29,9 @@ async function handle_add_liquidity() {
     for (let i = 0; i < N_COINS; i++)
         amounts[i] = BigInt(Math.floor(amounts[i] / c_rates[i])).toString(); // -> c-tokens
     if ($('#inf-approval').prop('checked'))
-        await ensure_allowance();
+        await ensure_allowance(false)
+    else
+        await ensure_allowance(amounts);
     var deadline = Math.floor((new Date()).getTime() / 1000) + trade_timeout;
     await swap.methods.add_liquidity(amounts, deadline).send({
         'from': default_account,
@@ -43,9 +44,8 @@ async function init_ui() {
     let infapproval = true;
     for (let i = 0; i < N_COINS; i++) {
         var default_account = (await web3.eth.getAccounts())[0];
-        if (BigInt(await underlying_coins[i].methods.allowance(default_account, swap_address).call()) <= max_allowance / BigInt(2)) {
+        if (BigInt(await coins[i].methods.allowance(default_account, swap_address).call()) <= max_allowance / BigInt(2))
             infapproval = false;
-        }
 
         $('#currency_' + i).on('input', function() {
             var el = $('#currency_' + i);
@@ -81,10 +81,10 @@ async function init_ui() {
         });
     }
 
-    if(infapproval)
+    if (infapproval)
         $('#inf-approval').prop('checked', true)
-    else 
-        $('#inf-approval').prop('checked', false)
+    else
+        $('#inf-approval').prop('checked', false);
 
 
 
@@ -95,7 +95,6 @@ async function init_ui() {
 
 window.addEventListener('load', async () => {
     await init();
-
     update_fee_info();
     await handle_sync_balances();
 });
