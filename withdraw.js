@@ -61,7 +61,7 @@ async function handle_remove_liquidity() {
     for (let i = 0; i < N_COINS; i++)
         amounts[i] = Math.floor(amounts[i] / c_rates[i]); // -> c-tokens
     var min_amounts = amounts.map(x => BigInt(Math.floor(0.97 * x)).toString());
-    amount = amounts.map(x => BigInt(x).toString());
+    amounts = amounts.map(x => BigInt(x).toString());
     var txhash;
     var default_account = (await web3.eth.getAccounts())[0];
     if (share_val == '---') {
