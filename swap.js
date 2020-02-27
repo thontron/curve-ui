@@ -119,7 +119,24 @@ async function init_ui() {
 }
 
 window.addEventListener('load', async () => {
-    await init();
-    await init_ui();
-    $("#from_currency").attr('disabled', false)
+    try {
+        await init();
+
+        await init_ui();
+
+        $("#from_currency").attr('disabled', false)
+
+    }
+    catch(err) {
+
+        console.log(err)
+        const web3 = new Web3(infura_url);
+        window.web3 = web3
+
+        await init_contracts();
+
+        console.log(web3)
+
+        await init_ui();
+    }
 });
