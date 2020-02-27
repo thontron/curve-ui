@@ -26,6 +26,7 @@ async function set_to_amount() {
     var i = from_currency;
     var j = to_currency;
     var b = parseInt(await swap.methods.balances(i).call()) * c_rates[i];
+    console.log(b)
     if (b >= 0.001) {
         // In c-units
         var dx_ = $('#from_currency').val();

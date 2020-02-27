@@ -13,12 +13,14 @@ async function update_balances() {
     token_supply = parseInt(await swap_token.methods.totalSupply().call());
 }
 
-function handle_change_amounts(i) {
+async function handle_change_amounts(i) {
+    var amounts = [...$("[id^=currency_]")].map(x => $(x).val());
+    var hasEnough = await swap.methods.calc_token_amount(amounts, false).call() / (1 - fee * N_COINS / (4 * (N_COINS - 1)))
     return function() {
         for (let j = 0; j < N_COINS; j++) {
             var cur = $('#currency_' + j);
-            if ((this.value > (balances[i] * c_rates[i] * token_balance / token_supply)) & (j == i))
-                cur.css('background-color', 'red')
+            if ((this.value > hasEnough))
+                cur.css('background-color', 'red');
             else
                 cur.css('background-color', 'blue');
             cur.css('color', 'aqua');
