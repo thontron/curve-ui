@@ -10,6 +10,7 @@ async function update_balances() {
     }
     for (let i = 0; i < N_COINS; i++)
         balances[i] = parseInt(await swap.methods.balances(i).call());
+    token_balance = 0;
     token_supply = parseInt(await swap_token.methods.totalSupply().call());
 }
 
@@ -45,8 +46,9 @@ function handle_change_share() {
 
     for (let i = 0; i < N_COINS; i++) {
         var cur = $('#currency_' + i);
-        if ((val >=0) & (val <= 100))
+        if ((val >=0) & (val <= 100)) {
             cur.val((val / 100 * balances[i] * c_rates[i] * token_balance / token_supply).toFixed(2))
+        }
         else
             cur.val('0.00');
         cur.css('background-color', '#707070');
@@ -94,9 +96,22 @@ function init_ui() {
 }
 
 window.addEventListener('load', async () => {
-    await init();
+    try {
+        await init();
+        await update_rates();
+        await update_balances();
+        init_ui();
+        $("#from_currency").attr('disabled', false)
+    }
+    catch(err) {
+        const web3 = new Web3(infura_url);
+        window.web3 = web3
 
-    await update_rates();
-    await update_balances();
-    init_ui();
+        await init_contracts();
+        await update_rates();
+        await update_balances();
+        init_ui();
+        $("#from_currency").attr('disabled', false)
+        
+    }
 });
