@@ -16,26 +16,31 @@ async function update_balances() {
 
 function handle_change_amounts(i) {
     return async function() {
-    var values = [...$("[id^=currency_]")].map((x,i) => $(x).val() * c_rates[i] * coin_precisions[i])
-    values = values.map(v=>BigInt(Math.floor(v)).toString())
+        var values = [...$("[id^=currency_]")].map((x,i) => $(x).val() / c_rates[i])
+        values = values.map(v=>BigInt(Math.floor(v)).toString())
+        var availableAmount;
 
-    let availableAmount =  await swap.methods.calc_token_amount(values, false).call()
-    availableAmount = availableAmount / (1 - fee * N_COINS / (4 * (N_COINS - 1)))
+        try {
+            availableAmount =  await swap.methods.calc_token_amount(values, false).call()
+            availableAmount = availableAmount / (1 - fee * N_COINS / (4 * (N_COINS - 1)))
+            var default_account = (await web3.eth.getAccounts())[0];
+            var maxAvailableAmount = parseInt(await swap_token.methods.balanceOf(default_account).call());
 
-    var default_account = (await web3.eth.getAccounts())[0];
-    var maxAvailableAmount = parseInt(await swap_token.methods.balanceOf(default_account).call());
+            if(availableAmount > maxAvailableAmount) {
+                $('#currency_0,#currency_1').css('background-color', 'red');
+            }
+            else {
+                $('#currency_0,#currency_1').css('background-color', 'blue');
+            }
 
-    if(availableAmount > maxAvailableAmount) {
-        $('#currency_0,#currency_1').css('background-color', 'red');
-    }
-    else {
-        $('#currency_0,#currency_1').css('background-color', 'blue');
-    }
-
-        var share = $('#liquidity-share');
-        share.val('---');
-        share.css('background-color', '#707070');
-        share.css('color', '#d0d0d0');
+            var share = $('#liquidity-share');
+            share.val('---');
+            share.css('background-color', '#707070');
+            share.css('color', '#d0d0d0');
+        }
+        catch(err) {
+            $('#currency_0,#currency_1').css('background-color', 'red');
+        }
     }
 }
 
