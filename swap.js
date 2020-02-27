@@ -134,5 +134,7 @@ window.addEventListener('load', async () => {
         await init_contracts();
 
         await init_ui();
+        $("#from_currency").attr('disabled', false)
+        
     }
 });
