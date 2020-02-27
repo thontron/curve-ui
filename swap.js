@@ -117,10 +117,26 @@ async function init_ui() {
 
     await update_fee_info();
     from_cur_handler();
-    $("#from_currency").attr('disabled', false)
     $("#from_currency").on("input", highlight_input);
 }
 
 window.addEventListener('load', async () => {
-    await init();
+    try {
+        await init();
+
+        await init_ui();
+
+        $("#from_currency").attr('disabled', false)
+
+    }
+    catch(err) {
+        console.log(err)
+        const web3 = new Web3(infura_url);
+
+
+        window.web3 = web3
+        console.log(web3)
+
+        init_ui();
+    }
 });
