@@ -106,7 +106,7 @@ window.addEventListener('load', async () => {
             console.log(await swap.methods.calc_token_amount(["412222","412222"], false).call())
         }
         catch(err) {
-            console.log(err)
+            console.error(err)
         }
         $("#from_currency").attr('disabled', false)
 
