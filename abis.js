@@ -2,8 +2,8 @@ var N_COINS = 4;
 var coin_precisions = [1e18, 1e6, 1e6, 1e18];
 var use_lending = [true, true, true, true];
 var tethered = [false, false, true, false];
-var swap_address = '0xb6A7935F8Bc7b9822A6B05E2E0C7e32Ba6e2Eb44';
-var token_address = '0xEbdd536B55A66484e356Be84C07D7f1632957f20';
+var swap_address = '0x79a8C46DeA5aDa233ABaFFD40F3A0A2B1e5A4F27';
+var token_address = '0x3B3Ac5386837Dc563660FB6a0937DFAa5924333B';
 var infura_url = 'https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b';
 
 var swap_abi = [
