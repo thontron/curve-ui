@@ -93,9 +93,27 @@ async function init_ui() {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-    await init();
+    try {
+        await init();
+        update_fee_info();
+        await handle_sync_balances();
+        
+        await init_ui();
 
-    update_fee_info();
-    await handle_sync_balances();
-    await init_ui();
+        $("#from_currency").attr('disabled', false)
+
+    }
+    catch(err) {
+        const web3 = new Web3(infura_url);
+        window.web3 = web3
+
+        await init_contracts();
+        update_fee_info();
+        await handle_sync_balances();
+
+        await init_ui();
+        $("#from_currency").attr('disabled', false)
+        
+    }
+
 });
