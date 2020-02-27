@@ -13,9 +13,9 @@
     <script src="/web3providers/burnerConnect.min.js"></script>
     <script src="/web3providers/fortmatic.min.js"></script>
     <script src="/abis.js?v21012020_2"></script>
-    <script src="/common.js?v25022020_2"></script>
-    <script src="/swap.js?v25022020_2"></script>
-    <script src="/init.js?v25022020"></script>
+    <script src="/common.js?v26022020"></script>
+    <script src="/swap.js?v26022020"></script>
+    <script src="/init.js?v26022020"></script>
   </head>
   <body>
     <div class="top-menu-bar">
@@ -93,28 +93,24 @@
     </div>
 
     <div class="blue window half-width info">
-        <table>
-            <tr>
-                <td>
-                    <h4>Currency reserves:</h4>
-                    <ul id='balances-info'>
-                        <li><b>DAI:</b> <span></span></li>
-                        <li><b>USDC:</b> <span></span></li>
-                        <li><b>DAI+USDC:</b> <span></span></li>
-                    </ul>
-                    <p><b>Fee:</b> <span id='fee-info'></span>%</p>
-                    <p><b>Admin fee:</b> <span id='admin-fee-info'></span>%</p>
-                </td>
-                <td id="lp-info-container">
-                    <h4>My share:</h4>
-                    <ul id='lp-info'>
-                        <li><b>DAI:</b> <span></span></li>
-                        <li><b>USDC:</b> <span></span></li>
-                        <li><b>DAI+USDC:</b> <span></span></li>
-                    </ul>
-                </td>
-            </tr>
-        </table>
+        <fieldset id="lp-info-currency">
+            <legend>Currency reserves</legend>
+            <ul id='balances-info'>
+                <li><b>DAI:</b> <span></span></li>
+                <li><b>USDC:</b> <span></span></li>
+                <li><b>DAI+USDC:</b> <span></span></li>
+            </ul>
+            <p><b>Fee:</b> <span id='fee-info'></span>%</p>
+            <p><b>Admin fee:</b> <span id='admin-fee-info'></span>%</p>
+          </fieldset>
+          <fieldset id="lp-info-container">
+            <legend>My share:</legend>
+            <ul id='lp-info'>
+                <li><b>DAI:</b> <span></span></li>
+                <li><b>USDC:</b> <span></span></li>
+                <li><b>DAI+USDC:</b> <span></span></li>
+            </ul>
+          </fieldset>
     </div>
 
   </body>

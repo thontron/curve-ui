@@ -29,7 +29,7 @@ async function set_to_amount() {
     if (b >= 0.001) {
         // In c-units
         var dx_ = $('#from_currency').val();
-        var dx = BigInt(dx_ * coin_precisions[i]).toString();
+        var dx = BigInt(Math.round(dx_ * coin_precisions[i])).toString();
         var dy_ = parseInt(await swap.methods.get_dy_underlying(i, j, dx).call()) / coin_precisions[j];
         var dy = dy_.toFixed(2);
         $('#to_currency').val(dy);
@@ -128,14 +128,10 @@ window.addEventListener('load', async () => {
 
     }
     catch(err) {
-
-        console.log(err)
         const web3 = new Web3(infura_url);
         window.web3 = web3
 
         await init_contracts();
-
-        console.log(web3)
 
         await init_ui();
     }

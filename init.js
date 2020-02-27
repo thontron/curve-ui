@@ -21,7 +21,6 @@ $(document).click(function(event) {
   if(!$target.closest('.web3connect-provider-wrapper').length && 
   $('.web3connect-provider-wrapper').is(":visible") && cancelablePromise && !window.web3) {
     cancelablePromise.cancel();
-    console.log("HEEEEEE")
   }        
 });
 async function init() {
@@ -76,7 +75,6 @@ async function init() {
         const web3 = new Web3(provider);
 
         window.web3 = web3
-
 
     /*    if (window.ethereum)
         {
