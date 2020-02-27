@@ -14,12 +14,12 @@ async function update_balances() {
 }
 
 async function handle_change_amounts(i) {
-    var amounts = [...$("[id^=currency_]")].map(x => $(x).val());
-    var hasEnough = await swap.methods.calc_token_amount(amounts, false).call() / (1 - fee * N_COINS / (4 * (N_COINS - 1)))
+    var maxAvailableAmount = (await swap.methods.calc_token_amount(balances[i], false).call()) || 0;
+    maxAvailableAmount = maxAvailableAmount / (1 - fee * N_COINS / (4 * (N_COINS - 1)))
     return function() {
         for (let j = 0; j < N_COINS; j++) {
             var cur = $('#currency_' + j);
-            if ((this.value > hasEnough))
+            if ((this.value > maxAvailableAmount))
                 cur.css('background-color', 'red');
             else
                 cur.css('background-color', 'blue');

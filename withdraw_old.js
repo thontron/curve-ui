@@ -56,8 +56,10 @@ function handle_change_share() {
 
 async function handle_migrate_new() {
     var default_account = (await web3.eth.getAccounts())[0];
-    await approve(migration_contract, token_balance, default_account)
     let migration = new web3.eth.Contract(migration_abi, migration_address);
+    console.log(migration.methods)
+    console.log(swap.methods)
+    await approve(oldswap, token_balance, default_account)
     await migration.methods.migrate().send()
 
     await update_balances();
@@ -109,4 +111,6 @@ window.addEventListener('load', async () => {
 
     await update_rates();
     await update_balances();
+
+    init_ui();
 });

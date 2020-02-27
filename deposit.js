@@ -32,6 +32,7 @@ async function handle_add_liquidity() {
         await ensure_allowance(false)
     else
         await ensure_allowance(amounts);
+    console.log(amounts)
     var token_amount = await swap.methods.calc_token_amount(amounts, true).call();
     token_amount = BigInt(Math.floor(token_amount * 0.99)).toString();
     await swap.methods.add_liquidity(amounts, token_amount).send({
@@ -101,7 +102,12 @@ window.addEventListener('load', async () => {
         await handle_sync_balances();
         
         await init_ui();
-
+        try {
+            console.log(await swap.methods.calc_token_amount(["412222","412222"], false).call())
+        }
+        catch(err) {
+            console.log(err)
+        }
         $("#from_currency").attr('disabled', false)
 
     }

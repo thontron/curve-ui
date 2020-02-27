@@ -98,8 +98,6 @@ async function init_contracts() {
         }
     });
 
-    console.log(swap_abi)
-
     oldswap = new web3.eth.Contract(swap_abi, swap_address);
     oldswap_token = new web3.eth.Contract(ERC20_abi, token_address);
 
@@ -151,7 +149,6 @@ async function update_fee_info() {
         total += balances[i] * c_rates[i];*/
     }
     let resolves = await Promise.all(promises)
-    console.log("HERE")
     resolves.forEach((balance, i) => {
         balances[i] = +balance;
         $(bal_info[i]).text((balances[i] * c_rates[i]).toFixed(2));
