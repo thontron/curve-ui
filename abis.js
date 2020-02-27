@@ -145,6 +145,11 @@ var newswap_abi = [
     "indexed": false
    },
    {
+    "type": "uint256[2]",
+    "name": "fees",
+    "indexed": false
+   },
+   {
     "type": "uint256",
     "name": "invariant",
     "indexed": false
@@ -160,6 +165,33 @@ var newswap_abi = [
  },
  {
   "name": "RemoveLiquidity",
+  "inputs": [
+   {
+    "type": "address",
+    "name": "provider",
+    "indexed": true
+   },
+   {
+    "type": "uint256[2]",
+    "name": "token_amounts",
+    "indexed": false
+   },
+   {
+    "type": "uint256[2]",
+    "name": "fees",
+    "indexed": false
+   },
+   {
+    "type": "uint256",
+    "name": "token_supply",
+    "indexed": false
+   }
+  ],
+  "anonymous": false,
+  "type": "event"
+ },
+ {
+  "name": "RemoveLiquidityImbalance",
   "inputs": [
    {
     "type": "address",
@@ -230,17 +262,17 @@ var newswap_abi = [
     "unit": "sec"
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "A",
     "indexed": false
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "fee",
     "indexed": false
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "admin_fee",
     "indexed": false
    }
@@ -252,17 +284,17 @@ var newswap_abi = [
   "name": "NewParameters",
   "inputs": [
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "A",
     "indexed": false
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "fee",
     "indexed": false
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "admin_fee",
     "indexed": false
    }
@@ -286,11 +318,11 @@ var newswap_abi = [
     "name": "_pool_token"
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "_A"
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "_fee"
    }
   ],
@@ -310,7 +342,30 @@ var newswap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 1083195
+  "gas": 1084167
+ },
+ {
+  "name": "calc_token_amount",
+  "outputs": [
+   {
+    "type": "uint256",
+    "name": "out"
+   }
+  ],
+  "inputs": [
+   {
+    "type": "uint256[2]",
+    "name": "amounts"
+   },
+   {
+    "type": "bool",
+    "name": "deposit"
+   }
+  ],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 4239939
  },
  {
   "name": "add_liquidity",
@@ -322,14 +377,13 @@ var newswap_abi = [
    },
    {
     "type": "uint256",
-    "unit": "sec",
-    "name": "deadline"
+    "name": "min_mint_amount"
    }
   ],
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 2266965
+  "gas": 6479997
  },
  {
   "name": "get_dy",
@@ -356,7 +410,34 @@ var newswap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2540055
+  "gas": 2543681
+ },
+ {
+  "name": "get_dx",
+  "outputs": [
+   {
+    "type": "uint256",
+    "name": "out"
+   }
+  ],
+  "inputs": [
+   {
+    "type": "int128",
+    "name": "i"
+   },
+   {
+    "type": "int128",
+    "name": "j"
+   },
+   {
+    "type": "uint256",
+    "name": "dy"
+   }
+  ],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 2543687
  },
  {
   "name": "get_dy_underlying",
@@ -383,7 +464,34 @@ var newswap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2540024
+  "gas": 2543506
+ },
+ {
+  "name": "get_dx_underlying",
+  "outputs": [
+   {
+    "type": "uint256",
+    "name": "out"
+   }
+  ],
+  "inputs": [
+   {
+    "type": "int128",
+    "name": "i"
+   },
+   {
+    "type": "int128",
+    "name": "j"
+   },
+   {
+    "type": "uint256",
+    "name": "dy"
+   }
+  ],
+  "constant": true,
+  "payable": false,
+  "type": "function",
+  "gas": 2543512
  },
  {
   "name": "exchange",
@@ -404,17 +512,12 @@ var newswap_abi = [
    {
     "type": "uint256",
     "name": "min_dy"
-   },
-   {
-    "type": "uint256",
-    "unit": "sec",
-    "name": "deadline"
    }
   ],
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 1000000
+  "gas": 5184573
  },
  {
   "name": "exchange_underlying",
@@ -435,17 +538,12 @@ var newswap_abi = [
    {
     "type": "uint256",
     "name": "min_dy"
-   },
-   {
-    "type": "uint256",
-    "unit": "sec",
-    "name": "deadline"
    }
   ],
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 1000000
+  "gas": 5200817
  },
  {
   "name": "remove_liquidity",
@@ -456,11 +554,6 @@ var newswap_abi = [
     "name": "_amount"
    },
    {
-    "type": "uint256",
-    "unit": "sec",
-    "name": "deadline"
-   },
-   {
     "type": "uint256[2]",
     "name": "min_amounts"
    }
@@ -468,7 +561,7 @@ var newswap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 1220465
+  "gas": 153898
  },
  {
   "name": "remove_liquidity_imbalance",
@@ -480,36 +573,35 @@ var newswap_abi = [
    },
    {
     "type": "uint256",
-    "unit": "sec",
-    "name": "deadline"
+    "name": "max_burn_amount"
    }
   ],
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 2346381
+  "gas": 6479708
  },
  {
   "name": "commit_new_parameters",
   "outputs": [],
   "inputs": [
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "amplification"
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "new_fee"
    },
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "new_admin_fee"
    }
   ],
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 146017
+  "gas": 146105
  },
  {
   "name": "apply_new_parameters",
@@ -518,7 +610,7 @@ var newswap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 133362
+  "gas": 133512
  },
  {
   "name": "revert_new_parameters",
@@ -527,7 +619,7 @@ var newswap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 21685
+  "gas": 21835
  },
  {
   "name": "commit_transfer_ownership",
@@ -541,7 +633,7 @@ var newswap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 74362
+  "gas": 74512
  },
  {
   "name": "apply_transfer_ownership",
@@ -550,7 +642,7 @@ var newswap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 60418
+  "gas": 60568
  },
  {
   "name": "revert_transfer_ownership",
@@ -559,7 +651,7 @@ var newswap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 21775
+  "gas": 21925
  },
  {
   "name": "withdraw_admin_fees",
@@ -568,7 +660,25 @@ var newswap_abi = [
   "constant": false,
   "payable": false,
   "type": "function",
-  "gas": 12403
+  "gas": 12831
+ },
+ {
+  "name": "kill_me",
+  "outputs": [],
+  "inputs": [],
+  "constant": false,
+  "payable": false,
+  "type": "function",
+  "gas": 37878
+ },
+ {
+  "name": "unkill_me",
+  "outputs": [],
+  "inputs": [],
+  "constant": false,
+  "payable": false,
+  "type": "function",
+  "gas": 22015
  },
  {
   "name": "coins",
@@ -587,7 +697,7 @@ var newswap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2040
+  "gas": 2190
  },
  {
   "name": "underlying_coins",
@@ -606,7 +716,7 @@ var newswap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2070
+  "gas": 2220
  },
  {
   "name": "balances",
@@ -625,13 +735,13 @@ var newswap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2100
+  "gas": 2250
  },
  {
   "name": "A",
   "outputs": [
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "out"
    }
   ],
@@ -639,13 +749,13 @@ var newswap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 1931
+  "gas": 2081
  },
  {
   "name": "fee",
   "outputs": [
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "out"
    }
   ],
@@ -653,13 +763,13 @@ var newswap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 1961
+  "gas": 2111
  },
  {
   "name": "admin_fee",
   "outputs": [
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "out"
    }
   ],
@@ -667,7 +777,7 @@ var newswap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 1991
+  "gas": 2141
  },
  {
   "name": "owner",
@@ -681,7 +791,7 @@ var newswap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2021
+  "gas": 2171
  },
  {
   "name": "admin_actions_deadline",
@@ -696,7 +806,7 @@ var newswap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2051
+  "gas": 2201
  },
  {
   "name": "transfer_ownership_deadline",
@@ -711,13 +821,13 @@ var newswap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2081
+  "gas": 2231
  },
  {
   "name": "future_A",
   "outputs": [
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "out"
    }
   ],
@@ -725,13 +835,13 @@ var newswap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2111
+  "gas": 2261
  },
  {
   "name": "future_fee",
   "outputs": [
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "out"
    }
   ],
@@ -739,13 +849,13 @@ var newswap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2141
+  "gas": 2291
  },
  {
   "name": "future_admin_fee",
   "outputs": [
    {
-    "type": "int128",
+    "type": "uint256",
     "name": "out"
    }
   ],
@@ -753,7 +863,7 @@ var newswap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2171
+  "gas": 2321
  },
  {
   "name": "future_owner",
@@ -767,9 +877,11 @@ var newswap_abi = [
   "constant": true,
   "payable": false,
   "type": "function",
-  "gas": 2201
+  "gas": 2351
  }
-];
+]
+
+
 
 var swap_abi = [
  {

@@ -130,13 +130,12 @@ window.addEventListener('load', async () => {
 
     }
     catch(err) {
-        console.log(err)
         const web3 = new Web3(infura_url);
-
-
         window.web3 = web3
-        console.log(web3)
 
-        init_ui();
+        await init_contracts();
+
+        await init_ui();
+        $("#from_currency").attr('disabled', false)
     }
 });

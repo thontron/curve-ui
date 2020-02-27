@@ -66,13 +66,15 @@ async function handle_remove_liquidity() {
     var txhash;
     var default_account = (await web3.eth.getAccounts())[0];
     if (share_val == '---') {
-        await swap.methods.remove_liquidity_imbalance(amounts, deadline).send({'from': default_account});
+        var token_amount = await swap.methods.calc_token_amount(amounts, false).call();
+        token_amount = BigInt(Math.floor(token_amount * 1.01)).toString()
+        await swap.methods.remove_liquidity_imbalance(amounts, token_amount).send({'from': default_account});
     }
     else {
         var amount = BigInt(Math.floor(share_val / 100 * token_balance)).toString();
         if (share_val == 100)
             amount = await swap_token.methods.balanceOf(default_account).call();
-        await swap.methods.remove_liquidity(amount, deadline, min_amounts).send({'from': default_account});
+        await swap.methods.remove_liquidity(amount, min_amounts).send({'from': default_account});
     }
 
     await update_balances();
@@ -94,8 +96,22 @@ function init_ui() {
 }
 
 window.addEventListener('load', async () => {
-    await init();
+   try {
+        await init();
+        await update_rates();
+        await update_balances();
+        init_ui();
+        $("#from_currency").attr('disabled', false)
+    }
+    catch(err) {
+        const web3 = new Web3(infura_url);
+        window.web3 = web3
 
-    await update_rates();
-    await update_balances();
+        await init_contracts();
+        await update_rates();
+        await update_balances();
+        init_ui();
+        $("#from_currency").attr('disabled', false)
+        
+    }
 });
