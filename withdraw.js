@@ -8,9 +8,11 @@ async function update_balances() {
             wallet_balances[i] = parseInt(await coins[i].methods.balanceOf(default_account).call());
         token_balance = parseInt(await swap_token.methods.balanceOf(default_account).call());
     }
+    else {
+        token_balance = 0;
+    }
     for (let i = 0; i < N_COINS; i++)
         balances[i] = parseInt(await swap.methods.balances(i).call());
-    token_balance = 0;
     token_supply = parseInt(await swap_token.methods.totalSupply().call());
 }
 
@@ -48,6 +50,8 @@ function handle_change_share() {
         var cur = $('#currency_' + i);
         if ((val >=0) & (val <= 100)) {
             cur.val((val / 100 * balances[i] * c_rates[i] * token_balance / token_supply).toFixed(2))
+            console.log(val, balances[i], c_rates[i], token_balance, token_supply)
+            console.log((val / 100 * balances[i] * c_rates[i] * token_balance / token_supply).toFixed(2))
         }
         else
             cur.val('0.00');
