@@ -59,7 +59,7 @@ async function init() {
     const provider = web3Connect.connect();
     cancelablePromise = makeCancelable(provider);
     return cancelablePromise.then(async (provider) => {    
-        provider.on("chainChanged", (chainId) => {
+        provider.on && provider.on("chainChanged", (chainId) => {
             console.log(chainId, "CHAIN")
             if(chainId != 1) {
                 $('#error-window').text('Error: wrong network type. Please switch to mainnet');
@@ -67,7 +67,7 @@ async function init() {
             }
         });
 
-        provider.on("accountsChanged", (accounts) => {
+        provider.on && provider.on("accountsChanged", (accounts) => {
             console.log(accounts)
             location.reload()
         })
