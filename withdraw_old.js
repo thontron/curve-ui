@@ -54,25 +54,6 @@ function handle_change_share() {
     }
 }
 
-async function handle_migrate_new() {
-    var default_account = (await web3.eth.getAccounts())[0];
-    let migration = new web3.eth.Contract(migration_abi, migration_address);
-    let old_balance = parseInt(await old_swap_token.methods.balanceOf(default_account).call())
-    console.log(parseInt(await old_swap_token.methods.allowance(default_account, migration_address).call()));
-    if(parseInt(await old_swap_token.methods.allowance(default_account, migration_address).call()) < old_balance) {    
-        await old_swap_token.methods.approve(migration_address, old_balance.toString()).send({
-            from: default_account,
-            gas: 100000
-        })
-    }
-    await migration.methods.migrate().send({
-        from: default_account,
-        gas: 1500000
-    })
-
-    await update_balances();
-    update_fee_info('old');
-}
 
 async function handle_remove_liquidity() {
     var share = $('#liquidity-share');

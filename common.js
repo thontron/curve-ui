@@ -29,7 +29,6 @@ async function ensure_allowance(amounts) {
     if (amounts) {
         // Non-infinite
         for (let i=0; i < N_COINS; i++) {
-            console.log(i, allowances[i], amounts[i]);
             if (allowances[i] < amounts[i]) {
                 if (allowances[i] > 0)
                     await approve(coins[i], 0, default_account);
@@ -147,7 +146,6 @@ async function update_fee_info(version) {
         swap_token_stats = old_swap_token;
     }
 
-    console.log(old_swap_abi, old_swap_address)
     var bal_info = $('#balances-info li span');
     await update_rates();
     var total = 0;
@@ -188,4 +186,23 @@ async function update_fee_info(version) {
             $('#lp-info-container').show();
         }
     }
+}
+
+async function handle_migrate_new() {
+    var default_account = (await web3.eth.getAccounts())[0];
+    let migration = new web3.eth.Contract(migration_abi, migration_address);
+    let old_balance = parseInt(await old_swap_token.methods.balanceOf(default_account).call())
+    if(parseInt(await old_swap_token.methods.allowance(default_account, migration_address).call()) < old_balance) {    
+        await old_swap_token.methods.approve(migration_address, old_balance.toString()).send({
+            from: default_account,
+            gas: 100000
+        })
+    }
+    await migration.methods.migrate().send({
+        from: default_account,
+        gas: 1500000
+    })
+
+    await update_balances();
+    update_fee_info('old');
 }
