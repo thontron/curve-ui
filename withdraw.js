@@ -17,19 +17,31 @@ async function update_balances() {
 }
 
 function handle_change_amounts(i) {
-    return function() {
-        for (let j = 0; j < N_COINS; j++) {
-            var cur = $('#currency_' + j);
-            if ((this.value > (balances[i] * c_rates[i] * token_balance / token_supply)) & (j == i))
-                cur.css('background-color', 'red')
-            else
-                cur.css('background-color', 'blue');
-            cur.css('color', 'aqua');
+    return async function() {
+        var values = [...$("[id^=currency_]")].map((x,i) => $(x).val() / c_rates[i])
+        values = values.map(v=>BigInt(Math.floor(v)).toString())
+
+        try {
+            var availableAmount = await swap.methods.calc_token_amount(values, false).call()
+            availableAmount = availableAmount / (1 - fee * N_COINS / (4 * (N_COINS - 1)))
+            var default_account = (await web3.eth.getAccounts())[0];
+            var maxAvailableAmount = parseInt(await swap_token.methods.balanceOf(default_account).call());
+
+            if(availableAmount > maxAvailableAmount) {
+                $('[id^=currency_]').css('background-color', 'red');
+            }
+            else {
+                $('[id^=currency_]').css('background-color', 'blue');
+            }
+
+            var share = $('#liquidity-share');
+            share.val('---');
+            share.css('background-color', '#707070');
+            share.css('color', '#d0d0d0');
         }
-        var share = $('#liquidity-share');
-        share.val('---');
-        share.css('background-color', '#707070');
-        share.css('color', '#d0d0d0');
+        catch(err) {
+            $('[id^=currency_]').css('background-color', 'red');
+        }
     }
 }
 
