@@ -117,15 +117,22 @@ async function init_ui() {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-    init_menu();
+    try {
+        await init();
 
-    if (window.ethereum)
-    {
-        window.web3 = new Web3(ethereum);
-        await ethereum.enable();
+        await init_ui();
+
+        $("#from_currency").attr('disabled', false)
+
     }
-    else
-        window.web3 = new Web3(infura_url);
-    await init_contracts();
-    await init_ui();
+    catch(err) {
+        const web3 = new Web3(infura_url);
+        window.web3 = web3
+
+        await init_contracts();
+
+        await init_ui();
+        $("#from_currency").attr('disabled', false)
+        
+    }
 });

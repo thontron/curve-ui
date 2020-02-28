@@ -12,30 +12,40 @@ var admin_fee;
 const trade_timeout = 1800;
 const max_allowance = BigInt(2) ** BigInt(256) - BigInt(1);
 
-async function ensure_allowance(_amounts) {
-    var default_account = (await web3.eth.getAccounts())[0];
-    var amounts;
-    if (_amounts == null) {
-        amounts = new Array(N_COINS);
-        for (let i=0; i < N_COINS; i++)
-            amounts[i] = max_allowance.toString();
-    } else
-        amounts = _amounts;
-    for (let i=0; i < N_COINS; i++) {
-        var current_allowance = parseInt(await coins[i].methods.allowance(default_account, swap_address).call());
-        if ((current_allowance < wallet_balances[i]) & (amounts[i] != 0)) {
-            if (current_allowance != 0)
-                await new Promise(resolve => {
-                    coins[i].methods.approve(swap_address, 0)
-                    .send({'from': default_account, 'gas': 100000})
-                    .once('transactionHash', function(hash) {resolve(true);});
-                });
-
-            await new Promise(resolve => {
-                coins[i].methods.approve(swap_address, amounts[i])
-                .send({'from': default_account, 'gas': 100000})
+function approve(contract, amount, account) {
+    return new Promise(resolve => {
+                contract.methods.approve(swap_address, amount.toString())
+                .send({'from': account, 'gas': 100000})
                 .once('transactionHash', function(hash) {resolve(true);});
             });
+}
+
+
+async function ensure_allowance(amounts) {
+    var default_account = (await web3.eth.getAccounts())[0];
+    var allowances = new Array(N_COINS);
+    for (let i=0; i < N_COINS; i++)
+        allowances[i] = await coins[i].methods.allowance(default_account, swap_address).call();
+
+    if (amounts) {
+        // Non-infinite
+        for (let i=0; i < N_COINS; i++) {
+            console.log(i, allowances[i], amounts[i]);
+            if (allowances[i] < amounts[i]) {
+                if (allowances[i] > 0)
+                    await approve(coins[i], 0, default_account);
+                await approve(coins[i], amounts[i], default_account);
+            }
+        }
+    }
+    else {
+        // Infinite
+        for (let i=0; i < N_COINS; i++) {
+            if (allowances[i] < max_allowance / BigInt(2)) {
+                if (allowances[i] > 0)
+                    await approve(coins[i], 0, default_account);
+                await approve(coins[i], max_allowance, default_account);
+            }
         }
     }
 }
@@ -82,16 +92,7 @@ async function ensure_token_allowance() {
 
 async function init_contracts() {
     web3.eth.net.getId((err, result) => {
-        if (result == 1) {
-            if (web3.currentProvider.constructor.name == 's') {
-                $('#error-window').text('Error: please use Metamask to do transactions');
-                $('#error-window').show();
-            }
-            else
-                $('#error-window').hide();
-        }
-        else
-        {
+        if (result != 1) {
             $('#error-window').text('Error: wrong network type. Please switch to mainnet');
             $('#error-window').show();
         }
@@ -130,11 +131,18 @@ async function update_fee_info() {
     var bal_info = $('#balances-info li span');
     await update_rates();
     var total = 0;
+    var promises = [];
+    let infuraProvider = new Web3(infura_url)
+    swapInfura = new infuraProvider.eth.Contract(swap_abi, swap_address);
     for (let i = 0; i < N_COINS; i++) {
-        balances[i] = parseInt(await swap.methods.balances(i).call());
+        promises.push(swapInfura.methods.balances(i).call());
+    }
+    let resolves = await Promise.all(promises)
+    resolves.forEach((balance, i) => {
+        balances[i] = +balance;
         $(bal_info[i]).text((balances[i] * c_rates[i]).toFixed(2));
         total += balances[i] * c_rates[i];
-    }
+    })
     $(bal_info[N_COINS]).text(total.toFixed(2));
     fee = parseInt(await swap.methods.fee().call()) / 1e10;
     admin_fee = parseInt(await swap.methods.admin_fee().call()) / 1e10;

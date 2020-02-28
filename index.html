@@ -3,16 +3,34 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>🌀 Curve.fi :: Yield</title>
+    <title>🌀 Curve.fi :: bUSD</title>
     <link rel="stylesheet" href="tvision.css?v19012020" />
     <script src="/jquery.min.js"></script>
     <script src="/web3.min.js"></script>
+    <script src="/web3connect.min.js"></script>
+    <script src="/web3providers/walletConnect.min.js"></script>
+    <script src="/web3providers/authereum.min.js"></script>
+    <script src="/web3providers/burnerConnect.min.js"></script>
+    <script src="/web3providers/fortmatic.min.js"></script>
     <script src="/abis.js?v13022020"></script>
     <script src="/common.js?v13022020v3"></script>
+    <script src="/init.js?v25022020"></script>
     <script src="/swap.js?v26022020"></script>
   </head>
   <body>
     <div class="top-menu-bar">
+      <label for="hamburger" class='border-menu'></label>
+      <input type="checkbox" id="hamburger"/>
+      
+      <div id='poolsdropdown'>
+        <a href='/pools.html'>Pools</a>
+        <div class='dropdown'>
+            <a href='https://compound.curve.fi'>Compound</a>
+            <a href='https://usdt.curve.fi'>USDT</a>
+            <a href='https://y.curve.fi'>Y</a>
+            <a href='https://busd.curve.fi'>bUSD</a>
+        </div>
+      </div>
       <a href="/">Buy and sell</a>
       <a href="/deposit.html">Deposit</a>
       <a href="/withdraw.html">Withdraw</a>
@@ -91,10 +109,8 @@
     </div>
 
     <div class="blue window half-width info">
-        <table>
-            <tr>
-                <td>
-                    <h4>Currency reserves:</h4>
+        <fieldset id="lp-info-currency">
+            <legend>Currency reserves</legend>
                     <ul id='balances-info'>
                         <li><b>DAI:</b> <span></span></li>
                         <li><b>USDC:</b> <span></span></li>
@@ -104,19 +120,17 @@
                     </ul>
                     <p><b>Fee:</b> <span id='fee-info'></span>%</p>
                     <p><b>Admin fee:</b> <span id='admin-fee-info'></span>%</p>
-                </td>
-                <td id="lp-info-container">
-                    <h4>My share:</h4>
-                    <ul id='lp-info'>
-                        <li><b>DAI:</b> <span></span></li>
-                        <li><b>USDC:</b> <span></span></li>
-                        <li><b>USDT:</b> <span></span></li>
-                        <li><b>BUSD:</b> <span></span></li>
-                        <li><b>DAI+USDC+USDT+BUSD:</b> <span></span></li>
-                    </ul>
-                </td>
-            </tr>
-        </table>
+        </fieldset>
+        <fieldset id="lp-info-container">
+            <h4>My share:</h4>
+            <ul id='lp-info'>
+                <li><b>DAI:</b> <span></span></li>
+                <li><b>USDC:</b> <span></span></li>
+                <li><b>USDT:</b> <span></span></li>
+                <li><b>BUSD:</b> <span></span></li>
+                <li><b>DAI+USDC+USDT+BUSD:</b> <span></span></li>
+            </ul>
+        </fieldset>
     </div>
 
   </body>
