@@ -57,19 +57,19 @@ function handle_change_share() {
 async function handle_migrate_new() {
     var default_account = (await web3.eth.getAccounts())[0];
     let migration = new web3.eth.Contract(migration_abi, migration_address);
-    console.log(migration.methods)
-    console.log(swap.methods)
-    let old_balance = parseInt(await swap_token.methods.balanceOf(default_account).call())
-    await old_swap_token.methods.approve(migration_address, old_balance).send({
-        from: default_account
-    })
+    let old_balance = parseInt(await old_swap_token.methods.balanceOf(default_account).call())
+    if(parseInt(await swap_token.methods.allowance(default_account, swap_address).call()) < old_balance) {    
+        await old_swap_token.methods.approve(migration_address, old_balance).send({
+            from: default_account
+        })
+    }
     await migration.methods.migrate().send({
         from: default_account,
         gas: 1500000
     })
 
     await update_balances();
-    update_fee_info();
+    update_fee_info('old');
 }
 
 async function handle_remove_liquidity() {
@@ -94,7 +94,7 @@ async function handle_remove_liquidity() {
     }
 
     await update_balances();
-    update_fee_info();
+    update_fee_info('old');
 }
 
 function init_ui() {
@@ -106,7 +106,7 @@ function init_ui() {
     $('#liquidity-share').on('input', handle_change_share);
 
     handle_change_share();
-    update_fee_info();
+    update_fee_info('old');
 
     $("#remove-liquidity").click(handle_remove_liquidity);
     $("#migrate-new").click(handle_migrate_new);
