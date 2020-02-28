@@ -12,9 +12,17 @@ var admin_fee;
 const trade_timeout = 1800;
 const max_allowance = BigInt(2) ** BigInt(256) - BigInt(1);
 
+function oldApprove(contract, amount, account) {
+    return new Promise(resolve => {
+                contract.methods.approve(old_swap_address, amount.toString())
+                .send({'from': account, 'gas': 100000})
+                .once('transactionHash', function(hash) {resolve(true);});
+            });
+}
+
 function approve(contract, amount, account) {
     return new Promise(resolve => {
-                contract.methods.approve(newswap_address, amount.toString())
+                contract.methods.approve(swap_address, amount.toString())
                 .send({'from': account, 'gas': 100000})
                 .once('transactionHash', function(hash) {resolve(true);});
             });
@@ -24,7 +32,7 @@ async function ensure_allowance(amounts) {
     var default_account = (await web3.eth.getAccounts())[0];
     var allowances = new Array(N_COINS);
     for (let i=0; i < N_COINS; i++)
-        allowances[i] = await coins[i].methods.allowance(default_account, newswap_address).call();
+        allowances[i] = await coins[i].methods.allowance(default_account, swap_address).call();
 
     if (amounts) {
         // Non-infinite
@@ -52,7 +60,7 @@ async function ensure_allowance(amounts) {
 async function ensure_underlying_allowance(i, _amount) {
     var default_account = (await web3.eth.getAccounts())[0];
     var amount = BigInt(_amount);
-    var current_allowance = BigInt(await underlying_coins[i].methods.allowance(default_account, newswap_address).call());
+    var current_allowance = BigInt(await underlying_coins[i].methods.allowance(default_account, swap_address).call());
 
     if (current_allowance == amount)
         return false;
@@ -70,9 +78,9 @@ async function ensure_underlying_allowance(i, _amount) {
 // Keeping for old withdraw, to be removed whenever the chance is
 async function ensure_token_allowance() {
     var default_account = (await web3.eth.getAccounts())[0];
-    if (parseInt(await swap_token.methods.allowance(default_account, newswap_address).call()) == 0)
+    if (parseInt(await swap_token.methods.allowance(default_account, swap_address).call()) == 0)
         return new Promise(resolve => {
-            swap_token.methods.approve(newswap_address, BigInt(max_allowance).toString())
+            swap_token.methods.approve(swap_address, BigInt(max_allowance).toString())
             .send({'from': default_account})
             .once('transactionHash', function(hash) {resolve(true);});
         })
@@ -98,11 +106,11 @@ async function init_contracts() {
         }
     });
 
-    oldswap = new web3.eth.Contract(swap_abi, swap_address);
-    oldswap_token = new web3.eth.Contract(ERC20_abi, token_address);
+    old_swap = new web3.eth.Contract(old_swap_abi, old_swap_address);
+    old_swap_token = new web3.eth.Contract(ERC20_abi, old_token_address);
 
-    swap = new web3.eth.Contract(newswap_abi, newswap_address);
-    swap_token = new web3.eth.Contract(ERC20_abi, newtoken_address);
+    swap = new web3.eth.Contract(swap_abi, swap_address);
+    swap_token = new web3.eth.Contract(ERC20_abi, token_address);
 
     for (let i = 0; i < N_COINS; i++) {
         var addr = await swap.methods.coins(i).call();
@@ -141,7 +149,7 @@ async function update_fee_info() {
     var total = 0;
     var promises = [];
     let infuraProvider = new Web3(infura_url)
-    swapInfura = new infuraProvider.eth.Contract(newswap_abi, newswap_address);
+    swapInfura = new infuraProvider.eth.Contract(swap_abi, swap_address);
     for (let i = 0; i < N_COINS; i++) {
         promises.push(swapInfura.methods.balances(i).call())
 /*        balances[i] = parseInt(await swap.methods.balances(i).call());

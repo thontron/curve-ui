@@ -6,11 +6,11 @@ async function update_balances() {
     if (default_account) {
         for (let i = 0; i < N_COINS; i++)
             wallet_balances[i] = parseInt(await coins[i].methods.balanceOf(default_account).call());
-        token_balance = parseInt(await oldswap_token.methods.balanceOf(default_account).call());
+        token_balance = parseInt(await old_swap_token.methods.balanceOf(default_account).call());
     }
     for (let i = 0; i < N_COINS; i++)
-        balances[i] = parseInt(await oldswap.methods.balances(i).call());
-    token_supply = parseInt(await oldswap_token.methods.totalSupply().call());
+        balances[i] = parseInt(await old_swap.methods.balances(i).call());
+    token_supply = parseInt(await old_swap_token.methods.totalSupply().call());
 }
 
 function handle_change_amounts(i) {
@@ -59,7 +59,7 @@ async function handle_migrate_new() {
     let migration = new web3.eth.Contract(migration_abi, migration_address);
     console.log(migration.methods)
     console.log(swap.methods)
-    await approve(swap_token, token_balance, default_account)
+    await approve(old_swap_token, token_balance, default_account)
     await migration.methods.migrate().send({
         from: default_account,
         gas: 1500000
@@ -81,13 +81,13 @@ async function handle_remove_liquidity() {
     var txhash;
     var default_account = (await web3.eth.getAccounts())[0];
     if (share_val == '---') {
-        await oldswap.methods.remove_liquidity_imbalance(amounts, deadline).send({'from': default_account});
+        await old_swap.methods.remove_liquidity_imbalance(amounts, deadline).send({'from': default_account});
     }
     else {
         var amount = BigInt(Math.floor(share_val / 100 * token_balance)).toString();
         if (share_val == 100)
-            amount = await oldswap_token.methods.balanceOf(default_account).call();
-        await oldswap.methods.remove_liquidity(amount, deadline, min_amounts).send({'from': default_account});
+            amount = await old_swap_token.methods.balanceOf(default_account).call();
+        await old_swap.methods.remove_liquidity(amount, deadline, min_amounts).send({'from': default_account});
     }
 
     await update_balances();
