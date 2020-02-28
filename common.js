@@ -12,14 +12,6 @@ var admin_fee;
 const trade_timeout = 1800;
 const max_allowance = BigInt(2) ** BigInt(256) - BigInt(1);
 
-function oldApprove(contract, amount, account) {
-    return new Promise(resolve => {
-                contract.methods.approve(old_swap_address, amount.toString())
-                .send({'from': account, 'gas': 100000})
-                .once('transactionHash', function(hash) {resolve(true);});
-            });
-}
-
 function approve(contract, amount, account) {
     return new Promise(resolve => {
                 contract.methods.approve(swap_address, amount.toString())

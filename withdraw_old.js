@@ -59,7 +59,10 @@ async function handle_migrate_new() {
     let migration = new web3.eth.Contract(migration_abi, migration_address);
     console.log(migration.methods)
     console.log(swap.methods)
-    await approve(old_swap_token, token_balance, default_account)
+    let old_balance = parseInt(await swap_token.methods.balanceOf(default_account).call())
+    await old_swap_token.methods.approve(migration_address, old_balance).send({
+        from: default_account
+    })
     await migration.methods.migrate().send({
         from: default_account,
         gas: 1500000
