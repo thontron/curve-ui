@@ -410,3 +410,7 @@ div.info table td {
   padding-left: 0.5em;
   text-align: left;
 }
+
+#highslippage-warning {
+  border: 0;
+}

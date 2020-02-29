@@ -52,7 +52,7 @@ async function init_ui() {
             infapproval = false;
 
         $('#currency_' + i).on('input', async function() {
-            calc_slippage()
+            calc_slippage(true)
 
             var el = $('#currency_' + i);
             if (this.value > wallet_balances[i] * c_rates[i])
