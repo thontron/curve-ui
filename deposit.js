@@ -105,6 +105,7 @@ window.addEventListener('load', async () => {
         await init();
         update_fee_info();
         await handle_sync_balances();
+        await calc_slippage();
         
         await init_ui();
         $("#from_currency").attr('disabled', false)
