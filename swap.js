@@ -84,7 +84,7 @@ async function handle_trade() {
     var b = parseInt(await swap.methods.balances(i).call()) / c_rates[i];
     if (b >= 0.001) {
         var dx = Math.floor($('#from_currency').val() * coin_precisions[i]);
-        var min_dy = Math.floor($('#to_currency').val() * 0.95 * coin_precisions[j]);
+        var min_dy = Math.floor($('#to_currency').val() * 0.99 * coin_precisions[j]);
         dx = BigInt(dx).toString();
         if ($('#inf-approval').prop('checked'))
             await ensure_underlying_allowance(i, max_allowance)
