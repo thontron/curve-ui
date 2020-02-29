@@ -217,21 +217,20 @@ async function handle_migrate_new() {
 }
 
 async function calc_slippage() {
-    var values = [...$("[id^=currency_]")].map((x,i) => $(x).val() / c_rates[i])
-    values = values.map(v=>BigInt(Math.floor(v)).toString())
-    var token_amount = await swap.methods.calc_token_amount(values, false).call();
+    var real_values = [...$("[id^=currency_]")].map((x,i) => parseFloat($(x).val()))
+    var values = real_values.map((x,i) => BigInt(Math.floor(x / c_rates[i])).toString())
+    var token_amount = await swap.methods.calc_token_amount(values, true).call();  // XXX true for deposits, false for withdrawals
     var token_supply = parseInt(await swap_token.methods.totalSupply().call());
     let slippage = 0;
     for(let i = 0; i < N_COINS; i++) {
-        let balance = parseInt(await swap.methods.balances(i).call()) * token_amount / token_supply
+        let balance = parseInt(await swap.methods.balances(i).call()) * c_rates[i] * token_amount / token_supply
         slippage += balance
     }
-    values = values.map(v=>parseInt(v))
-    slippage /= values.reduce((a,b) => a+b, 0)
+    slippage /= real_values.reduce((a,b) => a+b, 0)
     slippage = 1 - slippage;
     console.log(slippage)
-    if(slippage > 0.5) {
+    if(slippage > 0.01) {
         $("#highslippage-warning").show();
-        $("#highslippage-warning span").text(slippage)
+        $("#highslippage-warning span").text(slippage * 100)
     }
 }
