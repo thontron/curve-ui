@@ -21,7 +21,7 @@ function approve(contract, amount, account) {
 }
 
 
-function approve_to_migrate(amount) {
+function approve_to_migrate(amount, account) {
     return new Promise(resolve => {
                 old_swap_token.methods.approve(migration_address, amount)
                 .send({'from': account, 'gas': 100000})
@@ -204,8 +204,8 @@ async function handle_migrate_new() {
     var allowance = parseInt(await old_swap_token.methods.allowance(default_account, migration_address).call());
     if(allowance < old_balance) {
         if (allowance > 0)
-            await approve_to_migrate(0);
-        await approve_to_migrate(old_balance);
+            await approve_to_migrate(0, default_account);
+        await approve_to_migrate(old_balance, default_account);
     }
     await migration.methods.migrate().send({
         from: default_account,
