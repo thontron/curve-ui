@@ -51,7 +51,9 @@ async function init_ui() {
         if (BigInt(await coins[i].methods.allowance(default_account, swap_address).call()) <= max_allowance / BigInt(2))
             infapproval = false;
 
-        $('#currency_' + i).on('input', function() {
+        $('#currency_' + i).on('input', async function() {
+            calc_slippage()
+
             var el = $('#currency_' + i);
             if (this.value > wallet_balances[i] * c_rates[i])
                 el.css('background-color', 'red')

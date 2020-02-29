@@ -34,6 +34,7 @@ function handle_change_amounts(i) {
             else {
                 $('[id^=currency_]').css('background-color', 'blue');
             }
+            calc_slippage();
 
             var share = $('#liquidity-share');
             share.val('---');
@@ -41,6 +42,7 @@ function handle_change_amounts(i) {
             share.css('color', '#d0d0d0');
         }
         catch(err) {
+            console.error(err)
             $('[id^=currency_]').css('background-color', 'red');
         }
     }
@@ -63,8 +65,6 @@ function handle_change_share() {
         var cur = $('#currency_' + i);
         if ((val >=0) & (val <= 100)) {
             cur.val((val / 100 * balances[i] * c_rates[i] * token_balance / token_supply).toFixed(2))
-            console.log(val, balances[i], c_rates[i], token_balance, token_supply)
-            console.log((val / 100 * balances[i] * c_rates[i] * token_balance / token_supply).toFixed(2))
         }
         else
             cur.val('0.00');

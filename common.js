@@ -215,3 +215,23 @@ async function handle_migrate_new() {
     await update_balances();
     update_fee_info('old');
 }
+
+async function calc_slippage() {
+    var values = [...$("[id^=currency_]")].map((x,i) => $(x).val() / c_rates[i])
+    values = values.map(v=>BigInt(Math.floor(v)).toString())
+    var token_amount = await swap.methods.calc_token_amount(values, false).call();
+    var token_supply = parseInt(await swap_token.methods.totalSupply().call());
+    let slippage = 0;
+    for(let i = 0; i < N_COINS; i++) {
+        let balance = parseInt(await swap.methods.balances(i).call()) * token_amount / token_supply
+        slippage += balance
+    }
+    values = values.map(v=>parseInt(v))
+    slippage /= values.reduce((a,b) => a+b, 0)
+    slippage = 1 - slippage;
+    console.log(slippage)
+    if(slippage > 0.5) {
+        $("#highslippage-warning").show();
+        $("#highslippage-warning span").text(slippage)
+    }
+}
