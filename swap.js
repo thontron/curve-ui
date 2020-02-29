@@ -93,7 +93,7 @@ async function handle_trade() {
         else
             await ensure_underlying_allowance(i, dx);
         min_dy = BigInt(min_dy).toString();
-        await swap.methods.exchange_underlying(i, j, dx, min_dy, deadline).send({
+        await swap.methods.exchange_underlying(i, j, dx, min_dy).send({
                 from: default_account,
                 gas: 1200000,
             });
