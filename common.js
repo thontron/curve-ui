@@ -224,12 +224,14 @@ async function calc_slippage(deposit) {
     let slippage = 0;
     for(let i = 0; i < N_COINS; i++) {
         let coin_balance = parseInt(await swap.methods.balances(i).call()) * c_rates[i];
-        if(coin_balance < real_values[i]) {
-            $("#nobalance-warning").show();
-            $("#nobalance-warning span").text($("label[for='currency_"+i+"']").text());
+        if(!deposit) {            
+            if(coin_balance < real_values[i]) {
+                $("#nobalance-warning").show();
+                $("#nobalance-warning span").text($("label[for='currency_"+i+"']").text());
+            }
+            else
+                $("#nobalance-warning").hide();
         }
-        else
-            $("#nobalance-warning").hide();
         let balance =  coin_balance * token_amount / token_supply
         slippage += balance
     }
