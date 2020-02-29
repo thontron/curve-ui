@@ -34,6 +34,7 @@ async function set_to_amount() {
         var dy = dy_.toFixed(2);
         $('#to_currency').val(dy);
         $('#exchange-rate').text((dy_ / dx_).toFixed(4));
+        $('#from_currency').prop('disabled', false);
     }
     else
         $('#from_currency').prop('disabled', true);
@@ -84,7 +85,7 @@ async function handle_trade() {
     var b = parseInt(await swap.methods.balances(i).call()) / c_rates[i];
     if (b >= 0.001) {
         var dx = Math.floor($('#from_currency').val() * coin_precisions[i]);
-        var min_dy = Math.floor($('#to_currency').val() * 0.95 * coin_precisions[j]);
+        var min_dy = Math.floor($('#to_currency').val() * 0.99 * coin_precisions[j]);
         var deadline = Math.floor((new Date()).getTime() / 1000) + trade_timeout;
         dx = BigInt(dx).toString();
         if ($('#inf-approval').prop('checked'))
@@ -92,7 +93,7 @@ async function handle_trade() {
         else
             await ensure_underlying_allowance(i, dx);
         min_dy = BigInt(min_dy).toString();
-        await swap.methods.exchange_underlying(i, j, dx, min_dy, deadline).send({
+        await swap.methods.exchange_underlying(i, j, dx, min_dy).send({
                 from: default_account,
                 gas: 1200000,
             });
@@ -135,6 +136,6 @@ window.addEventListener('load', async () => {
 
         await init_ui();
         $("#from_currency").attr('disabled', false)
-        
+
     }
 });

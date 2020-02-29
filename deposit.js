@@ -32,8 +32,12 @@ async function handle_add_liquidity() {
         await ensure_allowance(false)
     else
         await ensure_allowance(amounts);
-    var deadline = Math.floor((new Date()).getTime() / 1000) + trade_timeout;
-    await swap.methods.add_liquidity(amounts, deadline).send({
+    var token_amount = 0;
+    if(parseInt(await swap_token.methods.totalSupply().call()) > 0) {    
+        token_amount = await swap.methods.calc_token_amount(amounts, true).call();
+        token_amount = BigInt(Math.floor(token_amount * 0.99)).toString();
+    }
+    await swap.methods.add_liquidity(amounts, token_amount).send({
         'from': default_account,
         'gas': 1300000});
     await handle_sync_balances();
@@ -91,6 +95,7 @@ async function init_ui() {
     $('#sync-balances').change(handle_sync_balances);
     $('#max-balances').change(handle_sync_balances);
     $("#add-liquidity").click(handle_add_liquidity);
+    $("#migrate-new").click(handle_migrate_new);
 }
 
 window.addEventListener('load', async () => {
@@ -100,7 +105,6 @@ window.addEventListener('load', async () => {
         await handle_sync_balances();
         
         await init_ui();
-
         $("#from_currency").attr('disabled', false)
 
     }
@@ -116,5 +120,4 @@ window.addEventListener('load', async () => {
         $("#from_currency").attr('disabled', false)
         
     }
-
 });

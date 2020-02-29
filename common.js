@@ -20,6 +20,15 @@ function approve(contract, amount, account) {
             });
 }
 
+
+function approve_to_migrate(amount, account) {
+    return new Promise(resolve => {
+                old_swap_token.methods.approve(migration_address, amount)
+                .send({'from': account, 'gas': 100000})
+                .once('transactionHash', function(hash) {resolve(true);});
+            });
+}
+
 async function ensure_allowance(amounts) {
     var default_account = (await web3.eth.getAccounts())[0];
     var allowances = new Array(N_COINS);
@@ -29,7 +38,6 @@ async function ensure_allowance(amounts) {
     if (amounts) {
         // Non-infinite
         for (let i=0; i < N_COINS; i++) {
-            console.log(i, allowances[i], amounts[i]);
             if (allowances[i] < amounts[i]) {
                 if (allowances[i] > 0)
                     await approve(coins[i], 0, default_account);
@@ -98,6 +106,9 @@ async function init_contracts() {
         }
     });
 
+    old_swap = new web3.eth.Contract(old_swap_abi, old_swap_address);
+    old_swap_token = new web3.eth.Contract(ERC20_abi, old_token_address);
+
     swap = new web3.eth.Contract(swap_abi, swap_address);
     swap_token = new web3.eth.Contract(ERC20_abi, token_address);
 
@@ -132,13 +143,24 @@ async function update_rates() {
     }
 }
 
-async function update_fee_info() {
+async function update_fee_info(version) {
+    var swap_abi_stats = swap_abi;
+    var swap_address_stats = swap_address;
+    var swap_stats = swap;
+    var swap_token_stats = swap_token;
+    if(version == 'old') {
+        swap_abi_stats = old_swap_abi;
+        swap_address_stats = old_swap_address;
+        swap_stats = old_swap;
+        swap_token_stats = old_swap_token;
+    }
+
     var bal_info = $('#balances-info li span');
     await update_rates();
     var total = 0;
     var promises = [];
     let infuraProvider = new Web3(infura_url)
-    swapInfura = new infuraProvider.eth.Contract(swap_abi, swap_address);
+    swapInfura = new infuraProvider.eth.Contract(swap_abi_stats, swap_address_stats);
     for (let i = 0; i < N_COINS; i++) {
         promises.push(swapInfura.methods.balances(i).call())
 /*        balances[i] = parseInt(await swap.methods.balances(i).call());
@@ -152,16 +174,16 @@ async function update_fee_info() {
         total += balances[i] * c_rates[i];
     })
     $(bal_info[N_COINS]).text(total.toFixed(2));
-    fee = parseInt(await swap.methods.fee().call()) / 1e10;
-    admin_fee = parseInt(await swap.methods.admin_fee().call()) / 1e10;
+    fee = parseInt(await swap_stats.methods.fee().call()) / 1e10;
+    admin_fee = parseInt(await swap_stats.methods.admin_fee().call()) / 1e10;
     $('#fee-info').text((fee * 100).toFixed(3));
     $('#admin-fee-info').text((admin_fee * 100).toFixed(3));
 
     var default_account = (await web3.eth.getAccounts())[0];
     if (default_account) {
-        var token_balance = parseInt(await swap_token.methods.balanceOf(default_account).call());
+        var token_balance = parseInt(await swap_token_stats.methods.balanceOf(default_account).call());
         if (token_balance > 0) {
-            var token_supply = parseInt(await swap_token.methods.totalSupply().call());
+            var token_supply = parseInt(await swap_token_stats.methods.totalSupply().call());
             var l_info = $('#lp-info li span');
             total = 0;
             for (let i=0; i < N_COINS; i++) {
@@ -173,4 +195,23 @@ async function update_fee_info() {
             $('#lp-info-container').show();
         }
     }
+}
+
+async function handle_migrate_new() {
+    var default_account = (await web3.eth.getAccounts())[0];
+    let migration = new web3.eth.Contract(migration_abi, migration_address);
+    let old_balance = await old_swap_token.methods.balanceOf(default_account).call();
+    var allowance = parseInt(await old_swap_token.methods.allowance(default_account, migration_address).call());
+    if(allowance < old_balance) {
+        if (allowance > 0)
+            await approve_to_migrate(0, default_account);
+        await approve_to_migrate(old_balance, default_account);
+    }
+    await migration.methods.migrate().send({
+        from: default_account,
+        gas: 1500000
+    });
+
+    await update_balances();
+    update_fee_info('old');
 }
