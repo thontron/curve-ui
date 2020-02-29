@@ -238,7 +238,7 @@ async function calc_slippage(deposit) {
     slippage /= real_values.reduce((a,b) => a+b, 0);
     slippage = 1 - slippage;
     console.log(slippage);
-    if(slippage > 0.5) {
+    if(slippage > 0.005) {
         $("#highslippage-warning").show();
         $("#highslippage-warning span").text(slippage * 100);
     }

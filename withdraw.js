@@ -34,7 +34,7 @@ function handle_change_amounts(i) {
             else {
                 $('[id^=currency_]').css('background-color', 'blue');
             }
-            calc_slippage(false);
+            await calc_slippage(false);
 
             var share = $('#liquidity-share');
             share.val('---');
