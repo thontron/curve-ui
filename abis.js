@@ -4,7 +4,7 @@ var old_swap_address = '0x2e60CF74d81ac34eB21eEff58Db4D385920ef419';
 var swap_address = '0xA2B47E3D5c44877cca798226B7B8118F9BFb7A56';
 var token_address = '0x845838DF265Dcd2c412A1Dc9e959c7d08537f8a2';
 var old_token_address = '0x3740fb63ab7a09891d7c0d4299442A551D06F5fD';
-var migration_address = '0xd133D1f0359dfEAdF1FA7bB655E2e1C76bE2f778';
+var migration_address = '0x54Ee22d5593FC76fB20EafAb66C45aAb3268B800';
 var infura_url = 'https://mainnet.infura.io/v3/c334bb4b45a444979057f0fb8a0c9d1b';
 
 var migration_abi = [
