@@ -20,6 +20,15 @@ function approve(contract, amount, account) {
             });
 }
 
+
+function approve_to_migrate(amount) {
+    return new Promise(resolve => {
+                old_swap_token.methods.approve(migration_address, amount)
+                .send({'from': account, 'gas': 100000})
+                .once('transactionHash', function(hash) {resolve(true);});
+            });
+}
+
 async function ensure_allowance(amounts) {
     var default_account = (await web3.eth.getAccounts())[0];
     var allowances = new Array(N_COINS);
@@ -191,17 +200,17 @@ async function update_fee_info(version) {
 async function handle_migrate_new() {
     var default_account = (await web3.eth.getAccounts())[0];
     let migration = new web3.eth.Contract(migration_abi, migration_address);
-    let old_balance = parseInt(await old_swap_token.methods.balanceOf(default_account).call())
-    if(parseInt(await old_swap_token.methods.allowance(default_account, migration_address).call()) < old_balance) {    
-        await old_swap_token.methods.approve(migration_address, old_balance.toString()).send({
-            from: default_account,
-            gas: 100000
-        })
+    let old_balance = await old_swap_token.methods.balanceOf(default_account).call();
+    var allowance = parseInt(await old_swap_token.methods.allowance(default_account, migration_address).call());
+    if(allowance < old_balance) {
+        if (allowance > 0)
+            await approve_to_migrate(0);
+        await approve_to_migrate(old_balance);
     }
     await migration.methods.migrate().send({
         from: default_account,
         gas: 1500000
-    })
+    });
 
     await update_balances();
     update_fee_info('old');
