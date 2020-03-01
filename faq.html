@@ -6,10 +6,12 @@
     <title>🌀 Curve.fi :: Compounded</title>
     <link rel="stylesheet" href="tvision.css?v19012020" />
     <script src="/jquery.min.js"></script>
-    <script src="/common.js?v25022020"></script>
     <script>
     window.addEventListener('load', async () => {
-        init_menu();
+        $("div.top-menu-bar a").toArray().forEach(function(el) {
+            if (el.href == window.location.href)
+                el.classList.add('selected')
+        })
     });
     </script>
   </head>

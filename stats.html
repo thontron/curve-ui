@@ -7,12 +7,14 @@
     <link rel="stylesheet" href="tvision.css?v19012020" />
     <script src="/jquery.min.js"></script>
     <script src="/apexcharts.min.js"></script>
-    <script src="/common.js?v25022020"></script>
     <script src="/chart.js?v25022020_2"></script>
     <script>
     window.addEventListener('load', async () => {
-        init_menu();
-        init_chart();
+      $("div.top-menu-bar a").toArray().forEach(function(el) {
+          if (el.href == window.location.href)
+              el.classList.add('selected')
+      })
+      init_chart();
     });
     </script>
   </head>
