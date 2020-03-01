@@ -2,6 +2,19 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <meta property="og:title" content="busd.curve.fi" />
+    <meta property="og:url" content="https://busd.curve.fi" />
+    <meta property="og:type" content="website" />
+    <meta property="og:description" content="A curve.fi portal for swapping BUSD and other stablecoins" />
+    <meta property="og:image" content="https://raw.githubusercontent.com/curvefi/curve-ui/busd/assets/curvepreview.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="busd.curve.fi" />
+    <meta name="twitter:site" content="@CurveFinance" />
+    <meta name="twitter:creator" content="@CurveFinance" />
+    <meta name="twitter:description" content="A curve.fi portal for swapping BUSD and other stablecoins"/>
+    <meta name="twitter:url" content="https://busd.curve.fi" />
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/curvefi/curve-ui/busd/assets/curvepreview.png" />
+    
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>🌀 Curve.fi :: bUSD</title>
     <link rel="stylesheet" href="tvision.css?v19012020" />
@@ -15,7 +28,7 @@
     <script src="/abis.js?v13022020"></script>
     <script src="/common.js?v13022020v3"></script>
     <script src="/init.js?v25022020"></script>
-    <script src="/swap.js?v26022020"></script>
+    <script src="/swap.js?v28022020"></script>
   </head>
   <body>
     <div class="top-menu-bar">
@@ -50,7 +63,7 @@
                     <legend>From:</legend>
                     <ul>
                         <li>
-                            <input type="text" id="from_currency" name="from_currency">
+                            <input type="text" id="from_currency" name="from_currency" disabled value='0.00'>
                         </li>
                         <li>
                             <input type="radio" id="from_cur_0" name="from_cur" value="0">

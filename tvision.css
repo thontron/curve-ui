@@ -410,3 +410,12 @@ div.info table td {
   padding-left: 0.5em;
   text-align: left;
 }
+
+.simple-error {
+  margin: 1em auto 0 auto;
+  background: red;
+  padding: 1em;
+  display: none;
+  color: white;
+  width: 80%;
+}

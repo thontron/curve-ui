@@ -14,7 +14,7 @@ async function handle_sync_balances() {
         $(".currencies input").prop('disabled', true);
         for (let i = 0; i < N_COINS; i++) {
             var val = Math.floor(wallet_balances[i] * c_rates[i] * 100) / 100;
-            $('#currency_' + i).val(val);
+            $('#currency_' + i).val(val.toFixed(2));
         }
     } else {
         $(".currencies input").prop('disabled', false);
@@ -50,7 +50,9 @@ async function init_ui() {
             infapproval = false;
         }
 
-        $('#currency_' + i).on('input', function() {
+        $('#currency_' + i).on('input', async function() {
+            await calc_slippage(true)
+
             var el = $('#currency_' + i);
             if (this.value > wallet_balances[i] * c_rates[i])
                 el.css('background-color', 'red')
@@ -99,6 +101,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         await init();
         update_fee_info();
         await handle_sync_balances();
+        await calc_slippage(true);
         
         await init_ui();
 
@@ -112,6 +115,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         await init_contracts();
         update_fee_info();
         await handle_sync_balances();
+        await calc_slippage(true);
 
         await init_ui();
         $("#from_currency").attr('disabled', false)

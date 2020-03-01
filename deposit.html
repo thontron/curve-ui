@@ -50,19 +50,19 @@
                 <ul>
                     <li>
                         <label for="currency_0">yDAI (in DAI)</label>
-                        <input type="text" id="currency_0" name="from_cur" value="0.0">
+                        <input type="text" id="currency_0" name="from_cur" value="0.00">
                     </li>
                     <li>
                         <label for="currency_1">yUSDC (in USDC)</label>
-                        <input type="text" id="currency_1" name="from_cur" value="0.0">
+                        <input type="text" id="currency_1" name="from_cur" value="0.00">
                     </li>
                     <li>
                         <label for="currency_2">yUSDT (in USDT)</label>
-                        <input type="text" id="currency_2" name="from_cur" value="0.0">
+                        <input type="text" id="currency_2" name="from_cur" value="0.00">
                     </li>
                     <li>
                         <label for="currency_3">yBUSD (in BUSD)</label>
-                        <input type="text" id="currency_3" name="from_cur" value="0.0">
+                        <input type="text" id="currency_3" name="from_cur" value="0.00">
                     </li>
                 </ul>
             </fieldset>
@@ -75,10 +75,15 @@
                     <input id="max-balances" type="checkbox" name="max-balances" checked>
                     <label for="max-balances">Use maximum amount of coins available</label>
                 </li>
+                <li>
+                    <input id="inf-approval" type="checkbox" name="inf-approval" checked>
+                    <label for="inf-approval">Infinite approval - trust this contract forever</label>
+                </li>
             </ul>
 
             <p style="text-align: center">
                 <button id="add-liquidity">Deposit</button>
+                <p class='simple-error' id='highslippage-warning'>Warning! High slippage: <span></span>%</p>
             </p>
         </div>
     </div>

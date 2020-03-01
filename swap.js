@@ -4,7 +4,7 @@ var to_currency;
 async function set_from_amount(i) {
     var default_account = (await web3.eth.getAccounts())[0];
     var el = $('#from_currency');
-    if (el.val() == '')
+    if (el.val() == '' || el.val() == 0)
         $('#from_currency').val(
             Math.floor(
                 100 * parseFloat(await underlying_coins[i].methods.balanceOf(default_account).call()) / coin_precisions[i]
@@ -84,7 +84,7 @@ async function handle_trade() {
     var b = parseInt(await swap.methods.balances(i).call()) / c_rates[i];
     if (b >= 0.001) {
         var dx = Math.floor($('#from_currency').val() * coin_precisions[i]);
-        var min_dy = Math.floor($('#to_currency').val() * 0.95 * coin_precisions[j]);
+        var min_dy = Math.floor($('#to_currency').val() * 0.99 * coin_precisions[j]);
         dx = BigInt(dx).toString();
         if ($('#inf-approval').prop('checked'))
             await ensure_underlying_allowance(i, max_allowance)
