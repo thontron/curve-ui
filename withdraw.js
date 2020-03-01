@@ -122,7 +122,7 @@ async function handle_remove_liquidity() {
 function init_ui() {
     for (let i = 0; i < N_COINS; i++) {
         $('#currency_' + i).focus(handle_change_amounts(i));
-        $('#currency_' + i).on('input', handle_change_amounts(i));
+        $('#currency_' + i).on('input', debounced(100, handle_change_amounts(i)));
     }
     $('#liquidity-share').focus(handle_change_share);
     $('#liquidity-share').on('input', handle_change_share);

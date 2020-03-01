@@ -246,3 +246,16 @@ async function calc_slippage(deposit) {
     else
         $("#highslippage-warning").hide();
 }
+
+function debounced(delay, fn) {
+  let timerId;
+  return function (...args) {
+    if (timerId) {
+      clearTimeout(timerId);
+    }
+    timerId = setTimeout(() => {
+      fn(...args);
+      timerId = null;
+    }, delay);
+  }
+}
