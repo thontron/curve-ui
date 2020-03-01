@@ -3,25 +3,85 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>🌀 Curve.fi :: Compounded</title>
-    <link rel="stylesheet" href="/tvision.css?v05012020" />
+    <meta property="og:title" content="curve.fi" />
+    <meta property="og:url" content="https://curve.fi" />
+    <meta property="og:type" content="website" />
+    <meta property="og:description" content="Curve is an exchange liquidity pool on Ethereum designed for extremely efficient stablecoin trading" />
+    <meta property="og:image" content="./assets/curve.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="curve.fi" />
+    <meta name="twitter:site" content="@CurveFinance" />
+    <meta name="twitter:creator" content="@CurveFinance" />
+    <meta name="twitter:description" content="Curve is an exchange liquidity pool on Ethereum designed for extremely efficient stablecoin trading"/>
+    <meta name="twitter:url" content="https://curve.fi" />
+    <meta name="twitter:image" content="./assets/curve.png" />
+    <title>🌀 Curve.fi</title>
+    <link rel="stylesheet" href="/tvision.css?v29022020_2" />
     <script src="/jquery.min.js"></script>
-    <script src="/common.js?v05012020"></script>
     <script>
-    window.addEventListener('load', async () => {
-        init_menu();
-    });
+        var activePoolLink = 0;
+        window.addEventListener('load', async () => {
+            $("div.top-menu-bar a").toArray().forEach(function(el) {
+                if (el.href == window.location.href)
+                    el.classList.add('selected')
+            })
+            $('.poolsdialog > div').eq(activePoolLink).addClass('selected')
+        });
+        document.addEventListener('keydown', e => {
+            if(e.code == 'ArrowUp' && activePoolLink != 0) {
+                e.preventDefault();
+                $('.poolsdialog > div').eq(activePoolLink).removeClass('selected')
+                $('.poolsdialog > div').eq(--activePoolLink).addClass('selected')
+            }
+            if(e.code == 'ArrowDown' && activePoolLink < 3) {
+                e.preventDefault();
+                $('.poolsdialog > div').eq(activePoolLink).removeClass('selected')
+                $('.poolsdialog > div').eq(++activePoolLink).addClass('selected')
+            }
+            if(e.code.includes('Digit')) {
+                e.preventDefault();
+                var digit = e.code.slice(-1);
+                if(digit > 3) return;
+                $('.poolsdialog > div').eq(activePoolLink).removeClass('selected')
+                activePoolLink = digit
+                $('.poolsdialog > div').eq(activePoolLink).addClass('selected')
+            }
+            if(e.code == 'Enter') {
+                e.preventDefault();
+                window.location.href = $('.poolsdialog > div').eq(activePoolLink).find('a').attr('href')
+            }
+        })
     </script>
   </head>
   <body>
     <div class="top-menu-bar">
       <a href="/">This FAQ</a>
-      <a href="https://compound.curve.fi">USDC/DAI + Compound</a>
+      <a href="https://twitter.com/CurveFinance">#Twitter</a>
+      <a href="https://t.me/curvefi">@Telegram</a>
+      <a href="https://www.duneanalytics.com/curve">Dune Analytics</a>
       <a href="https://github.com/curvefi/curve-contract">git@</a>
     </div>
     <div id="screen">
         <div class="blue window">
-            <h1>🌀 Curve</h1>
+            <h1><img src="./logo.svg" alt="🌀 Curve" height="50"></h1>
+        </div>
+
+        <div class="window white">
+            <fieldset class='poolsdialog'>
+                <legend>Curve pools</legend>
+                <div>
+                    <a href='https://compound.curve.fi'>0.  Compound &nbsp;&nbsp;&nbsp;&nbsp;[(c)DAI, (c)USDC]</a>
+                </div>
+                <div>
+                    <a href='https://usdt.curve.fi'>1.  USDT &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(c)DAI, (c)USDC, USDT]</a>
+                </div>
+                <div>
+                    <a href='https://y.curve.fi'>2.  Y &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(y)DAI, (y)USDC, (y)USDT, (y)TUSD]</a>
+                </div>
+                <div>
+                    <a href='https://busd.curve.fi'>3.  BUSD &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(y)DAI, (y)USDC, (y)USDT, (y)BUSD]</a>
+                </div>
+            </fieldset>
         </div>
 
         <div class="window white">
@@ -34,16 +94,21 @@
             risk, supplemental fee income for liquidity providers, without an
             opportunity cost.</p>
 
-            <p>Curve allows users (and smart contracts like <a href="http://1inch.exchange/">1inch</a>) to trade
-            between DAI and USDC with a bespoke low slippage, low fee algorithm
-            designed specifically for stablecoins. Behind the scenes, the
-            liquidity pool is supplied to the <a href="https://compound.finance/">Compound</a> protocol, where it
-            generates income for liquidity providers.</p>
+            <p>Curve allows users (and smart contracts like
+            <a href="http://1inch.exchange/">1inch</a> and
+            <a href="https://paraswap.io/">Paraswap</a>)
+            to trade between DAI and USDC with a bespoke low slippage, low fee algorithm
+            designed specifically for stablecoins and earn fees. Behind the scenes, the
+            liquidity pool is also supplied to the <a href="https://compound.finance/">Compound</a> protocol
+            or <a href="https://iearn.finance/">iearn.finance</a>
+            where it generates even more income for liquidity providers.</p>
 
             <h3>Has Curve been audited?</h3>
-            <p>Curve is currently in alpha - the codebase can be found
-            <a href="https://github.com/curvefi/curve-contract/tree/compounded">on GitHub</a>.
-            Please don’t supply your life savings, or assets you
+            <p>Results of an audit peformed by Trail of Bits will be published soon.</p>
+            <p>Curve is currently in beta - the codebase can be found
+            <a href="https://github.com/curvefi/curve-contract/">on GitHub</a>.
+            As the case with any new, even audited, DeFi project, please don’t
+            supply your life savings, or assets you
             can’t afford to lose, to Curve, especially as a liquidity
             provider.</p>
 
@@ -52,9 +117,9 @@
 
             <h3>How do I trade on Curve?</h3>
             <p>Before trading, you’ll have to approve Curve to interact with
-            your DAI or USDC balance, similar to most DeFi applications.</p>
+            your stablecoin balance, similar to most DeFi applications.</p>
 
-            <p>On the <a href="https://compound.curve.fi">exchange</a>, select the asset you would like to convert (e.g.
+            <p>On the exchange page, select the asset you would like to convert (e.g.
             USDC), and the quantity (e.g. 1,000) - the exchange rate, and
             quantity that you will receive (including and all slippage and fees)
             will be displayed. The exchange rate might surprise you - that’s the
@@ -63,23 +128,11 @@
             <h3>How do I provide liquidity to Curve?</h3>
 
             <p>Curve uses <a href="https://compound.finance/ctokens">cTokens</a>,
-            assets inside the Compound protocol, as the
+            or <a href="https://docs.iearn.finance/curve">Ytokens</a>
+            assets for lending while market making, as the
             liquidity pool - this ensures that assets are always being put to
-            work. You can acquire cDAI or cUSDC by supplying DAI or USDC to
-            <a href="https://app.compound.finance/">Compound</a>, or by
-            acquiring cTokens on <a href="https://1inch.exchange/">1inch</a>.</p>
-
-            <p>Before providing liquidity, you’ll have to approve Curve to
-            interact with your cDAI or cUSDC balances.</p>
-
-            <p>Visit the <a href="https://compound.curve.fi/deposit.html">Curve deposit page</a>, and your available balances should
-            appear. If you <b>add all coins in a balanced proportion</b>, you will
-            provide cTokens at the current exchange Curve rate; this requires
-            you to have both assets in your wallet. You can uncheck this feature
-            to supply one side of the market, or a different ratio of assets,
-            and Curve will automatically exchange them into the proper quantity
-            (with the same low slippage & fees of the Curve exchange) -
-            magic!</p>
+            work. You will need to acquire cTokens or YTokens if you want to
+            provide liquidity (you can read the instuctions in each pool's FAQ).</p>
 
             <h3>What's "Use maximum amount of coins available"?</h3>
             <p>This means using all USDC and DAI in your wallet. This way is
@@ -87,15 +140,14 @@
             liquidity pool.</p>
 
             <h3>How to withdraw liquidity I provided?</h3>
-            <p>Go to <a href="https://compound.curve.fi/withdraw.html">the withdraw page</a>. If you want
+            <p>Go to the withdraw page. If you want
             to withdraw some percentage of your liquidity (the preferred way),
             type that percentage in the top field.
             You can, however, withdraw in a form of individual coins (USDC,
-            DAI), having the exchange happening for you, if you type amounts in
+            DAI, ...), having the exchange happening for you, if you type amounts in
             lower fields. You'll get charge with the exchange fee in the latter
             case.</p>
         </div>
     </div>
   </body>
 </html>
-
