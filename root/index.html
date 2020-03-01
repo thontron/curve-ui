@@ -6,11 +6,13 @@
     <title>🌀 Curve.fi :: Compounded</title>
     <link rel="stylesheet" href="/tvision.css?v29022020_2" />
     <script src="/jquery.min.js"></script>
-    <script src="/common.js?v29022020_2"></script>
     <script>
         var activePoolLink = 0;
         window.addEventListener('load', async () => {
-            init_menu();
+            $("div.top-menu-bar a").toArray().forEach(function(el) {
+                if (el.href == window.location.href)
+                    el.classList.add('selected')
+            })
             $('.poolsdialog > div').eq(activePoolLink).addClass('selected')
         });
         document.addEventListener('keydown', e => {
