@@ -197,7 +197,8 @@ async function update_fee_info(version) {
     }
 }
 
-async function handle_migrate_new() {
+async function handle_migrate_new(page) {
+    console.log(page)
     var default_account = (await web3.eth.getAccounts())[0];
     let migration = new web3.eth.Contract(migration_abi, migration_address);
     let old_balance = await old_swap_token.methods.balanceOf(default_account).call();
@@ -213,11 +214,11 @@ async function handle_migrate_new() {
     });
 
     await update_balances();
-    update_fee_info('old');
+    update_fee_info(page);
 }
 
 async function calc_slippage(deposit) {
-    var real_values = [...$("[id^=currency_]")].map((x,i) => parseFloat($(x).val()));
+    var real_values = [...$("[id^=currency_]")].map((x,i) => +($(x).val()));
     var values = real_values.map((x,i) => BigInt(Math.floor(x / c_rates[i])).toString());
     var token_amount = await swap.methods.calc_token_amount(values, deposit).call();  // XXX true for deposits, false for withdrawals
     var token_supply = parseInt(await swap_token.methods.totalSupply().call());

@@ -92,7 +92,9 @@ function init_ui() {
     update_fee_info('old');
 
     $("#remove-liquidity").click(handle_remove_liquidity);
-    $("#migrate-new").click(handle_migrate_new);
+    $("#migrate-new").click(() => {
+        handle_migrate_new('old');
+    });
 }
 
 window.addEventListener('load', async () => {

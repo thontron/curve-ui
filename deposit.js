@@ -14,6 +14,7 @@ async function handle_sync_balances() {
         $(".currencies input").prop('disabled', true);
         for (let i = 0; i < N_COINS; i++) {
             var val = Math.floor(wallet_balances[i] * c_rates[i] * 100) / 100;
+            val = val.toFixed(2)
             $('#currency_' + i).val(val);
         }
     } else
@@ -97,7 +98,10 @@ async function init_ui() {
     $('#sync-balances').change(handle_sync_balances);
     $('#max-balances').change(handle_sync_balances);
     $("#add-liquidity").click(handle_add_liquidity);
-    $("#migrate-new").click(handle_migrate_new);
+    $("#migrate-new").click(() => {
+        handle_migrate_new('new');
+        
+    });
 }
 
 window.addEventListener('load', async () => {

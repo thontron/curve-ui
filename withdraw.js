@@ -19,9 +19,19 @@ async function update_balances() {
 
 function handle_change_amounts(i) {
     return async function() {
+        var real_values = [...$("[id^=currency_]")].map((x,i) => +($(x).val()));
         var values = [...$("[id^=currency_]")].map((x,i) => $(x).val() / c_rates[i])
         values = values.map(v=>BigInt(Math.floor(v)).toString())
-
+        for(let i = 0; i < N_COINS; i++) {
+            let coin_balance = parseInt(await swap.methods.balances(i).call()) * c_rates[i];
+            if(coin_balance < real_values[i]) {
+                $("#nobalance-warning").show();
+                $("#nobalance-warning span").text($("label[for='currency_"+i+"']").text());
+                return;
+            }
+            else
+                $("#nobalance-warning").hide();
+        }
         try {
             var availableAmount =  await swap.methods.calc_token_amount(values, false).call()
             availableAmount = availableAmount / (1 - fee * N_COINS / (4 * (N_COINS - 1)))
@@ -112,7 +122,9 @@ function init_ui() {
     update_fee_info();
 
     $("#remove-liquidity").click(handle_remove_liquidity);
-    $("#migrate-new").click(handle_migrate_new);
+    $("#migrate-new").click(() => {
+        handle_migrate_new('new');
+    });
 }
 
 window.addEventListener('load', async () => {
