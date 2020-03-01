@@ -15,14 +15,17 @@
         });
         document.addEventListener('keydown', e => {
             if(e.code == 'ArrowUp' && activePoolLink != 0) {
+                e.preventDefault();
                 $('.poolsdialog > div').eq(activePoolLink).removeClass('selected')
                 $('.poolsdialog > div').eq(--activePoolLink).addClass('selected')
             }
             if(e.code == 'ArrowDown' && activePoolLink < 3) {
+                e.preventDefault();
                 $('.poolsdialog > div').eq(activePoolLink).removeClass('selected')
                 $('.poolsdialog > div').eq(++activePoolLink).addClass('selected')
             }
             if(e.code.includes('Digit')) {
+                e.preventDefault();
                 var digit = e.code.slice(-1);
                 if(digit > 3) return;
                 $('.poolsdialog > div').eq(activePoolLink).removeClass('selected')
@@ -30,6 +33,7 @@
                 $('.poolsdialog > div').eq(activePoolLink).addClass('selected')
             }
             if(e.code == 'Enter') {
+                e.preventDefault();
                 window.location.href = $('.poolsdialog > div').eq(activePoolLink).find('a').attr('href')
             }
         })
@@ -45,7 +49,7 @@
     </div>
     <div id="screen">
         <div class="blue window">
-            <h1><img src="/logo.svg" alt="🌀 Curve" height="50"></h1>
+            <h1><img src="./logo.svg" alt="🌀 Curve" height="50"></h1>
         </div>
 
         <div class="window white">
