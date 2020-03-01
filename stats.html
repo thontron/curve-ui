@@ -11,8 +11,11 @@
     <script src="/chart.js?v20012020"></script>
     <script>
     window.addEventListener('load', async () => {
-        init_menu();
-        init_chart();
+      $("div.top-menu-bar a").toArray().forEach(function(el) {
+          if (el.href == window.location.href)
+              el.classList.add('selected')
+      })
+      init_chart();
     });
     </script>
   </head>

@@ -17,12 +17,31 @@ async function update_balances() {
 }
 
 function handle_change_amounts(i) {
-    return async function() {
+return async function() {
+        var real_values = [...$("[id^=currency_]")].map((x,i) => +($(x).val()));
         var values = [...$("[id^=currency_]")].map((x,i) => $(x).val() / c_rates[i])
         values = values.map(v=>BigInt(Math.floor(v)).toString())
-
+        let show_nobalance = false;
+        let show_nobalance_i = 0;
+        for(let i = 0; i < N_COINS; i++) {
+            let coin_balance = parseInt(await swap.methods.balances(i).call()) * c_rates[i];
+            if(coin_balance < real_values[i]) {
+                show_nobalance |= true;
+                show_nobalance_i = i;
+            }
+            else
+                show_nobalance |= false;
+        }
+        if(show_nobalance) {
+            $("#nobalance-warning").show();
+            $("#nobalance-warning span").text($("label[for='currency_"+show_nobalance_i+"']").text());
+            return;
+        }
+        else {
+            $("#nobalance-warning").hide();
+        }
         try {
-            var availableAmount = await swap.methods.calc_token_amount(values, false).call()
+            var availableAmount =  await swap.methods.calc_token_amount(values, false).call()
             availableAmount = availableAmount / (1 - fee * N_COINS / (4 * (N_COINS - 1)))
             var default_account = (await web3.eth.getAccounts())[0];
             var maxAvailableAmount = parseInt(await swap_token.methods.balanceOf(default_account).call());
@@ -33,6 +52,7 @@ function handle_change_amounts(i) {
             else {
                 $('[id^=currency_]').css('background-color', 'blue');
             }
+            await calc_slippage(false);
 
             var share = $('#liquidity-share');
             share.val('---');
@@ -40,6 +60,7 @@ function handle_change_amounts(i) {
             share.css('color', '#d0d0d0');
         }
         catch(err) {
+            console.error(err)
             $('[id^=currency_]').css('background-color', 'red');
         }
     }
@@ -99,7 +120,7 @@ async function handle_remove_liquidity() {
 function init_ui() {
     for (let i = 0; i < N_COINS; i++) {
         $('#currency_' + i).focus(handle_change_amounts(i));
-        $('#currency_' + i).on('input', handle_change_amounts(i));
+        $('#currency_' + i).on('input', debounced(100, handle_change_amounts(i)));
     }
     $('#liquidity-share').focus(handle_change_share);
     $('#liquidity-share').on('input', handle_change_share);

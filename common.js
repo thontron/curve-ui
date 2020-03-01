@@ -160,3 +160,46 @@ async function update_fee_info() {
         }
     }
 }
+
+async function calc_slippage(deposit) {
+    var real_values = [...$("[id^=currency_]")].map((x,i) => +($(x).val()));
+    var values = real_values.map((x,i) => BigInt(Math.floor(x / c_rates[i])).toString());
+    var token_amount = await swap.methods.calc_token_amount(values, deposit).call();  // XXX true for deposits, false for withdrawals
+    var token_supply = parseInt(await swap_token.methods.totalSupply().call());
+    let slippage = 0;
+    for(let i = 0; i < N_COINS; i++) {
+        let coin_balance = parseInt(await swap.methods.balances(i).call()) * c_rates[i];
+        if(!deposit) {            
+            if(coin_balance < real_values[i]) {
+                $("#nobalance-warning").show();
+                $("#nobalance-warning span").text($("label[for='currency_"+i+"']").text());
+            }
+            else
+                $("#nobalance-warning").hide();
+        }
+        let balance =  coin_balance * token_amount / token_supply
+        slippage += balance
+    }
+    slippage /= real_values.reduce((a,b) => a+b, 0);
+    slippage = 1 - slippage;
+    console.log(slippage);
+    if(slippage > 0.005) {
+        $("#highslippage-warning").show();
+        $("#highslippage-warning span").text(slippage * 100);
+    }
+    else
+        $("#highslippage-warning").hide();
+}
+
+function debounced(delay, fn) {
+  let timerId;
+  return function (...args) {
+    if (timerId) {
+      clearTimeout(timerId);
+    }
+    timerId = setTimeout(() => {
+      fn(...args);
+      timerId = null;
+    }, delay);
+  }
+}

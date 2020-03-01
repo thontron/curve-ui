@@ -4,7 +4,7 @@ var to_currency;
 async function set_from_amount(i) {
     var default_account = (await web3.eth.getAccounts())[0];
     var el = $('#from_currency');
-    if (el.val() == '')
+    if (el.val() == '' || el.val() == 0)
         $('#from_currency').val(
             Math.floor(
                 100 * parseFloat(await underlying_coins[i].methods.balanceOf(default_account).call()) / coin_precisions[i]
@@ -33,7 +33,9 @@ async function set_to_amount() {
         var dy_ = parseInt(await swap.methods.get_dy_underlying(i, j, dx).call()) / coin_precisions[j];
         var dy = dy_.toFixed(2);
         $('#to_currency').val(dy);
-        $('#exchange-rate').text((dy_ / dx_).toFixed(4));
+        var exchange_rate = (dy_ / dx_).toFixed(4);
+        if(isNaN(exchange_rate)) exchange_rate = "Not available"
+        $('#exchange-rate').text(exchange_rate);
     }
     else
         $('#from_currency').prop('disabled', true);
