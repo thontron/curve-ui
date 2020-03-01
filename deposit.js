@@ -14,7 +14,7 @@ async function handle_sync_balances() {
         $(".currencies input").prop('disabled', true);
         for (let i = 0; i < N_COINS; i++) {
             var val = Math.floor(wallet_balances[i] * c_rates[i] * 100) / 100;
-            $('#currency_' + i).val(val);
+            $('#currency_' + i).val(val.toFixed(2));
         }
     } else
         $(".currencies input").prop('disabled', false);
