@@ -22,15 +22,24 @@ function handle_change_amounts(i) {
         var real_values = [...$("[id^=currency_]")].map((x,i) => +($(x).val()));
         var values = [...$("[id^=currency_]")].map((x,i) => $(x).val() / c_rates[i])
         values = values.map(v=>BigInt(Math.floor(v)).toString())
+        let show_nobalance = false;
+        let show_nobalance_i = 0;
         for(let i = 0; i < N_COINS; i++) {
             let coin_balance = parseInt(await swap.methods.balances(i).call()) * c_rates[i];
             if(coin_balance < real_values[i]) {
-                $("#nobalance-warning").show();
-                $("#nobalance-warning span").text($("label[for='currency_"+i+"']").text());
-                return;
+                show_nobalance |= true;
+                show_nobalance_i = i;
             }
             else
-                $("#nobalance-warning").hide();
+                show_nobalance |= false;
+        }
+        if(show_nobalance) {
+            $("#nobalance-warning").show();
+            $("#nobalance-warning span").text($("label[for='currency_"+show_nobalance_i+"']").text());
+            return;
+        }
+        else {
+            $("#nobalance-warning").hide();
         }
         try {
             var availableAmount =  await swap.methods.calc_token_amount(values, false).call()
