@@ -325,6 +325,9 @@ div.info table td {
   .top-menu-bar.top-menu-bar #poolsdropdown:hover .dropdown {
     display: none;
   }
+  #poolsdropdown > a:after {
+    content: " Pools";
+  }
 }
 
 .icon-container {
