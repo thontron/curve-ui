@@ -198,7 +198,6 @@ async function update_fee_info(version) {
 }
 
 async function handle_migrate_new(page) {
-    console.log(page)
     var default_account = (await web3.eth.getAccounts())[0];
     let migration = new web3.eth.Contract(migration_abi, migration_address);
     let old_balance = await old_swap_token.methods.balanceOf(default_account).call();
@@ -241,7 +240,6 @@ async function calc_slippage(deposit) {
     else
         slippage = real_values.reduce((a,b) => a+b, 0) / slippage;
     slippage = 1 - slippage;
-    console.log(slippage);
     if(slippage > 0.005) {
         $("#highslippage-warning").show();
         $("#highslippage-warning span").text(slippage * 100);
