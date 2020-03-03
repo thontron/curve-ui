@@ -26,6 +26,14 @@
                     el.classList.add('selected')
             })
             $('.poolsdialog > div').eq(activePoolLink).addClass('selected')
+            var urls = ['https://compound.curve.fi', 'https://usdt.curve.fi', 'https://y.curve.fi', 'https://busd.curve.fi']        
+            let stats = await Promise.all(urls.map(url=>$.getJSON(url+'/stats.json')))
+            for(let i = 0; i < stats.length; i++) {
+                let json = stats[i];
+                console.log(json);
+                var weekly_apr = json['weekly_apr'];
+                $(`.poolsdialog div:nth-of-type(${i+1}) a span`).text((weekly_apr * 100).toFixed(2));
+            }
         });
         document.addEventListener('keydown', e => {
             if(e.code == 'ArrowUp' && activePoolLink != 0) {
@@ -70,16 +78,16 @@
             <fieldset class='poolsdialog'>
                 <legend>Curve pools</legend>
                 <div>
-                    <a href='https://compound.curve.fi'>0.  Compound &nbsp;&nbsp;&nbsp;&nbsp;[(c)DAI, (c)USDC]</a>
+                    <a href='https://compound.curve.fi'>0.  Compound &nbsp;&nbsp;&nbsp;&nbsp;[(c)DAI, (c)USDC] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; APR: <span></span></a>
                 </div>
                 <div>
-                    <a href='https://usdt.curve.fi'>1.  USDT &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(c)DAI, (c)USDC, USDT]</a>
+                    <a href='https://usdt.curve.fi'>1.  USDT &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(c)DAI, (c)USDC, USDT] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; APR: <span></span></a>
                 </div>
                 <div>
-                    <a href='https://y.curve.fi'>2.  Y &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(y)DAI, (y)USDC, (y)USDT, (y)TUSD]</a>
+                    <a href='https://y.curve.fi'>2.  Y &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(y)DAI, (y)USDC, (y)USDT, (y)TUSD] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; APR: <span></span></a>
                 </div>
                 <div>
-                    <a href='https://busd.curve.fi'>3.  BUSD &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(y)DAI, (y)USDC, (y)USDT, (y)BUSD]</a>
+                    <a href='https://busd.curve.fi'>3.  BUSD &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[(y)DAI, (y)USDC, (y)USDT, (y)BUSD] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; APR: <span></span></a>
                 </div>
             </fieldset>
         </div>
