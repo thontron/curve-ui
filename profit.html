@@ -27,7 +27,6 @@
     <script src="/abis.js?v29022020"></script>
     <script src="/init.js?v26022020"></script>
     <script src="/common.js?v26022020"></script>
-    <script src="/deposit.js?v26022020"></script>
     <script src="/calcprofit.js?v03032020"></script>
   </head>
   <body>
@@ -54,49 +53,17 @@
       <a href="/faq.html">FAQ</a>
       <a href="https://github.com/curvefi/curve-contract/tree/pool_compound">git@</a>
     </div>
-    <div id="screen">
-        <div class="blue window">
-            <h1><img src="/logo.svg" alt="🌀 Curve" height="50"></h1>
-        </div>
-        <div class="error window half-width info" id="error-window"></div>
-
-        <div class="window white add-liquidity">
-            <fieldset class="currencies">
-                <legend>Currencies:</legend>
-                <ul>
-                    <li>
-                        <label for="currency_0">cDAI (in DAI)</label>
-                        <input type="text" id="currency_0" disabled name="from_cur" value="0.00">
-                    </li>
-                    <li>
-                        <label for="currency_1">cUSDC (in USDC)</label>
-                        <input type="text" id="currency_1" disabled name="from_cur" value="0.00">
-                    </li>
-                </ul>
-            </fieldset>
-            <ul>
-                <li>
-                    <input id="sync-balances" type="checkbox" name="sync-balances" checked>
-                    <label for="sync-balances">Add all coins in a balanced proportion</label>
-                </li>
-                <li>
-                    <input id="max-balances" type="checkbox" name="max-balances" checked>
-                    <label for="max-balances">Use maximum amount of coins available</label>
-                </li>
-                <li>
-                    <input id="inf-approval" type="checkbox" name="inf-approval" checked>
-                    <label for="inf-approval">Infinite approval - trust this contract forever</label>
-                </li>
+    <div class='blue window half-width info'>
+        <fieldset id='profit-info'>
+            <legend>Profit</legend>
+            <ul id='profit'>
+                <li><b>Deposits:</b> <span></span></li>
+                <li><b>Withdrawals:</b> <span></span></li>
+                <li><b>Available:</b> <span></span></li>
+                <li><b>Profit:</b> <span></span></li>
             </ul>
-
-            <p style="text-align: center">
-                <button id="add-liquidity">Deposit</button>
-                <button id="migrate-new">Migrate</button>
-                <p class='simple-error' id='highslippage-warning'>Warning! High slippage: <span></span>%</p>
-            </p>
-        </div>
+        </fieldset>
     </div>
-
     <div class="blue window half-width info">
       <fieldset id="lp-info-currency">
         <legend>Currency reserves</legend>

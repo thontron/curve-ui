@@ -112,6 +112,9 @@ window.addEventListener('load', async () => {
         await calc_slippage(true);
         
         await init_ui();
+        BN = web3.utils.toBN;
+
+        await getDeposits();
         $("#from_currency").attr('disabled', false)
 
     }
