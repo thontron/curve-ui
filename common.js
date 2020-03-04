@@ -16,7 +16,7 @@ function approve(contract, amount, account) {
     return new Promise(resolve => {
                 contract.methods.approve(swap_address, amount.toString())
                 .send({from: account, gas: 100000})
-                .once(transactionHash, function(hash) {resolve(true);});
+                .once('transactionHash', function(hash) {resolve(true);});
             });
 }
 
@@ -25,7 +25,7 @@ function approve_to_migrate(amount, account) {
     return new Promise(resolve => {
                 old_swap_token.methods.approve(migration_address, amount)
                 .send({from: account, gas: 100000})
-                .once(transactionHash, function(hash) {resolve(true);});
+                .once('transactionHash', function(hash) {resolve(true);});
             });
 }
 
@@ -82,7 +82,7 @@ async function ensure_token_allowance() {
         return new Promise(resolve => {
             swap_token.methods.approve(swap_address, BigInt(max_allowance).toString())
             .send({from: default_account})
-            .once(transactionHash, function(hash) {resolve(true);});
+            .once('transactionHash', function(hash) {resolve(true);});
         })
     else
         return false;
