@@ -32,7 +32,7 @@
                 let json = stats[i];
                 console.log(json);
                 var weekly_apr = json['weekly_apr'];
-                $(`.poolsdialog div:nth-of-type(${i+1}) a span`).text((weekly_apr * 100).toFixed(2));
+                $(`.poolsdialog div:nth-of-type(${i+1}) a span.apr span`).text((weekly_apr * 100).toFixed(2));
             }
         });
         document.addEventListener('keydown', e => {
