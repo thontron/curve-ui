@@ -1,18 +1,6 @@
 var BN;
 
-const ADDRESSES = {
-    cdai: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
-    cusdc: '0x39AA39c021dfbaE8faC545936693aC917d5E7563',
-    usdt: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-}
-
-const decimals = {
-    cdai: 1e10,
-    cusdc: 1e2,
-}
-
-var depositUsdSum = 0;
-
+const ADDRESSES = {};
 
 const CURVE = swap_address;
 const CURVE_TOKEN = token_address;
@@ -21,17 +9,17 @@ const TRANSFER_TOPIC =
     '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 
 function fromNative(curr, value) {
-    if(curr == 'cdai') return value.div(BN(1e10)).div(BN(1e16)).toNumber();
-    if(curr == 'cusdc') {
-        return value.div(BN(1e14)).toNumber();
+    if(curr == 'cDAI') return value.divRound(BN(1e10)).divRound(BN(1e16)).toNumber();
+    if(curr == 'cUSDC') {
+        return value.divRound(BN(1e14)).toNumber();
     }
-    if(curr == 'usdt') {
-        return value.div(BN(1e4)).toNumber();
+    if(curr == 'USDT') {
+        return value.divRound(BN(1e4)).toNumber();
     }
 }
 
 async function convertValues(curr) {
-    if(['cdai','cusdc'].includes(curr)) {
+    if(['cDAI','cUSDC'].includes(curr)) {
         //exchangeRate method
         const exchangeRate = await web3.eth.call({
             to: ADDRESSES[curr],
@@ -139,19 +127,39 @@ async function getAvailable(curr) {
         .div(BN(poolTokensSupply));
 }
 
+async function initConverters() {
+    let converters = {};
+    for(let curr of Object.keys(ADDRESSES)) {
+        converters[curr] = await convertValues(curr);
+    }
+    return converters;
+}
+
 async function init_ui() {
+    for(let i = 0; i < N_COINS; i++) {
+        let symbol = await coins[i].methods.symbol().call()
+        ADDRESSES[symbol] = coins[i]._address;
+    }
+
+    console.log(ADDRESSES)
+
 	try {
 		let deposits = await getDeposits();
 		$("#profit li:first span").text(deposits/100)
 		let withdrawals = 0;
 		let available = 0;
-		for(let curr of Object.keys(ADDRESSES)) {
-			const converter = await convertValues(curr);
-			const usdWithdrawn = converter(await getWithdrawals(ADDRESSES[curr]));
-			withdrawals += usdWithdrawn;
-			const availableUsd = converter(await getAvailable(curr));
-			available += availableUsd;
-		}
+        let promises = [];
+        let converters = await initConverters();
+        for(let curr of Object.keys(ADDRESSES)) {
+            promises.push(getWithdrawals(ADDRESSES[curr]))
+            promises.push(getAvailable(curr))
+        }
+        let prices = await Promise.all(promises);
+        for(let i = 0; i < prices.length; i+=2) {
+            withdrawals += converters[Object.keys(ADDRESSES)[i/2]](prices[i]);
+            console.log(converters[Object.keys(ADDRESSES)[i/2]](prices[i+1]), "AVAILABLE", Object.keys(ADDRESSES)[i/2], +prices[i+1])
+            available += converters[Object.keys(ADDRESSES)[i/2]](prices[i+1]);
+        }
 		$("#profit li:nth-child(2) span").text(withdrawals/100)
 		$("#profit li:nth-child(3) span").text(available/100)
 		$("#profit li:nth-child(4) span").text((available/100 + withdrawals/100 - deposits/100).toFixed(2))
@@ -176,6 +184,7 @@ window.addEventListener('load', async () => {
 
         await init_contracts();
         update_fee_info();
+        BN = web3.utils.toBN;
 
         await init_ui();        
     }
