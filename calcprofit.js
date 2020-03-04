@@ -9,9 +9,9 @@ const TRANSFER_TOPIC =
     '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 
 function fromNative(curr, value) {
-    if(curr == 'cDAI') return value.div(BN(1e10)).div(BN(1e16)).toNumber();
+    if(curr == 'cDAI') return value.divRound(BN(1e10)).divRound(BN(1e16)).toNumber();
     if(curr == 'cUSDC') {
-        return value.div(BN(1e14)).toNumber();
+        return value.divRound(BN(1e14)).toNumber();
     }
 }
 
@@ -26,7 +26,7 @@ async function convertValues(curr) {
             curr,
             BN(exchangeRate)
             .mul(BN(value))
-            .div(BN(1e8))
+            .divRound(BN(1e8))
         )
     };
 }
