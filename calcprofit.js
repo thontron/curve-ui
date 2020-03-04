@@ -1,28 +1,15 @@
 var BN;
 
-const ADDRESSES = {
-    idai: '0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01',
-    iusdc: '0xd6aD7a6750A7593E092a9B218d66C0A814a3436e',
-    iusdt: '0x83f798e925BcD4017Eb265844FDDAbb448f1707D',
-    itusd: '0x73a052500105205d34Daf004eAb301916DA8190f',
-};
+const ADDRESSES = {};
 
-const decimals = {
-    cdai: 1e10,
-    cusdc: 1e2,
-}
-
-var depositUsdSum = 0;
-
-
-const CURVE = '0x45f783cce6b7ff23b2ab2d70e416cdb7d6055f51';
-const CURVE_TOKEN = '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8';
+const CURVE = swap_address;
+const CURVE_TOKEN = token_address;
 //web3.utils.sha3('Transfer(address,address,uint256)')
 const TRANSFER_TOPIC =
     '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 
 function fromNative(curr, value) {
-    const decimals = ['iusdc', 'iusdt'].includes(curr) ? 6 : 18;
+    const decimals = ['yUSDC', 'yUSDT'].includes(curr) ? 6 : 18;
     if (decimals === 18) {
         return Number(web3.utils.fromWei(value));
     }
@@ -43,7 +30,7 @@ async function convertValues(curr) {
             curr,
             BN(usdPool)
                 .mul(BN(value))
-                .div(BN(tokensSupply))
+                .divRound(BN(tokensSupply))
                 .mul(BN(100))
         );
     };
@@ -127,19 +114,36 @@ async function getAvailable(curr) {
         .div(BN(poolTokensSupply));
 }
 
+async function initConverters() {
+    let converters = {};
+    for(let curr of Object.keys(ADDRESSES)) {
+        converters[curr] = await convertValues(curr);
+    }
+    return converters;
+}
+
+
 async function init_ui() {
+    for(let i = 0; i < N_COINS; i++) {
+        let symbol = await coins[i].methods.symbol().call()
+        ADDRESSES[symbol] = coins[i]._address;
+    }
 	try {
 		let deposits = await getDeposits();
 		$("#profit li:first span").text((deposits/100).toFixed(2))
 		let withdrawals = 0;
 		let available = 0;
-		for(let curr of Object.keys(ADDRESSES)) {
-			const converter = await convertValues(curr);
-			const usdWithdrawn = converter(await getWithdrawals(ADDRESSES[curr]));
-			withdrawals += usdWithdrawn || 0;
-			const availableUsd = converter(await getAvailable(curr));
-			available += availableUsd || 0;
-		}
+        let promises = [];
+        let converters = await initConverters();
+        for(let curr of Object.keys(ADDRESSES)) {
+            promises.push(getWithdrawals(ADDRESSES[curr]))
+            promises.push(getAvailable(curr))
+        }
+        let prices = await Promise.all(promises);
+        for(let i = 0; i < prices.length; i+=2) {
+            withdrawals += converters[Object.keys(ADDRESSES)[i/2]](prices[i]);
+            available += converters[Object.keys(ADDRESSES)[i/2]](prices[i+1]);
+        }
 		$("#profit li:nth-child(2) span").text((withdrawals/100).toFixed(2))
 		$("#profit li:nth-child(3) span").text((available/100).toFixed(2))
 		$("#profit li:nth-child(4) span").text((available/100 + withdrawals/100 - deposits/100).toFixed(2))
