@@ -330,6 +330,20 @@ div.info table td {
   }
 }
 
+@media only screen and (max-device-width : 640px) {
+  span.poolstext, .pools {
+    width: auto;
+  }
+  
+  span.pooltext {
+    display: inline-block;
+  }
+
+  span.pools {
+    display: block;
+  }
+}
+
 .icon-container {
   height: 15px;
   position: relative;
@@ -421,4 +435,14 @@ div.info table td {
   display: none;
   color: white;
   width: 80%;
+}
+
+.pooltext {
+  display: inline-block;
+  width: 12%;
+}
+
+.pools {
+  display: inline-block;
+  width: 60%;
 }
