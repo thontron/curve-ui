@@ -428,13 +428,20 @@ div.info table td {
   text-align: left;
 }
 
-.simple-error {
+.simple-error, .success {
   margin: 1em auto 0 auto;
-  background: red;
   padding: 1em;
   display: none;
   color: white;
   width: 80%;
+}
+
+.simple-error {
+  background: red;
+}
+
+.success {
+  background: green;
 }
 
 .pooltext {
