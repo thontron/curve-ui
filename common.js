@@ -194,7 +194,7 @@ async function calc_slippage(deposit) {
         $("#highslippage-warning").show();
         $("#highslippage-warning span").text(-slippage * 100);
     }
-    else {
+    else if(slippage > 0) {
         $("#highslippage-warning").hide();
         $("#bonus-window").show();
         $("#bonus-window span").text(slippage * 100);
