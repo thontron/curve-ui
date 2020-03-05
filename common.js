@@ -190,12 +190,15 @@ async function calc_slippage(deposit) {
     else
         slippage = real_values.reduce((a,b) => a+b, 0) / slippage;
     slippage = 1 - slippage;
-    if(slippage > 0.005) {
+    if(slippage < -0.005) {
         $("#highslippage-warning").show();
-        $("#highslippage-warning span").text(slippage * 100);
+        $("#highslippage-warning span").text(-slippage * 100);
     }
-    else
+    else {
         $("#highslippage-warning").hide();
+        $("#bonus-window").show();
+        $("#bonus-window span").text(slippage * 100);
+    }
 }
 
 function debounced(delay, fn) {
