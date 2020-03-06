@@ -414,7 +414,7 @@ div.info table td {
   text-align: left;
 }
 
-.simple-error, .success {
+.simple-error, .success, .info-message {
   margin: 1em auto 0 auto;
   padding: 1em;
   display: none;
@@ -426,6 +426,20 @@ div.info table td {
   background: red;
 }
 
+.info-message {
+  background: gray;
+}
+
 .success {
   background: green;
+}
+
+.pooltext {
+  display: inline-block;
+  width: 12%;
+}
+
+.pools {
+  display: inline-block;
+  width: 60%;
 }
