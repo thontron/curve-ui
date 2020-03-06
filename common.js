@@ -245,20 +245,20 @@ async function calc_slippage(deposit) {
     if(slippage < -0.005) {
         $("#bonus-window").hide();
         $("#highslippage-warning").removeClass('info-message').addClass('simple-error');
-        $("#highslippage-warning .text").text("High ");
-        $("#highslippage-warning .percent").text((-slippage * 100).toFixed(2));
+        $("#highslippage-warning .text").text("Warning! High slippage");
+        $("#highslippage-warning .percent").text((-slippage * 100).toFixed(3));
         $("#highslippage-warning").show();
     }
     else if(slippage > 0) {
         $("#highslippage-warning").hide();
         $("#bonus-window").show();
-        $("#bonus-window span").text((slippage * 100).toFixed(2));
+        $("#bonus-window span").text((slippage * 100).toFixed(3));
     }
-    else if(slippage <= -0.001) {
+    else if(slippage <= 0) {
         $("#bonus-window").hide();
         $("#highslippage-warning").removeClass('simple-error').addClass('info-message');
-        $("#highslippage-warning .text").text("Low ");
-        $("#highslippage-warning .percent").text((-slippage * 100).toFixed(2));
+        $("#highslippage-warning .text").text("Slippage");
+        $("#highslippage-warning .percent").text((-slippage * 100).toFixed(3));
         $("#highslippage-warning").show();
     }
     else {
