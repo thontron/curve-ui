@@ -240,15 +240,26 @@ async function calc_slippage(deposit) {
     else
         slippage = ideal_token_amount / token_amount;
     slippage = slippage - 1;
+    slippage = slippage || 0
+    console.log(slippage)
     if(slippage < -0.005) {
         $("#bonus-window").hide();
+        $("#highslippage-warning").removeClass('info-message').addClass('simple-error');
+        $("#highslippage-warning .text").text("High ");
+        $("#highslippage-warning .percent").text((-slippage * 100).toFixed(2));
         $("#highslippage-warning").show();
-        $("#highslippage-warning span").text((-slippage * 100).toFixed(2));
     }
     else if(slippage > 0) {
         $("#highslippage-warning").hide();
         $("#bonus-window").show();
         $("#bonus-window span").text((slippage * 100).toFixed(2));
+    }
+    else if(slippage != 0) {
+        $("#bonus-window").hide();
+        $("#highslippage-warning").removeClass('simple-error').addClass('info-message');
+        $("#highslippage-warning .text").text("Low ");
+        $("#highslippage-warning .percent").text((-slippage * 100).toFixed(2));
+        $("#highslippage-warning").show();
     }
 }
 

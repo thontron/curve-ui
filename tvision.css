@@ -428,7 +428,7 @@ div.info table td {
   text-align: left;
 }
 
-.simple-error, .success {
+.simple-error, .success, .info-message {
   margin: 1em auto 0 auto;
   padding: 1em;
   display: none;
@@ -438,6 +438,10 @@ div.info table td {
 
 .simple-error {
   background: red;
+}
+
+.info-message {
+  background: lightgray;
 }
 
 .success {
