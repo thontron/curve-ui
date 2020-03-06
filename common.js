@@ -241,13 +241,14 @@ async function calc_slippage(deposit) {
         slippage = ideal_token_amount / token_amount;
     slippage = slippage - 1;
     if(slippage < -0.005) {
+        $("#bonus-window").hide();
         $("#highslippage-warning").show();
-        $("#highslippage-warning span").text(-slippage * 100);
+        $("#highslippage-warning span").text((-slippage * 100).toFixed(2));
     }
     else if(slippage > 0) {
         $("#highslippage-warning").hide();
         $("#bonus-window").show();
-        $("#bonus-window span").text(slippage * 100);
+        $("#bonus-window span").text((slippage * 100).toFixed(2));
     }
 }
 
