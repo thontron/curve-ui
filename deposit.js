@@ -26,9 +26,16 @@ async function handle_sync_balances() {
 
 async function handle_add_liquidity() {
     var default_account = (await web3.eth.getAccounts())[0];
+    var max_balances = $("#max-balances").is(':checked')
     var amounts = $("[id^=currency_]").toArray().map(x => $(x).val());
-    for (let i = 0; i < N_COINS; i++)
-        amounts[i] = BigInt(Math.floor(amounts[i] / c_rates[i])).toString(); // -> c-tokens
+    for (let i = 0; i < N_COINS; i++) {
+        if(max_balances) {
+            amounts[i] = BigInt(amounts[i] / c_rates[i]).toString();
+        }
+        else {
+            amounts[i] = BigInt(Math.floor(amounts[i] / c_rates[i])).toString(); // -> c-tokens
+        }
+    }
     if ($('#inf-approval').prop('checked'))
         await ensure_allowance(false)
     else
