@@ -168,10 +168,12 @@ async function update_fee_info() {
 
 async function calc_slippage(deposit) {
     var real_values = [...$("[id^=currency_]")].map((x,i) => +($(x).val()));
+    var Sr = real_values.reduce((a,b) => a+b, 0);
     var values = real_values.map((x,i) => BigInt(Math.floor(x / c_rates[i])).toString());
+    var ideal_values = c_rates.map((rate, i) => BigInt(Math.floor(Sr / rate / N_COINS)).toString());
     var token_amount = await swap.methods.calc_token_amount(values, deposit).call();
+    var ideal_token_amount = await swap.methods.calc_token_amount(ideal_values, deposit).call();
     var token_supply = parseInt(await swap_token.methods.totalSupply().call());
-    let slippage = 0;
     for(let i = 0; i < N_COINS; i++) {
         let coin_balance = parseInt(await swap.methods.balances(i).call()) * c_rates[i];
         if(!deposit) {
@@ -182,22 +184,36 @@ async function calc_slippage(deposit) {
             else
                 $("#nobalance-warning").hide();
         }
-        let balance = coin_balance * token_amount / token_supply
-        slippage += balance
     }
     if (deposit)
-        slippage /= real_values.reduce((a,b) => a+b, 0)
+        slippage = token_amount / ideal_token_amount
     else
-        slippage = real_values.reduce((a,b) => a+b, 0) / slippage;
-    slippage = 1 - slippage;
+        slippage = ideal_token_amount / token_amount;
+    slippage = slippage - 1;
+    slippage = slippage || 0
+    console.log(slippage)
     if(slippage < -0.005) {
+        $("#bonus-window").hide();
+        $("#highslippage-warning").removeClass('info-message').addClass('simple-error');
+        $("#highslippage-warning .text").text("Warning! High slippage");
+        $("#highslippage-warning .percent").text((-slippage * 100).toFixed(3));
         $("#highslippage-warning").show();
-        $("#highslippage-warning span").text(-slippage * 100);
     }
     else if(slippage > 0) {
         $("#highslippage-warning").hide();
         $("#bonus-window").show();
-        $("#bonus-window span").text(slippage * 100);
+        $("#bonus-window span").text((slippage * 100).toFixed(3));
+    }
+    else if(slippage <= 0) {
+        $("#bonus-window").hide();
+        $("#highslippage-warning").removeClass('simple-error').addClass('info-message');
+        $("#highslippage-warning .text").text("Slippage");
+        $("#highslippage-warning .percent").text((-slippage * 100).toFixed(3));
+        $("#highslippage-warning").show();
+    }
+    else {
+      $("#bonus-window").hide();
+      $("#highslippage-warning").hide();
     }
 }
 
