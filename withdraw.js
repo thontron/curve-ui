@@ -11,8 +11,10 @@ async function update_balances() {
     else {
         token_balance = 0;
     }
-    for (let i = 0; i < N_COINS; i++)
+    for (let i = 0; i < N_COINS; i++) {
         balances[i] = parseInt(await swap.methods.balances(i).call());
+        if(!default_account) balances[i] = 0
+    }
     token_supply = parseInt(await swap_token.methods.totalSupply().call());
 }
 
@@ -125,7 +127,6 @@ async function init_ui() {
     $('#liquidity-share').on('input', debounced(100, handle_change_share));
 
     handle_change_share();
-    fee = parseInt(await swap.methods.fee().call()) / 1e10;
     update_fee_info();
 
     $("#remove-liquidity").click(handle_remove_liquidity);
@@ -137,7 +138,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         await update_rates();
         await update_balances();
         await init_ui();
-        $("#from_currency").attr('disabled', false)
     }
     catch(err) {
         const web3 = new Web3(infura_url);
@@ -146,8 +146,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         await init_contracts();
         await update_rates();
         await update_balances();
-        await init_ui();
-        $("#from_currency").attr('disabled', false)
-        
+        await init_ui();        
     }
 });
