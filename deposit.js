@@ -7,8 +7,10 @@ async function handle_sync_balances() {
 
     await update_rates();
 
-    for (let i = 0; i < N_COINS; i++)
+    for (let i = 0; i < N_COINS; i++) {
         wallet_balances[i] = parseInt(await coins[i].methods.balanceOf(default_account).call());
+        if(!default_account) wallet_balances[i] = 0
+    }
 
     if (max_balances) {
         $(".currencies input").prop('disabled', true);
@@ -50,7 +52,7 @@ async function init_ui() {
             infapproval = false;
         }
 
-        $('#currency_' + i).on('input', async function() {
+        $('#currency_' + i).on('input', debounced(100, async function() {
             await calc_slippage(true)
 
             var el = $('#currency_' + i);
@@ -83,7 +85,7 @@ async function init_ui() {
                             el_j.css('background-color', 'blue');
                     }
             }
-        });
+        }));
     }
 
     if (infapproval)

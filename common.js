@@ -90,12 +90,18 @@ async function ensure_token_allowance() {
 
 
 async function init_contracts() {
-    web3.eth.net.getId((err, result) => {
-        if (result != 1) {
+    try {
+        let networkId = await web3.eth.net.getId();
+        if(networkId != 1) {
             $('#error-window').text('Error: wrong network type. Please switch to mainnet');
             $('#error-window').show();
         }
-    });
+    }
+    catch(err) {
+        console.error(err);
+        $('#error-window').text('There was an error connecting. Please refresh page');
+        $('#error-window').show();
+    }
 
     swap = new web3.eth.Contract(swap_abi, swap_address);
     swap_token = new web3.eth.Contract(ERC20_abi, token_address);
@@ -124,6 +130,7 @@ async function update_rates() {
             c_rates[i] = rate;
         }
     }
+    fee = parseInt(await swap.methods.fee().call()) / 1e10;
 }
 
 async function update_fee_info() {
@@ -229,3 +236,21 @@ function debounced(delay, fn) {
     }, delay);
   }
 }
+
+function makeCancelable(promise) {
+    let rejectFn;
+
+    const wrappedPromise = new Promise((resolve, reject) => {
+        rejectFn = reject;
+
+        Promise.resolve(promise)
+            .then(resolve)
+            .catch(reject);
+    });
+
+    wrappedPromise.cancel = () => {
+        rejectFn({ canceled: true });
+    };
+
+    return wrappedPromise;
+};
