@@ -98,10 +98,19 @@ function init_ui() {
 }
 
 window.addEventListener('load', async () => {
-    await init();
+    try {
+        await init();
+        await update_rates('old');
+        await update_balances();
+        init_ui();
+    }
+    catch(err) {
+        const web3 = new Web3(infura_url);
+        window.web3 = web3
 
-    await update_rates();
-    await update_balances();
-
-    init_ui();
+        await init_contracts();
+        await update_rates('old');
+        await update_balances();
+        init_ui();
+    }
 });

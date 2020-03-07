@@ -22,28 +22,51 @@ async function highlight_input() {
         el.css('background-color', 'blue');
 }
 
+function promiseTimeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+let promise = makeCancelable(Promise.resolve());
 async function set_to_amount() {
-    var i = from_currency;
-    var j = to_currency;
-    var b = parseInt(await swap.methods.balances(i).call()) * c_rates[i];
-    console.log(b, c_rates[i])
-    if (b >= 0.001) {
-        // In c-units
-        var dx_ = $('#from_currency').val();
-        var dx = BigInt(Math.round(dx_ * coin_precisions[i])).toString();
-        var dy_ = parseInt(await swap.methods.get_dy_underlying(i, j, dx).call()) / coin_precisions[j];
-        var dy = dy_.toFixed(2);
-        $('#to_currency').val(dy);
-        var exchange_rate = (dy_ / dx_).toFixed(4);
-        if(isNaN(exchange_rate)) exchange_rate = "Not available"
-        $('#exchange-rate').text(exchange_rate);
-        $('#from_currency').prop('disabled', false);
-    }
-    else {
-        console.log("HEREEEEEEEE")
-        $('#from_currency').prop('disabled', true);
-    }
-    highlight_input();
+    promise.cancel();
+    promise = setAmountPromise()
+        .then(([dy, dy_, dx_]) => {
+            $('#to_currency').val(dy);
+            var exchange_rate = (dy_ / dx_).toFixed(4);
+            if(isNaN(exchange_rate)) exchange_rate = "Not available"
+            $('#exchange-rate').text(exchange_rate);
+            $('#from_currency').prop('disabled', false);
+        })
+        .catch(err => {
+            console.error(err);
+            $('#from_currency').prop('disabled', true);
+
+        })
+        .finally(() => {
+            highlight_input();
+        })
+    promise = makeCancelable(promise)
+}
+
+function setAmountPromise() {
+    let promise = new Promise(async (resolve, reject) => {
+        var i = from_currency;
+        var j = to_currency;
+        var b = parseInt(await swap.methods.balances(i).call()) * c_rates[i];
+        if (b >= 0.001) {
+            // In c-units
+            var dx_ = $('#from_currency').val();
+            var dx = BigInt(Math.round(dx_ * coin_precisions[i])).toString();
+            var dy_ = parseInt(await swap.methods.get_dy_underlying(i, j, dx).call()) / coin_precisions[j];
+            var dy = dy_.toFixed(2);
+            console.log("RESOLVE")
+            resolve([dy, dy_, dx_])
+        }
+        else { 
+            reject()
+        }
+    })
+    return makeCancelable(promise);
 }
 
 async function from_cur_handler() {
@@ -116,7 +139,7 @@ async function init_ui() {
     $("#from_cur_0").attr('checked', true);
     $("#to_cur_1").attr('checked', true);
 
-    $('#from_currency').on('input', debounced(100, set_to_amount));
+    $('#from_currency').on('input', set_to_amount);
     $('#from_currency').click(function() {this.select()});
 
     $("#trade").click(handle_trade);

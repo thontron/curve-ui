@@ -151,7 +151,7 @@ async function update_rates(version = 'new') {
     fee = parseInt(await swap_stats.methods.fee().call()) / 1e10;
 }
 
-async function update_fee_info(version) {
+async function update_fee_info(version = 'new') {
     var swap_abi_stats = swap_abi;
     var swap_address_stats = swap_address;
     var swap_stats = swap;
@@ -287,3 +287,21 @@ function debounced(delay, fn) {
     }, delay);
   }
 }
+
+function makeCancelable(promise) {
+    let rejectFn;
+
+    const wrappedPromise = new Promise((resolve, reject) => {
+        rejectFn = reject;
+
+        Promise.resolve(promise)
+            .then(resolve)
+            .catch(reject);
+    });
+
+    wrappedPromise.cancel = () => {
+        rejectFn({ canceled: true });
+    };
+
+    return wrappedPromise;
+};

@@ -142,7 +142,6 @@ window.addEventListener('load', async () => {
         await update_rates();
         await update_balances();
         init_ui();
-        $("#from_currency").attr('disabled', false)
     }
     catch(err) {
         const web3 = new Web3(infura_url);
@@ -151,8 +150,6 @@ window.addEventListener('load', async () => {
         await init_contracts();
         await update_rates();
         await update_balances();
-        init_ui();
-        $("#from_currency").attr('disabled', false)
-        
+        init_ui();        
     }
 });
