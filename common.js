@@ -90,21 +90,18 @@ async function ensure_token_allowance() {
 
 
 async function init_contracts() {
-    web3.eth.net.getId((err, result) => {
-/*        if (result == 1) {
-            if (web3.currentProvider.constructor.name == 's') {
-                $('#error-window').text('Error: please use Metamask to do transactions');
-                $('#error-window').show();
-            }
-            else
-                $('#error-window').hide();
-        }
-        else*/
-        if(result != 1) {
+    try {
+        let networkId = await web3.eth.net.getId();
+        if(networkId != 1) {
             $('#error-window').text('Error: wrong network type. Please switch to mainnet');
             $('#error-window').show();
         }
-    });
+    }
+    catch(err) {
+        console.error(err);
+        $('#error-window').text('There was an error connecting. Please refresh page');
+        $('#error-window').show();
+    }
 
     old_swap = new web3.eth.Contract(old_swap_abi, old_swap_address);
     old_swap_token = new web3.eth.Contract(ERC20_abi, old_token_address);
