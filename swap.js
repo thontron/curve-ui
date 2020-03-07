@@ -2,14 +2,16 @@ var from_currency;
 var to_currency;
 
 async function set_from_amount(i) {
-    var default_account = (await web3.eth.getAccounts())[0];
+    var default_account = (await web3.eth.getAccounts())[0] ;
     var el = $('#from_currency');
-    if (el.val() == '' || el.val() == 0)
-        $('#from_currency').val(
-            Math.floor(
-                100 * parseFloat(await underlying_coins[i].methods.balanceOf(default_account).call()) / coin_precisions[i]
+    if (el.val() == '' || el.val() == 0) {
+        let balance = await underlying_coins[i].methods.balanceOf(default_account).call();
+        if(!default_account) balance = 0
+        let amount = Math.floor(
+                100 * parseFloat(balance) / coin_precisions[i]
             ) / 100
-        );
+        $('#from_currency').val(amount.toFixed(2));
+    }
 }
 
 async function highlight_input() {
@@ -59,7 +61,6 @@ function setAmountPromise() {
             var dx = BigInt(Math.round(dx_ * coin_precisions[i])).toString();
             var dy_ = parseInt(await swap.methods.get_dy_underlying(i, j, dx).call()) / coin_precisions[j];
             var dy = dy_.toFixed(2);
-            console.log("RESOLVE")
             resolve([dy, dy_, dx_])
         }
         else { 

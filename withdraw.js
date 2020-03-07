@@ -11,8 +11,10 @@ async function update_balances() {
     else {
         token_balance = 0;
     }
-    for (let i = 0; i < N_COINS; i++)
+    for (let i = 0; i < N_COINS; i++) {
         balances[i] = parseInt(await swap.methods.balances(i).call());
+        if(!default_account) balances[i] = 0
+    }
     token_supply = parseInt(await swap_token.methods.totalSupply().call());
     fee = parseInt(await swap.methods.fee().call()) / 1e10;
 }

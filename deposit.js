@@ -7,8 +7,10 @@ async function handle_sync_balances() {
 
     await update_rates();
 
-    for (let i = 0; i < N_COINS; i++)
+    for (let i = 0; i < N_COINS; i++) {
         wallet_balances[i] = parseInt(await coins[i].methods.balanceOf(default_account).call());
+        if(!default_account) wallet_balances[i] = 0
+    }
 
     if (max_balances) {
         $(".currencies input").prop('disabled', true);
