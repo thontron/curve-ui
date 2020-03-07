@@ -35,6 +35,8 @@ async function set_to_amount() {
         .then(([dy, dy_, dx_]) => {
             $('#to_currency').val(dy);
             var exchange_rate = (dy_ / dx_).toFixed(4);
+            if(exchange_rate <= 0.98) $("#to_currency").css('background-color', 'red')
+            else $("#to_currency").css('background-color', '#505070')
             if(isNaN(exchange_rate)) exchange_rate = "Not available"
             $('#exchange-rate').text(exchange_rate);
             $('#from_currency').prop('disabled', false);
