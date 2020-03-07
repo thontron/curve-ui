@@ -61,7 +61,7 @@ async function init_ui() {
         if (BigInt(await coins[i].methods.allowance(default_account, swap_address).call()) <= max_allowance / BigInt(2))
             infapproval = false;
 
-        $('#currency_' + i).on('input', async function() {
+        $('#currency_' + i).on('input', debounced(100, async function() {
             await calc_slippage(true)
 
             var el = $('#currency_' + i);
@@ -94,7 +94,7 @@ async function init_ui() {
                             el_j.css('background-color', 'blue');
                     }
             }
-        });
+        }));
     }
 
     if (infapproval)
