@@ -116,15 +116,16 @@ async function handle_remove_liquidity() {
     update_fee_info();
 }
 
-function init_ui() {
+async function init_ui() {
     for (let i = 0; i < N_COINS; i++) {
         $('#currency_' + i).focus(handle_change_amounts(i));
-        $('#currency_' + i).on('input', handle_change_amounts(i));
+        $('#currency_' + i).on('input', debounced(100, handle_change_amounts(i)));
     }
     $('#liquidity-share').focus(handle_change_share);
-    $('#liquidity-share').on('input', handle_change_share);
+    $('#liquidity-share').on('input', debounced(100, handle_change_share));
 
     handle_change_share();
+    fee = parseInt(await swap.methods.fee().call()) / 1e10;
     update_fee_info();
 
     $("#remove-liquidity").click(handle_remove_liquidity);
@@ -135,7 +136,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         await init();
         await update_rates();
         await update_balances();
-        init_ui();
+        await init_ui();
         $("#from_currency").attr('disabled', false)
     }
     catch(err) {
@@ -145,7 +146,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         await init_contracts();
         await update_rates();
         await update_balances();
-        init_ui();
+        await init_ui();
         $("#from_currency").attr('disabled', false)
         
     }
