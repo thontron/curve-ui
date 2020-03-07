@@ -139,7 +139,7 @@ async function init_ui() {
     $("#from_cur_0").attr('checked', true);
     $("#to_cur_1").attr('checked', true);
 
-    $('#from_currency').on('input', set_to_amount);
+    $('#from_currency').on('input', debounced(100, set_to_amount));
     $('#from_currency').click(function() {this.select()});
 
     $("#trade").click(handle_trade);
