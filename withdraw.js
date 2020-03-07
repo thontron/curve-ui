@@ -128,7 +128,6 @@ function init_ui() {
     $('#liquidity-share').on('input', handle_change_share);
 
     handle_change_share();
-    fee = parseInt(await swap_stats.methods.fee().call()) / 1e10;
     update_fee_info();
 
     $("#remove-liquidity").click(handle_remove_liquidity);

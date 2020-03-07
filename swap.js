@@ -26,6 +26,7 @@ async function set_to_amount() {
     var i = from_currency;
     var j = to_currency;
     var b = parseInt(await swap.methods.balances(i).call()) * c_rates[i];
+    console.log(b, c_rates[i])
     if (b >= 0.001) {
         // In c-units
         var dx_ = $('#from_currency').val();
@@ -38,8 +39,10 @@ async function set_to_amount() {
         $('#exchange-rate').text(exchange_rate);
         $('#from_currency').prop('disabled', false);
     }
-    else
+    else {
+        console.log("HEREEEEEEEE")
         $('#from_currency').prop('disabled', true);
+    }
     highlight_input();
 }
 
@@ -99,7 +102,9 @@ async function handle_trade() {
                 from: default_account,
                 gas: 1200000,
             });
-        await update_fee_info();
+        
+        await update_rates();
+        update_fee_info();
         from_cur_handler();
     }
 }
@@ -115,8 +120,9 @@ async function init_ui() {
     $('#from_currency').click(function() {this.select()});
 
     $("#trade").click(handle_trade);
-
-    await update_fee_info();
+    
+    await update_rates();
+    update_fee_info();
     from_cur_handler();
     $("#from_currency").on("input", highlight_input);
 }

@@ -124,7 +124,7 @@ function init_menu() {
     })
 }
 
-async function update_rates() {
+async function update_rates(version = 'new') {
     for (let i = 0; i < N_COINS; i++) {
         /*
         rate: uint256 = cERC20(self.coins[i]).exchangeRateStored()
@@ -138,6 +138,17 @@ async function update_rates() {
         var block = await web3.eth.getBlockNumber();
         c_rates[i] = rate * (1 + supply_rate * (block - old_block) / 1e18);
     }
+    var swap_abi_stats = swap_abi;
+    var swap_address_stats = swap_address;
+    var swap_stats = swap;
+    var swap_token_stats = swap_token;
+    if(version == 'old') {
+        swap_abi_stats = old_swap_abi;
+        swap_address_stats = old_swap_address;
+        swap_stats = old_swap;
+        swap_token_stats = old_swap_token;
+    }
+    fee = parseInt(await swap_stats.methods.fee().call()) / 1e10;
 }
 
 async function update_fee_info(version) {
