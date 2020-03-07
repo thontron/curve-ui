@@ -121,6 +121,7 @@ async function update_rates() {
             c_rates[i] = rate;
         }
     }
+    fee = parseInt(await swap.methods.fee().call()) / 1e10;
 }
 
 async function update_fee_info() {
@@ -229,3 +230,21 @@ function debounced(delay, fn) {
     }, delay);
   }
 }
+
+function makeCancelable(promise) {
+    let rejectFn;
+
+    const wrappedPromise = new Promise((resolve, reject) => {
+        rejectFn = reject;
+
+        Promise.resolve(promise)
+            .then(resolve)
+            .catch(reject);
+    });
+
+    wrappedPromise.cancel = () => {
+        rejectFn({ canceled: true });
+    };
+
+    return wrappedPromise;
+}; 

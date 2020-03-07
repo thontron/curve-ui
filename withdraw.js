@@ -11,8 +11,10 @@ async function update_balances() {
     else {
         token_balance = 0;
     }
-    for (let i = 0; i < N_COINS; i++)
+    for (let i = 0; i < N_COINS; i++) {
         balances[i] = parseInt(await swap.methods.balances(i).call());
+        if(!default_account) balances[i] = 0
+    }
     token_supply = parseInt(await swap_token.methods.totalSupply().call());
 }
 
@@ -137,7 +139,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         await update_rates();
         await update_balances();
         init_ui();
-        $("#from_currency").attr('disabled', false)
     }
     catch(err) {
         const web3 = new Web3(infura_url);
@@ -146,8 +147,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         await init_contracts();
         await update_rates();
         await update_balances();
-        init_ui();
-        $("#from_currency").attr('disabled', false)
-        
+        init_ui();        
     }
 });
