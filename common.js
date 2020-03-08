@@ -9,6 +9,8 @@ var c_rates = new Array(N_COINS);
 var fee;
 var admin_fee;
 
+var cBN = (val) => new BN(val);
+
 const trade_timeout = 1800;
 const max_allowance = cBN(2).pow(cBN(256)).sub(cBN(1));
 
