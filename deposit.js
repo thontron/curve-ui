@@ -32,13 +32,13 @@ async function handle_add_liquidity() {
     var max_balances = $("#max-balances").is(':checked')
     var amounts = $("[id^=currency_]").toArray().map(x => $(x).val());
     for (let i = 0; i < N_COINS; i++) {
-        let amount = cBN(Math.floor(amounts[i] / c_rates[i])).toString();
+        let amount = cBN(Math.floor(amounts[i] / c_rates[i]).toString()).toString();
         let balance = await coins[i].methods.balanceOf(default_account).call();
         if(Math.abs(balance/amount-1) < 0.005) {
             amounts[i] = cBN(balance).toString();
         }
         else {
-            amounts[i] = cBN(Math.floor(amounts[i] / c_rates[i])).toString(); // -> c-tokens
+            amounts[i] = cBN(Math.floor(amounts[i] / c_rates[i]).toString()).toString(); // -> c-tokens
         }
     }
     if ($('#inf-approval').prop('checked'))
