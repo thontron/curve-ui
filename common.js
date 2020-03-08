@@ -10,12 +10,12 @@ var fee;
 var admin_fee;
 
 const trade_timeout = 1800;
-const max_allowance = BigInt(2) ** BigInt(256) - BigInt(1);
+const max_allowance = cBN(2).pow(cBN(256)).sub(cBN(1));
 
 function approve(contract, amount, account) {
     return new Promise(resolve => {
                 contract.methods.approve(swap_address, amount.toString())
-                .send({'from': account, 'gas': 100000})
+                .send({from: account, gas: 100000})
                 .once('transactionHash', function(hash) {resolve(true);});
             });
 }
@@ -40,7 +40,7 @@ async function ensure_allowance(amounts) {
     else {
         // Infinite
         for (let i=0; i < N_COINS; i++) {
-            if (allowances[i] < max_allowance / BigInt(2)) {
+            if (allowances[i] < max_allowance.div(cBN(2))) {
                 if (allowances[i] > 0)
                     await approve(coins[i], 0, default_account);
                 await approve(coins[i], max_allowance, default_account);
@@ -51,25 +51,25 @@ async function ensure_allowance(amounts) {
 
 async function ensure_underlying_allowance(i, _amount) {
     var default_account = (await web3.eth.getAccounts())[0];
-    var amount = BigInt(_amount);
-    var current_allowance = BigInt(await underlying_coins[i].methods.allowance(default_account, swap_address).call());
+    var amount = cBN(_amount);
+    var current_allowance = cBN(await underlying_coins[i].methods.allowance(default_account, swap_address).call());
 
     if (current_allowance == amount)
         return false;
 
-    if ((_amount == max_allowance) & (current_allowance > max_allowance / BigInt(2)))
+    if ((_amount == max_allowance) & (current_allowance > max_allowance.div(cBN(2))))
         return false;  // It does get spent slowly, but that's ok
 
     if (current_allowance != 0)
         await new Promise(resolve => {
             underlying_coins[i].methods.approve(swap_address, 0)
-            .send({'from': default_account, 'gas': 100000})
+            .send({from: default_account, gas: 100000})
             .once('transactionHash', function(hash) {resolve(true);});
         });
 
     return new Promise(resolve => {
         underlying_coins[i].methods.approve(swap_address, amount.toString())
-        .send({'from': default_account, 'gas': 100000})
+        .send({from: default_account, gas: 100000})
         .once('transactionHash', function(hash) {resolve(true);});
     })
 }
@@ -80,8 +80,8 @@ async function ensure_token_allowance() {
     var default_account = (await web3.eth.getAccounts())[0];
     if (parseInt(await swap_token.methods.allowance(default_account, swap_address).call()) == 0)
         return new Promise(resolve => {
-            swap_token.methods.approve(swap_address, BigInt(max_allowance).toString())
-            .send({'from': default_account, 'gas': 100000})
+            swap_token.methods.approve(swap_address, cBN(max_allowance).toString())
+            .send({from: default_account, gas: 100000})
             .once('transactionHash', function(hash) {resolve(true);});
         })
     else
@@ -248,8 +248,8 @@ function makeCancelable(promise) {
             .catch(reject);
     });
 
-    wrappedPromise.cancel = () => {
-        rejectFn({ canceled: true });
+    wrappedPromise.cancel = (reason) => {
+        rejectFn({ canceled: true, reason: reason });
     };
 
     return wrappedPromise;
