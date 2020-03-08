@@ -19,94 +19,143 @@ function convertValues(curr, exchangeRate, value) {
 }
 
 function fromNativeCurrent(curr, value) {
-    if(curr == 'cDAI') return value.div(BN(1e10)).div(BN(1e16)).toNumber();
-    if(curr == 'cUSDC') {
-        return value.div(BN(1e14)).toNumber();
+    const decimals = ['yUSDC', 'yUSDT'].includes(curr) ? 6 : 18;
+    if (decimals === 18) {
+        return Number(web3.utils.fromWei(value));
     }
+    return value.toNumber() / 10 ** decimals;
 }
 
-async function checkExchangeRateBlocks(block, address, direction) {
+async function convertValuesCurrent(curr) {
+    const usdPool = await web3.eth.call({
+        to: ADDRESSES[curr],
+        data: '0x7137ef99',
+    });
+    const tokensSupply = await web3.eth.call({
+        to: ADDRESSES[curr],
+        data: '0x18160ddd',
+    });
+    return value => {
+        return this.fromNativeCurrent(
+            curr,
+            BN(usdPool)
+                .mul(BN(value))
+                .div(BN(tokensSupply))
+                .mul(BN(100))
+        );
+    };
+}
+
+async function checkExchangeRateBlocks(block, address, direction, type = 'deposit') {
+    var default_account = (await web3.eth.getAccounts())[0];
+    // default_account = '0x203cfe1d269a4808e2efb4d0922667ce35fee326'
+    default_account = default_account.substr(2).toLowerCase();
+
     let fromBlock = '0x'+parseInt(block-100).toString(16)
     let toBlock = '0x'+parseInt(block).toString(16)
     if(direction == 1) {
         fromBlock = '0x'+parseInt(block).toString(16)
         toBlock = '0x'+parseInt(block+100).toString(16)
+        toBlock = 'latest'
     }
     if(direction == 0) {
         fromBlock = '0x'+parseInt(block-1).toString(16)
         toBlock = '0x'+parseInt(block+1).toString(16)
+        fromBlock = '0x909974'
     }
-    console.log(address)
+    //console.log(address)
     const tokenIndex = Object.values(ADDRESSES).indexOf(address);
     let underlying_address = underlying_coins[tokenIndex]._address
     let mints = await web3.eth.getPastLogs({
         fromBlock: fromBlock,
         toBlock: toBlock,
         address: address,
-        //web3.utils.sha3('Mint(address,uint256,uint256)')
+        //web3.utils.sha3('Transfer(address,address,uint256)')
         topics: [
             '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
-            [],
-            '0x000000000000000000000000' + CURVE.substr(2).toLowerCase(),
+            '0x0000000000000000000000000000000000000000000000000000000000000000'
         ],
     });
+    if(type != 'deposit') {
+       mints = await web3.eth.getPastLogs({
+            fromBlock: fromBlock,
+            toBlock: toBlock,
+            address: address,
+            //web3.utils.sha3('Transfer(address,address,uint256)')
+            topics: [
+                '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+                [],
+                '0x0000000000000000000000000000000000000000000000000000000000000000'
+            ],
+        }); 
+    }
     console.log(mints, "MINTS")
-    let deposits = await web3.eth.getPastLogs({
-        fromBlock: '0x909974',
-        toBlock: toBlock,
-        address: underlying_address,
-        //web3.utils.sha3('Mint(address,uint256,uint256)')
-        topics: [
-            '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
-            mints[0].topics[1],
-            '0x000000000000000000000000' + address.substr(2).toLowerCase(),
-        ],
-    });
-    console.log(deposits, "DEPOSITS")
-    return 0;
     if(mints.length) {
         let mint = mints[0]
-        let mintevent = web3.eth.abi.decodeParameters(['address','uint256','uint256'], mint.data)
-        let exchangeRate = BN(mintevent[1]).div(BN(mintevent[2]));
-        if(address == coins[1]._address) {
-            exchangeRate = BN(mintevent[1]).mul(BN(1e12)).div(BN(mintevent[2]))
+        if(direction = -1) mint = mints[mints.length-1]
+        //console.log(mint)
+        let tr = await web3.eth.getTransactionReceipt(mint.transactionHash)
+        //console.log(tr)
+        let sent = tr.logs.filter(log => {
+            return log.topics[0] == TRANSFER_TOPIC 
+                    && log.address.toLowerCase() == underlying_address.toLowerCase()
+                    //&& log.topics[1] == '0x000000000000000000000000' + default_account
+                    //  && log.topics[2] == '0x000000000000000000000000' + address.substr(2).toLowerCase()
+        })
+        if(type != 'deposit') {
+            sent = tr.logs.filter(log => {
+                return log.topics[0] == TRANSFER_TOPIC 
+                        && log.address.toLowerCase() == underlying_address.toLowerCase()
+                        //&& log.topics[1] == '0x000000000000000000000000' + default_account
+                        //  && log.topics[2] == '0x000000000000000000000000' + address.substr(2).toLowerCase()
+            })
         }
-        if(direction == 0) return exchangeRate
+        //console.log(sent[0].data, "DATATA", mint.data)
+        var exchangeRate = sent[0].data/mint.data
+        //console.log(+exchangeRate, "EXRATE")
         return {blockNumber: mint.blockNumber, exchangeRate: exchangeRate};
     }
     return false;
 }
 
-async function getExchangeRate(blockNumber, address, value) {
-    let exchangeRate = await checkExchangeRateBlocks(blockNumber, address, 0);
+async function getExchangeRate(blockNumber, address, value, type = 'deposit') {
+    let exchangeRate = await checkExchangeRateBlocks(blockNumber, address, 0, type);
     let exchangeRatePast, exchangeRateFuture;
     if(exchangeRate === false) {
         let i = j = blockNumber;
-        while((exchangeRatePast = await checkExchangeRateBlocks(i, address, -1)) === false) {
+        while((exchangeRatePast = await checkExchangeRateBlocks(i, address, -1, type)) === false) {
             i-=100;
         }
-        while((exchangeRateFuture = await checkExchangeRateBlocks(j, address, 1)) === false) {
+        while((exchangeRateFuture = await checkExchangeRateBlocks(j, address, 1, type)) === false) {
             j+=100;
         }
+        exchangeRate = (exchangeRateFuture.blockNumber - exchangeRatePast.blockNumber) * (exchangeRateFuture.exchangeRate - exchangeRatePast.exchangeRate)
+        exchangeRate = exchangeRate / (exchangeRateFuture.blockNumber - exchangeRatePast.blockNumber)
+        exchangeRate = exchangeRate + (exchangeRatePast.exchangeRate)
 
-        exchangeRate = BN(exchangeRateFuture.blockNumber - exchangeRatePast.blockNumber).mul(exchangeRateFuture.exchangeRate.sub(exchangeRatePast.exchangeRate))
-        exchangeRate = exchangeRate.div(BN(exchangeRateFuture.blockNumber - exchangeRatePast.blockNumber))
-        exchangeRate = exchangeRate.add(exchangeRatePast.exchangeRate)
+        //console.log(exchangeRate, "EXRATEEEEE")
+    }
+    else {
+        exchangeRate = exchangeRate.exchangeRate;
     }
 
-    const tokens = BN(value);
+    let tokens = BN(value);
     const tokenIndex = Object.values(ADDRESSES).indexOf(address);
     let curr = Object.keys(ADDRESSES)[tokenIndex]
     let currRate = await web3.eth.call({
         to: ADDRESSES[curr],
         data: '0xbd6d894d',
     });
-    const usd = fromNative(curr, BN(exchangeRate).mul(BN(tokens)))
+    console.log(exchangeRate, +tokens, curr, "EXRATE TOKENS")
+    if(curr == 'yDAI' || curr == 'yTUSD') tokens /= 1e18;
+    if(curr == 'yUSDC' || curr == 'yUSDT') tokens /= 1e6
+    const usd = exchangeRate * tokens
+    console.log(usd, "USD")
     return usd;
 }
 async function getDeposits() {
     var default_account = (await web3.eth.getAccounts())[0];
-    default_account = '0x203cfe1d269a4808e2efb4d0922667ce35fee326'
+    // default_account = '0x203cfe1d269a4808e2efb4d0922667ce35fee326'
     default_account = default_account.substr(2).toLowerCase();
 
     const poolTokensReceivings = await web3.eth.getPastLogs({
@@ -126,20 +175,17 @@ async function getDeposits() {
     for (const hash of txs) {
         const receipt = await web3.eth.getTransactionReceipt(hash);
         for (const log of receipt.logs) {
-            console.log(log)
+            //console.log(log)
             const tokenIndex = Object.values(ADDRESSES).indexOf(log.address);
             if (
                 tokenIndex !== -1 &&
                 log.topics[0] === TRANSFER_TOPIC &&
                 log.topics[2] === '0x000000000000000000000000' + CURVE.substr(2).toLowerCase()
             ) {
-                console.log("HEREEE")
-                try {
-                    let usd = await getExchangeRate(receipt.blockNumber, log.address, log.data)
-                }
-                catch(err) {
-                    console.log(err)
-                }
+                //console.log("HEREEE")
+
+                let usd = await getExchangeRate(receipt.blockNumber, log.address, log.data)
+                //console.log(usd, "USDDD")
                 depositUsdSum += usd;
             }
         }
@@ -150,6 +196,7 @@ async function getDeposits() {
 
 async function getWithdrawals(address) {
     var default_account = (await web3.eth.getAccounts())[0];
+    // default_account = '0x203cfe1d269a4808e2efb4d0922667ce35fee326'
     default_account = default_account.substr(2).toLowerCase();
     const logs = await web3.eth.getPastLogs({
         fromBlock: '0x909974',
@@ -163,7 +210,7 @@ async function getWithdrawals(address) {
     });
     let withdrawals = 0;
     for(let log of logs) {
-        let usd = await getExchangeRate(log.blockNumber, log.address, log.data)
+        let usd = await getExchangeRate(log.blockNumber, log.address, log.data, 'withdrawal')
         withdrawals += usd;
     }
     return withdrawals;
@@ -171,6 +218,7 @@ async function getWithdrawals(address) {
 
 async function getAvailable(curr) {
     var default_account = (await web3.eth.getAccounts())[0];
+    // default_account = '0x203cfe1d269a4808e2efb4d0922667ce35fee326'
     default_account = default_account.substr(2).toLowerCase();
     const tokenAddress = ADDRESSES[curr];
     //balanceOf method
@@ -201,10 +249,10 @@ async function init_ui() {
 
     try {
         let deposits = await getDeposits();
-        $("#profit li:first span").text(deposits/100)
-        let withdrawals = 0;
+        $("#profit li:first span").text(deposits.toFixed(2))
         let available = 0;
 
+        let withdrawals = 0;
         let promises = [];
         for(let curr of Object.keys(ADDRESSES)) {
             promises.push(getWithdrawals(ADDRESSES[curr]))
@@ -218,15 +266,24 @@ async function init_ui() {
                 to: ADDRESSES[curr],
                 data: '0xbd6d894d',
             });
+            const usdPool = await web3.eth.call({
+                to: ADDRESSES[curr],
+                data: '0x7137ef99',
+            });
+            const tokensSupply = await web3.eth.call({
+                to: ADDRESSES[curr],
+                data: '0x18160ddd',
+            });
+            console.log(usdPool/tokensSupply, "USDPS")
             available += fromNativeCurrent(curr,
-                BN(exchangeRate)
+                BN(usdPool)
                 .mul(BN(prices[i+1]))
-                .div(BN(1e8))
+                .divRound(BN(tokensSupply))
             );
         }
-        $("#profit li:nth-child(2) span").text(withdrawals/100)
-        $("#profit li:nth-child(3) span").text(available/100)
-        $("#profit li:nth-child(4) span").text((available/100 + withdrawals/100 - deposits/100).toFixed(2))
+        $("#profit li:nth-child(2) span").text(withdrawals.toFixed(2))
+        $("#profit li:nth-child(3) span").text(available.toFixed(2))
+        $("#profit li:nth-child(4) span").text((available + withdrawals - deposits).toFixed(2))
     }
     catch(err) {
         console.error(err)
