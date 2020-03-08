@@ -99,7 +99,7 @@ async function handle_remove_liquidity() {
         var share_val = share.val();
         var amounts = $("[id^=currency_]").toArray().map(x => $(x).val());
         for (let i = 0; i < N_COINS; i++)
-            amounts[i] = Math.floor(amounts[i] / c_rates[i]); // -> c-tokens
+            amounts[i] = cBN(Math.floor(amounts[i] / c_rates[i]).toString()).toString(); // -> c-tokens
         var min_amounts = amounts.map(x => cBN(Math.floor(0.97 * x).toString()).toString());
         amount = amounts.map(x => cBN(x.toString()).toString());
         var txhash;
