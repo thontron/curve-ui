@@ -146,8 +146,8 @@ async function getExchangeRate(blockNumber, address, value, type = 'deposit') {
         to: ADDRESSES[curr],
         data: '0xbd6d894d',
     });
-    console.log(exchangeRate, +tokens, curr, "EXRATE TOKENS")
-    if(curr == 'yDAI' || curr == 'yTUSD') tokens /= 1e18;
+    console.log(exchangeRate, +tokens, curr, "EXCHANGERATE TOKENS")
+    if(curr == 'yDAI' || curr == 'yTUSD' || 'yBUSD') tokens /= 1e18;
     if(curr == 'yUSDC' || curr == 'yUSDT') tokens /= 1e6
     const usd = exchangeRate * tokens
     console.log(usd, "USD")
@@ -274,7 +274,6 @@ async function init_ui() {
                 to: ADDRESSES[curr],
                 data: '0x18160ddd',
             });
-            console.log(usdPool/tokensSupply, "USDPS")
             available += fromNativeCurrent(curr,
                 BN(usdPool)
                 .mul(BN(prices[i+1]))
