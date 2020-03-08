@@ -9,8 +9,9 @@ var c_rates = new Array(N_COINS);
 var fee;
 var admin_fee;
 
+var cBN = (val) => new BN(val);
 const trade_timeout = 1800;
-const max_allowance = BigInt(2) ** BigInt(256) - BigInt(1);
+const max_allowance = cBN(2).pow(cBN(256)).sub(cBN(1));
 
 function approve(contract, amount, account) {
     return new Promise(resolve => {
@@ -48,7 +49,7 @@ async function ensure_allowance(amounts) {
     else {
         // Infinite
         for (let i=0; i < N_COINS; i++) {
-            if (allowances[i] < max_allowance / BigInt(2)) {
+            if (allowances[i] < max_allowance.div(cBN(2))) {
                 if (allowances[i] > 0)
                     await approve(coins[i], 0, default_account);
                 await approve(coins[i], max_allowance, default_account);
@@ -59,13 +60,13 @@ async function ensure_allowance(amounts) {
 
 async function ensure_underlying_allowance(i, _amount) {
     var default_account = (await web3.eth.getAccounts())[0];
-    var amount = BigInt(_amount);
-    var current_allowance = BigInt(await underlying_coins[i].methods.allowance(default_account, swap_address).call());
+    var amount = cBN(_amount);
+    var current_allowance = cBN(await underlying_coins[i].methods.allowance(default_account, swap_address).call());
 
     if (current_allowance == amount)
         return false;
 
-    if ((_amount == max_allowance) & (current_allowance > max_allowance / BigInt(2)))
+    if ((_amount == max_allowance) & (current_allowance > max_allowance.div(cBN(2))))
         return false;  // It does get spent slowly, but that's ok
 
     if ((current_allowance > 0) & (current_allowance < amount))
@@ -80,7 +81,7 @@ async function ensure_token_allowance() {
     var default_account = (await web3.eth.getAccounts())[0];
     if (parseInt(await swap_token.methods.allowance(default_account, swap_address).call()) == 0)
         return new Promise(resolve => {
-            swap_token.methods.approve(swap_address, BigInt(max_allowance).toString())
+            swap_token.methods.approve(swap_address, cBN(max_allowance).toString())
             .send({from: default_account})
             .once('transactionHash', function(hash) {resolve(true);});
         })
@@ -219,8 +220,8 @@ async function handle_migrate_new(page) {
 async function calc_slippage(deposit) {
     var real_values = [...$("[id^=currency_]")].map((x,i) => +($(x).val()));
     var Sr = real_values.reduce((a,b) => a+b, 0);
-    var values = real_values.map((x,i) => BigInt(Math.floor(x / c_rates[i])).toString());
-    var ones = c_rates.map((rate, i) => BigInt(Math.floor(1.0 / rate / N_COINS)).toString());
+    var values = real_values.map((x,i) => cBN(Math.floor(x / c_rates[i]).toString()).toString());
+    var ones = c_rates.map((rate, i) => cBN(Math.floor(1.0 / rate / N_COINS).toString()).toString());
     var token_amount = await swap.methods.calc_token_amount(values, deposit).call();
     var ideal_token_amount = parseInt(await swap.methods.calc_token_amount(ones, deposit).call()) * Sr;
     var token_supply = parseInt(await swap_token.methods.totalSupply().call());

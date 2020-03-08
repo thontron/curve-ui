@@ -4,7 +4,6 @@ async function handle_sync_balances() {
     sync_balances = $('#sync-balances').prop('checked');
     var max_balances = $('#max-balances').prop('checked');
     var default_account = (await web3.eth.getAccounts())[0];
-
     await update_rates();
 
     for (let i = 0; i < N_COINS; i++) {
@@ -13,8 +12,10 @@ async function handle_sync_balances() {
     }
 
     if (max_balances) {
+
         $(".currencies input").prop('disabled', true);
         for (let i = 0; i < N_COINS; i++) {
+            console.log(wallet_balances[i], c_rates[i], wallet_balances[i]*c_rates[i], "INPUT VALS")
             var val = Math.floor(wallet_balances[i] * c_rates[i] * 100) / 100;
             val = val.toFixed(2)
             $('#currency_' + i).val(val);
@@ -31,13 +32,13 @@ async function handle_add_liquidity() {
     var max_balances = $("#max-balances").is(':checked')
     var amounts = $("[id^=currency_]").toArray().map(x => $(x).val());
     for (let i = 0; i < N_COINS; i++) {
-        let amount = BigInt(Math.floor(amounts[i] / c_rates[i])).toString();
+        let amount = cBN(Math.floor(amounts[i] / c_rates[i])).toString();
         let balance = await coins[i].methods.balanceOf(default_account).call();
         if(Math.abs(balance/amount-1) < 0.005) {
-            amounts[i] = BigInt(balance).toString();
+            amounts[i] = cBN(balance).toString();
         }
         else {
-            amounts[i] = BigInt(Math.floor(amounts[i] / c_rates[i])).toString(); // -> c-tokens
+            amounts[i] = cBN(Math.floor(amounts[i] / c_rates[i])).toString(); // -> c-tokens
         }
     }
     if ($('#inf-approval').prop('checked'))
@@ -47,11 +48,11 @@ async function handle_add_liquidity() {
     var token_amount = 0;
     if(parseInt(await swap_token.methods.totalSupply().call()) > 0) {    
         token_amount = await swap.methods.calc_token_amount(amounts, true).call();
-        token_amount = BigInt(Math.floor(token_amount * 0.99)).toString();
+        token_amount = cBN(Math.floor(token_amount * 0.99).toString()).toString();
     }
     await swap.methods.add_liquidity(amounts, token_amount).send({
-        'from': default_account,
-        'gas': 1300000});
+        from: default_account,
+        gas: 1300000});
     await handle_sync_balances();
     update_fee_info();
 }
@@ -60,7 +61,7 @@ async function init_ui() {
     let infapproval = true;
     for (let i = 0; i < N_COINS; i++) {
         var default_account = (await web3.eth.getAccounts())[0];
-        if (BigInt(await coins[i].methods.allowance(default_account, swap_address).call()) <= max_allowance / BigInt(2))
+        if (cBN(await coins[i].methods.allowance(default_account, swap_address).call()) <= max_allowance.div(cBN(2)))
             infapproval = false;
 
         $('#currency_' + i).on('input', debounced(100, async function() {
@@ -128,6 +129,7 @@ window.addEventListener('load', async () => {
     }
     catch(err) {
         console.error(err)
+
         if(err.reason == 'cancelDialog') {
             const web3 = new Web3(infura_url);
             window.web3 = web3
