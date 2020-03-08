@@ -127,16 +127,18 @@ window.addEventListener('load', async () => {
 
     }
     catch(err) {
-        const web3 = new Web3(infura_url);
-        window.web3 = web3
+        console.error(err)
+        if(err.reason == 'cancelDialog') {
+            const web3 = new Web3(infura_url);
+            window.web3 = web3
 
-        await init_contracts();
-        update_fee_info();
-        await handle_sync_balances();
-        await calc_slippage(true);
+            await init_contracts();
+            update_fee_info();
+            await handle_sync_balances();
+            await calc_slippage(true);
 
-        await init_ui();
-        $("#from_currency").attr('disabled', false)
-        
+            await init_ui();
+            $("#from_currency").attr('disabled', false)
+        }
     }
 });

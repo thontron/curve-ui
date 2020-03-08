@@ -291,8 +291,8 @@ function makeCancelable(promise) {
             .catch(reject);
     });
 
-    wrappedPromise.cancel = () => {
-        rejectFn({ canceled: true });
+    wrappedPromise.cancel = (reason) => {
+        rejectFn({ canceled: true, reason: reason });
     };
 
     return wrappedPromise;

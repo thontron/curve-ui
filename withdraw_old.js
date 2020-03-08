@@ -105,12 +105,15 @@ window.addEventListener('load', async () => {
         init_ui();
     }
     catch(err) {
-        const web3 = new Web3(infura_url);
-        window.web3 = web3
+        console.error(err)
+        if(err.reason == 'cancelDialog') {     
+            const web3 = new Web3(infura_url);
+            window.web3 = web3
 
-        await init_contracts();
-        await update_rates('old');
-        await update_balances();
-        init_ui();
+            await init_contracts();
+            await update_rates('old');
+            await update_balances();
+            init_ui();
+        }
     }
 });
