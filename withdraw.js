@@ -97,7 +97,7 @@ async function handle_remove_liquidity() {
     var share_val = share.val();
     var amounts = $("[id^=currency_]").toArray().map(x => $(x).val());
     for (let i = 0; i < N_COINS; i++)
-        amounts[i] = Math.floor(amounts[i] / c_rates[i]); // -> c-tokens
+        amounts[i] = cBN(Math.floor(amounts[i] / c_rates[i]).toString()).toString(); // -> c-tokens
     var min_amounts = amounts.map(x => cBN(Math.floor(0.97 * x).toString()).toString());
     amount = amounts.map(x => cBN(x.toString()).toString());
     var txhash;
@@ -105,13 +105,13 @@ async function handle_remove_liquidity() {
     if (share_val == '---') {
         var token_amount = await swap.methods.calc_token_amount(amounts, false).call();
         token_amount = cBN(Math.floor(token_amount * 1.01).toString()).toString()
-        await swap.methods.remove_liquidity_imbalance(amounts, token_amount).send({from: default_account});
+        await swap.methods.remove_liquidity_imbalance(amounts, token_amount).send({from: default_account, gas: 1000000});
     }
     else {
         var amount = cBN(Math.floor(share_val / 100 * token_balance).toString()).toString();
         if (share_val == 100)
             amount = await swap_token.methods.balanceOf(default_account).call();
-        await swap.methods.remove_liquidity(amount, min_amounts).send({from: default_account});
+        await swap.methods.remove_liquidity(amount, min_amounts).send({from: default_account, gas: 600000});
     }
 
     await update_balances();
