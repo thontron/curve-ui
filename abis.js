@@ -1,3 +1,12 @@
+//adding Sentry as soon as possible
+Sentry.init({ 
+  dsn: 'https://369b23361106452dbce8617c15513b9c@sentry.io/4035223',
+  integrations: [
+    new Sentry.Integrations.CaptureConsole()
+  ],
+});
+
+
 var N_COINS = 4;
 var coin_precisions = [1e18, 1e6, 1e6, 1e18];
 var use_lending = [true, true, true, true];
