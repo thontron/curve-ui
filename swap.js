@@ -56,7 +56,7 @@ function setAmountPromise() {
         if (b >= 0.001) {
             // In c-units
             var dx_ = $('#from_currency').val();
-            var dx = BigInt(Math.round(dx_ * coin_precisions[i])).toString();
+            var dx = cBN(Math.round(dx_ * coin_precisions[i]).toString()).toString();
             var dy_ = parseInt(await swap.methods.get_dy_underlying(i, j, dx).call()) / coin_precisions[j];
             var dy = dy_.toFixed(2);
             console.log("RESOLVE")
@@ -74,7 +74,7 @@ async function from_cur_handler() {
     to_currency = $('input[type=radio][name=to_cur]:checked').val();
     var default_account = (await web3.eth.getAccounts())[0];
 
-    if (BigInt(await underlying_coins[from_currency].methods.allowance(default_account, swap_address).call()) > max_allowance / BigInt(2))
+    if (cBN(await underlying_coins[from_currency].methods.allowance(default_account, swap_address).call()) > max_allowance.div(cBN(2)))
         $('#inf-approval').prop('checked', true)
     else
         $('#inf-approval').prop('checked', false);
@@ -114,12 +114,12 @@ async function handle_trade() {
     if (b >= 0.001) {
         var dx = Math.floor($('#from_currency').val() * coin_precisions[i]);
         var min_dy = Math.floor($('#to_currency').val() * 0.95 * coin_precisions[j]);
-        dx = BigInt(dx).toString();
+        dx = cBN(dx.toString()).toString();
         if ($('#inf-approval').prop('checked'))
             await ensure_underlying_allowance(i, max_allowance)
         else
             await ensure_underlying_allowance(i, dx);
-        min_dy = BigInt(min_dy).toString();
+        min_dy = cBN(min_dy.toString()).toString();
         await swap.methods.exchange_underlying(i, j, dx, min_dy).send({
             'from': default_account,
             'gas': 1200000});
@@ -158,12 +158,15 @@ window.addEventListener('load', async () => {
 
     }
     catch(err) {
-        const web3 = new Web3(infura_url);
-        window.web3 = web3
+        console.error(err)
+        if(err.reason == 'cancelDialog') {
+            const web3 = new Web3(infura_url);
+            window.web3 = web3
 
-        await init_contracts();
+            await init_contracts();
 
-        await init_ui();
-        $("#from_currency").attr('disabled', false)  
+            await init_ui();
+            $("#from_currency").attr('disabled', false)
+        }
     }
 });

@@ -22,7 +22,7 @@ function handle_change_amounts(i) {
 return async function() {
         var real_values = [...$("[id^=currency_]")].map((x,i) => +($(x).val()));
         var values = [...$("[id^=currency_]")].map((x,i) => $(x).val() / c_rates[i])
-        values = values.map(v=>BigInt(Math.floor(v)).toString())
+        values = values.map(v=>cBN(Math.floor(v).toString()).toString())
         let show_nobalance = false;
         let show_nobalance_i = 0;
         for(let i = 0; i < N_COINS; i++) {
@@ -98,20 +98,20 @@ async function handle_remove_liquidity() {
     var amounts = $("[id^=currency_]").toArray().map(x => $(x).val());
     for (let i = 0; i < N_COINS; i++)
         amounts[i] = Math.floor(amounts[i] / c_rates[i]); // -> c-tokens
-    var min_amounts = amounts.map(x => BigInt(Math.floor(0.97 * x)).toString());
-    amount = amounts.map(x => BigInt(x).toString());
+    var min_amounts = amounts.map(x => cBN(Math.floor(0.97 * x).toString()).toString());
+    amount = amounts.map(x => cBN(x.toString()).toString());
     var txhash;
     var default_account = (await web3.eth.getAccounts())[0];
     if (share_val == '---') {
         var token_amount = await swap.methods.calc_token_amount(amounts, false).call();
-        token_amount = BigInt(Math.floor(token_amount * 1.01)).toString()
-        await swap.methods.remove_liquidity_imbalance(amounts, token_amount).send({'from': default_account});
+        token_amount = cBN(Math.floor(token_amount * 1.01).toString()).toString()
+        await swap.methods.remove_liquidity_imbalance(amounts, token_amount).send({from: default_account});
     }
     else {
-        var amount = BigInt(Math.floor(share_val / 100 * token_balance)).toString();
+        var amount = cBN(Math.floor(share_val / 100 * token_balance).toString()).toString();
         if (share_val == 100)
             amount = await swap_token.methods.balanceOf(default_account).call();
-        await swap.methods.remove_liquidity(amount, min_amounts).send({'from': default_account});
+        await swap.methods.remove_liquidity(amount, min_amounts).send({from: default_account});
     }
 
     await update_balances();
@@ -140,12 +140,15 @@ window.addEventListener('DOMContentLoaded', async () => {
         await init_ui();
     }
     catch(err) {
-        const web3 = new Web3(infura_url);
-        window.web3 = web3
+        console.error(err)
+        if(err.reason == 'cancelDialog') {     
+            const web3 = new Web3(infura_url);
+            window.web3 = web3
 
-        await init_contracts();
-        await update_rates();
-        await update_balances();
-        await init_ui();        
+            await init_contracts();
+            await update_rates();
+            await update_balances();
+            init_ui();        
+        }
     }
 });
