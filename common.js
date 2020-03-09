@@ -157,6 +157,8 @@ async function update_fee_info(version = 'new') {
     }
 
     var bal_info = $('#balances-info li span');
+    var bal_info_fees = bal_info.add('#fee-info, #admin-fee-info')
+    bal_info_fees.map((i, el)=>$(el).addClass('loading line'))
     await update_rates();
     var total = 0;
     var promises = [];
@@ -169,6 +171,7 @@ async function update_fee_info(version = 'new') {
         total += balances[i] * c_rates[i];*/
     }
     let resolves = await Promise.all(promises)
+    bal_info_fees.map((i, el)=>$(el).removeClass('loading line'))
     resolves.forEach((balance, i) => {
         balances[i] = +balance;
         $(bal_info[i]).text((balances[i] * c_rates[i]).toFixed(2));
