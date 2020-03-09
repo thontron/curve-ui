@@ -121,8 +121,8 @@ async function handle_trade() {
             await ensure_underlying_allowance(i, dx);
         min_dy = cBN(min_dy.toString()).toString();
         await swap.methods.exchange_underlying(i, j, dx, min_dy).send({
-            'from': default_account,
-            'gas': 1200000});
+            from: default_account,
+            gas: 1200000});
         await update_rates();
         update_fee_info();
         from_cur_handler();
