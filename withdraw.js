@@ -19,7 +19,7 @@ function handle_change_amounts(i) {
     return async function() {
         var real_values = [...$("[id^=currency_]")].map((x,i) => +($(x).val()));
         var values = [...$("[id^=currency_]")].map((x,i) => $(x).val() / c_rates[i])
-        values = values.map(v=>cBN(Math.floor(v).toString()).toString())
+        values = values.map(v=>cBN(Math.floor(v).toString()).toString(10))
         let show_nobalance = false;
         let show_nobalance_i = 0;
         for(let i = 0; i < N_COINS; i++) {
@@ -94,18 +94,18 @@ async function handle_remove_liquidity() {
     var share_val = share.val();
     var amounts = $("[id^=currency_]").toArray().map(x => $(x).val());
     for (let i = 0; i < N_COINS; i++)
-        amounts[i] = cBN(Math.floor(amounts[i] / c_rates[i]).toString()).toString(); // -> c-tokens
-    var min_amounts = amounts.map(x => cBN(Math.floor(0.97 * x).toString()).toString());
-    amount = amounts.map(x => cBN(x.toString()).toString());
+        amounts[i] = cBN(Math.floor(amounts[i] / c_rates[i]).toString()).toString(10); // -> c-tokens
+    var min_amounts = amounts.map(x => cBN(Math.floor(0.97 * x).toString()).toString(10));
+    amount = amounts.map(x => cBN(x.toString()).toString(10));
     var txhash;
     var default_account = (await web3.eth.getAccounts())[0];
     if (share_val == '---') {
         var token_amount = await swap.methods.calc_token_amount(amounts, false).call();
-        token_amount = cBN(Math.floor(token_amount * 1.01).toString()).toString()
+        token_amount = cBN(Math.floor(token_amount * 1.01).toString()).toString(10)
         await swap.methods.remove_liquidity_imbalance(amounts, token_amount).send({from: default_account, gas: 1000000});
     }
     else {
-        var amount = cBN(Math.floor(share_val / 100 * token_balance).toString()).toString();
+        var amount = cBN(Math.floor(share_val / 100 * token_balance).toString()).toString(10);
         if (share_val == 100)
             amount = await swap_token.methods.balanceOf(default_account).call();
         await swap.methods.remove_liquidity(amount, min_amounts).send({from: default_account, gas: 600000});

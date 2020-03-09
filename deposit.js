@@ -31,13 +31,13 @@ async function handle_add_liquidity() {
     var max_balances = $("#max-balances").is(':checked')
     var amounts = $("[id^=currency_]").toArray().map(x => $(x).val());
     for (let i = 0; i < N_COINS; i++) {
-        let amount = cBN(Math.floor(amounts[i] / c_rates[i]).toString()).toString();
+        let amount = cBN(Math.floor(amounts[i] / c_rates[i]).toString()).toString(10);
         let balance = await coins[i].methods.balanceOf(default_account).call();
         if(Math.abs(balance/amount-1) < 0.005) {
-            amounts[i] = cBN(balance).toString();
+            amounts[i] = cBN(balance).toString(10);
         }
         else {
-            amounts[i] = cBN(Math.floor(amounts[i] / c_rates[i]).toString()).toString(); // -> c-tokens
+            amounts[i] = cBN(Math.floor(amounts[i] / c_rates[i]).toString()).toString(10); // -> c-tokens
         }
     }
     if ($('#inf-approval').prop('checked'))
@@ -47,7 +47,7 @@ async function handle_add_liquidity() {
     var token_amount = 0;
     if(parseInt(await swap_token.methods.totalSupply().call()) > 0) {    
         token_amount = await swap.methods.calc_token_amount(amounts, true).call();
-        token_amount = cBN(Math.floor(token_amount * 0.99).toString()).toString();
+        token_amount = cBN(Math.floor(token_amount * 0.99).toString()).toString(10);
     }
     await swap.methods.add_liquidity(amounts, token_amount).send({
         from: default_account,
