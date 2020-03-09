@@ -1,6 +1,6 @@
 //adding Sentry as soon as possible
 Sentry.init({ 
-  dsn: 'https://369b23361106452dbce8617c15513b9c@sentry.io/4035223',
+  dsn: 'https://5494f535e0244513a301f2912f5d899f@sentry.io/4169463',
   integrations: [
     new Sentry.Integrations.CaptureConsole()
   ],
