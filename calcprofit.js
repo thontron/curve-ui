@@ -146,7 +146,15 @@ async function getWithdrawals(address) {
     });
     let withdrawals = 0;
     for(let log of logs) {
-        let usd = await getExchangeRate(log.blockNumber, log.address, log.data)
+        let usd;
+        if(log.address == coins[2]._address) {
+            usd = BN(log.data).div(BN(1e4)).toNumber();
+            console.log(usd.toString(), "USDT")
+        }
+        else {
+            usd = await getExchangeRate(log.blockNumber, log.address, log.data)
+        }
+        //let usd = await getExchangeRate(log.blockNumber, log.address, log.data)
         withdrawals += usd;
     }
     return withdrawals;
