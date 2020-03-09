@@ -51,8 +51,8 @@ async function handle_add_liquidity() {
         token_amount = cBN(Math.floor(token_amount * 0.99).toString()).toString();
     }
     await swap.methods.add_liquidity(amounts, token_amount).send({
-        from: default_account,
-        gas: 1300000});
+        'from': default_account,
+        'gas': 1300000});
     await handle_sync_balances();
     update_fee_info();
 }
