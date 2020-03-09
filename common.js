@@ -41,7 +41,7 @@ async function ensure_allowance(amounts) {
     else {
         // Infinite
         for (let i=0; i < N_COINS; i++) {
-            if (allowances[i] < max_allowance.div(cBN(2))) {
+            if (cBN(allowances[i]).isLessThan(max_allowance.div(cBN(2)))) {
                 if (allowances[i] > 0)
                     await approve(coins[i], 0, default_account);
                 await approve(coins[i], max_allowance, default_account);
@@ -55,16 +55,14 @@ async function ensure_underlying_allowance(i, _amount) {
     var amount = cBN(_amount);
     var current_allowance = cBN(await underlying_coins[i].methods.allowance(default_account, swap_address).call());
 
-    if (current_allowance == amount)
+    if (current_allowance.isEqualTo(amount))
         return false;
-
-    if ((_amount == max_allowance) & (current_allowance > max_allowance.div(cBN(2))))
+    if ((cBN(_amount).isEqualTo(max_allowance)) & (current_allowance.isGreaterThan(max_allowance.div(cBN(2)))))
         return false;  // It does get spent slowly, but that's ok
 
-    if ((current_allowance > 0) & (current_allowance < amount))
+    if ((current_allowance.isGreaterThan(cBN(0))) & (current_allowance.isLessThan(amount)))
         await approve(underlying_coins[i], 0, default_account);
-
-    return await approve(underlying_coins[i], amount, default_account);
+    return await approve(underlying_coins[i], amount.toString(10), default_account);
 }
 
 // XXX not needed anymore
