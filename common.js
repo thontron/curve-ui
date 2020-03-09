@@ -9,14 +9,14 @@ var c_rates = new Array(N_COINS);
 var fee;
 var admin_fee;
 
-var cBN = (val) => new BN(val);
+var cBN = (val) => new BigNumber(val);
 
 const trade_timeout = 1800;
-const max_allowance = cBN(2).pow(cBN(256)).sub(cBN(1));
+const max_allowance = cBN(2).pow(cBN(256)).minus(cBN(1));
 
 function approve(contract, amount, account) {
     return new Promise(resolve => {
-                contract.methods.approve(swap_address, amount.toString())
+                contract.methods.approve(swap_address, amount.toString(10))
                 .send({from: account, gas: 100000})
                 .once('transactionHash', function(hash) {resolve(true);});
             });
@@ -73,7 +73,7 @@ async function ensure_token_allowance() {
     var default_account = (await web3.eth.getAccounts())[0];
     if (parseInt(await swap_token.methods.allowance(default_account, swap_address).call()) == 0)
         return new Promise(resolve => {
-            swap_token.methods.approve(swap_address, cBN(max_allowance).toString())
+            swap_token.methods.approve(swap_address, cBN(max_allowance).toString(10))
             .send({from: default_account})
             .once('transactionHash', function(hash) {resolve(true);});
         })
@@ -184,8 +184,8 @@ async function update_fee_info() {
 async function calc_slippage(deposit) {
     var real_values = [...$("[id^=currency_]")].map((x,i) => +($(x).val()));
     var Sr = real_values.reduce((a,b) => a+b, 0);
-    var values = real_values.map((x,i) => cBN(Math.floor(x / c_rates[i]).toString()).toString());
-    var ones = c_rates.map((rate, i) => cBN(Math.floor(1.0 / rate / N_COINS).toString()).toString());
+    var values = real_values.map((x,i) => cBN(Math.floor(x / c_rates[i]).toString()).toString(10));
+    var ones = c_rates.map((rate, i) => cBN(Math.floor(1.0 / rate / N_COINS).toString()).toString(10));
     var token_amount = await swap.methods.calc_token_amount(values, deposit).call();
     var ideal_token_amount = parseInt(await swap.methods.calc_token_amount(ones, deposit).call()) * Sr;
     var token_supply = parseInt(await swap_token.methods.totalSupply().call());
