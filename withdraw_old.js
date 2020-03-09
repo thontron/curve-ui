@@ -62,15 +62,15 @@ async function handle_remove_liquidity() {
     var amounts = $("[id^=currency_]").toArray().map(x => $(x).val());
     for (let i = 0; i < N_COINS; i++)
         amounts[i] = Math.floor(amounts[i] / c_rates[i]); // -> c-tokens
-    var min_amounts = amounts.map(x => cBN(Math.floor(0.97 * x).toString()).toString());
-    amount = amounts.map(x => cBN(x.toString()).toString());
+    var min_amounts = amounts.map(x => cBN(Math.floor(0.97 * x).toString()).toString(10));
+    amount = amounts.map(x => cBN(x.toString()).toString(10));
     var txhash;
     var default_account = (await web3.eth.getAccounts())[0];
     if (share_val == '---') {
         await old_swap.methods.remove_liquidity_imbalance(amounts, deadline).send({from: default_account, gas: 1000000});
     }
     else {
-        var amount = cBN(Math.floor(share_val / 100 * token_balance).toString()).toString();
+        var amount = cBN(Math.floor(share_val / 100 * token_balance).toString()).toString(10);
         if (share_val == 100)
             amount = await old_swap_token.methods.balanceOf(default_account).call();
         await old_swap.methods.remove_liquidity(amount, deadline, min_amounts).send({from: default_account, gas: 600000});

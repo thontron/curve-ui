@@ -60,7 +60,8 @@ function setAmountPromise() {
         if (b >= 0.001) {
             // In c-units
             var dx_ = $('#from_currency').val();
-            var dx = cBN(Math.round(dx_ * coin_precisions[i]).toString()).toString();
+            console.log(Math.round(dx_ * coin_precisions[i]))
+            var dx = cBN(Math.round(dx_ * coin_precisions[i])).toFixed(0);
             var dy_ = parseInt(await swap.methods.get_dy_underlying(i, j, dx).call()) / coin_precisions[j];
             var dy = dy_.toFixed(2);
             resolve([dy, dy_, dx_])
@@ -118,12 +119,12 @@ async function handle_trade() {
         var dx = Math.floor($('#from_currency').val() * coin_precisions[i]);
         var min_dy = Math.floor($('#to_currency').val() * 0.99 * coin_precisions[j]);
         var deadline = Math.floor((new Date()).getTime() / 1000) + trade_timeout;
-        dx = cBN(dx.toString()).toString();
+        dx = cBN(dx.toString()).toFixed(0);
         if ($('#inf-approval').prop('checked'))
             await ensure_underlying_allowance(i, max_allowance)
         else
             await ensure_underlying_allowance(i, dx);
-        min_dy = cBN(min_dy.toString()).toString();
+        min_dy = cBN(min_dy.toString()).toFixed(0);
         await swap.methods.exchange_underlying(i, j, dx, min_dy).send({
                 from: default_account,
                 gas: 1200000,
