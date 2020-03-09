@@ -249,6 +249,7 @@ async function init_ui() {
 
     try {
         let deposits = await getDeposits();
+        $("#profit li:first span").removeClass('loading line');
         $("#profit li:first span").text(deposits.toFixed(2))
         let available = 0;
 
@@ -280,8 +281,11 @@ async function init_ui() {
                 .divRound(BN(tokensSupply))
             );
         }
+        $("#profit li:nth-child(2) span").removeClass('loading line');
         $("#profit li:nth-child(2) span").text(withdrawals.toFixed(2))
+        $("#profit li:nth-child(3) span").removeClass('loading line');
         $("#profit li:nth-child(3) span").text(available.toFixed(2))
+        $("#profit li:nth-child(4) span").removeClass('loading line');
         $("#profit li:nth-child(4) span").text((available + withdrawals - deposits).toFixed(2))
     }
     catch(err) {
