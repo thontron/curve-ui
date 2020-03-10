@@ -492,3 +492,15 @@ div.info table td {
 .lp-info-container {
   display: none;
 }
+
+.loading.matrix::after {
+  content:"░ ░░░░\A░░ ░░░\A░░░ ░░\A░░░░ ░";
+  animation: spin .5s steps(4) infinite alternate;
+}
+
+.loading.matrix {
+  font-size: 3em;
+  background: transparent;
+  border: none;
+  margin: 0.5em;
+}
