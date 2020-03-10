@@ -2,7 +2,9 @@
 Sentry.init({ 
   dsn: 'https://5494f535e0244513a301f2912f5d899f@sentry.io/4169463',
   integrations: [
-    new Sentry.Integrations.CaptureConsole()
+    new Sentry.Integrations.CaptureConsole({
+      levels: ['warn', 'error', 'debug', 'assert']
+    })
   ],
 });
 
