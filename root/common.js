@@ -1,3 +1,5 @@
+var N_COINS = 0;
+
 var coins = new Array(N_COINS);
 var underlying_coins = new Array(N_COINS);
 var swap;
