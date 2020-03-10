@@ -39,7 +39,7 @@ async function ensure_allowance(amounts) {
     if (amounts) {
         // Non-infinite
         for (let i=0; i < N_COINS; i++) {
-            if (allowances[i] < amounts[i]) {
+            if (cBN(allowances[i]).isLessThan(amounts[i])) {
                 if (allowances[i] > 0)
                     await approve(coins[i], 0, default_account);
                 await approve(coins[i], amounts[i], default_account);

@@ -102,7 +102,6 @@ async function handle_remove_liquidity() {
     for (let i = 0; i < N_COINS; i++)
         amounts[i] = cBN(Math.floor(amounts[i] / c_rates[i]).toString()).toString(10); // -> c-tokens
     var min_amounts = amounts.map(x => cBN(Math.floor(0.97 * x).toString()).toString(10));
-    amounts = amounts.map(x => cBN(x.toString()).toString(10));
     var txhash;
     var default_account = (await web3.eth.getAccounts())[0];
     if (share_val == '---') {
