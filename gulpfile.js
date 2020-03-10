@@ -1,16 +1,16 @@
 var gulp = require('gulp')
 var rev = require('gulp-rev-append');
 
-gulp.task('rev', function() {
+gulp.task('bump', function() {
   return gulp.src('./*.html')
     .pipe(rev())
-    .pipe(gulp.dest('./dist'));
+    .pipe(gulp.dest('.'));
 });
 
-gulp.task('revRoot', function() {
+gulp.task('bumpRoot', function() {
   return gulp.src('./root/*.html')
     .pipe(rev())
-    .pipe(gulp.dest('./dist/root/'));
+    .pipe(gulp.dest('./root/'));
 });
 
-gulp.task('default', gulp.series('rev','revRoot'))
+gulp.task('default', gulp.series('bump','bumpRoot'))
