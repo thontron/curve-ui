@@ -1,0 +1,244 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:title" content="compound.curve.fi" />
+    <meta property="og:url" content="https://compound.curve.fi" />
+    <meta property="og:type" content="website" />
+    <meta property="og:description" content="A curve.fi portal for swapping cDAI/cUSDC" />
+    <meta property="og:image" content="./assets/compoundcurve_preview.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="compound.curve.fi" />
+    <meta name="twitter:site" content="@CurveFinance" />
+    <meta name="twitter:creator" content="@CurveFinance" />
+    <meta name="twitter:description" content="A curve.fi portal for swapping cDAI/cUSDC" />
+    <meta name="twitter:url" content="https://compound.curve.fi" />
+    <meta name="twitter:image" content="./assets/compoundcurve_preview.png" />
+    <title>🌀 Curve.fi :: Compounded</title>
+    <link rel="stylesheet" href="tvision.css?v09032020" />
+    <script src="/jquery.min.js"></script>
+    <script src="/apexcharts.min.js"></script>
+    <script src="/bigNumber.min.js"></script>
+    <script src="/web3.min.js"></script>
+    <script src="/web3connect.min.js"></script>
+    <script src="/web3providers/walletConnect.min.js"></script>
+    <script src="/web3providers/authereum.min.js"></script>
+    <script src="/web3providers/burnerConnect.min.js"></script>
+    <script src="/web3providers/fortmatic.min.js"></script>
+    <script src="/root/abis.js?rev=687cb76f57feaf62a4c401e535b7d092"></script>
+    <script src="/chart.js?rev=b8429ef53fbc568303663dee444bd000"></script>
+    <script src="/common.js?rev=2cc239a946ee6b12121bdc066c7262ca"></script>
+    <script src="/init.js?rev=3cb72915727eb1db3bb16196aa350dd8"></script>
+    <script src='cstats.js'></script>
+  </head>
+  <body>
+    <div class="top-menu-bar">
+      <label for="hamburger" class='border-menu'></label>
+      <input type="checkbox" id="hamburger"/>
+
+      <div id='poolsdropdown'>
+        <a href='https://www.curve.fi'>☰</a>
+        <div class='dropdown'>
+            <a href='https://compound.curve.fi'>Compound</a>
+            <a href='https://usdt.curve.fi'>USDT</a>
+            <a href='https://y.curve.fi'>Y</a>
+            <a href='https://busd.curve.fi'>bUSD</a>
+        </div>
+      </div>
+
+      <a href="/">Buy and sell</a>
+      <a href="/deposit.html">Deposit</a>
+      <a href="/withdraw.html">Withdraw</a>
+      <a href="/withdraw_old.html">Withdraw old</a>
+      <a href="/stats.html">Stats</a>
+      <a href="/profit.html">Profit</a>
+      <a href="/faq.html">FAQ</a>
+      <a href="https://github.com/curvefi/curve-contract/tree/pool_compound">git@</a>
+    </div>
+    <div id="screen">
+      <div class="blue window">
+          <h1><img src="/logo.svg" alt="🌀 Curve" height="50"></h1>
+      </div>
+
+      <div class="window white">
+          <p class='text-center'><a href='https://compound.curve.fi'>compound.curve.fi</a></p>
+
+          <fieldset>
+              <legend>Average liquidity provider profit [<span class="apr-profit" data-i='0'></span>% APY]</legend>
+              <p id="chart0" data-i='0'></p>
+          </fieldset>
+          <p>Recent daily APY: <span class="daily-apr" data-i='0'></span>%</p>
+          <p>Recent weekly APY: <span class="weekly-apr" data-i='0'></span>%</p>
+
+
+          <div class="blue window half-width info">
+            <fieldset id="lp-info-currency">
+                <legend>Currency reserves</legend>
+                <ul class='balances-info compound'>
+                    <li><b>DAI:</b> <span class='loading line'></span></li>
+                    <li><b>USDC:</b> <span class='loading line'></span></li>
+                    <li><b>DAI+USDC:</b> <span class='loading line'></span></li>
+                </ul>
+                <p><b>Fee:</b> <span class='fee-info compound loading line'></span>%</p>
+                <p><b>Admin fee:</b> <span class='admin-fee-info compound loading line'></span>%</p>
+              </fieldset>
+              <fieldset class="lp-info-container compound">
+                <legend>My share:</legend>
+                <ul class='lp-info compound'>
+                    <li><b>DAI:</b> <span class='loading line'></span></li>
+                    <li><b>USDC:</b> <span class='loading line'></span></li>
+                    <li><b>DAI+USDC:</b> <span class='loading line'></span></li>
+                </ul>
+            </fieldset>
+          </div>
+      </div>
+
+      <div class="window white">
+          <p class='text-center'><a href='https://usdt.curve.fi'>usdt.curve.fi</a></p>
+
+          <fieldset>
+              <legend>Average liquidity provider profit [<span class="apr-profit" data-i='1'></span>% APY]</legend>
+              <p id="chart1" data-i='1'></p>
+          </fieldset>
+          <p>Recent daily APY: <span class="daily-apr" data-i='1'></span>%</p>
+          <p>Recent weekly APY: <span class="weekly-apr" data-i='1'></span>%</p>
+
+
+          <div class="blue window half-width info">
+            <fieldset id="lp-info-currency">
+                <legend>Currency reserves</legend>
+                <ul class='balances-info usdt'>
+                  <li><b>DAI:</b> <span class='loading line'></span></li>
+                  <li><b>USDC:</b> <span class='loading line'></span></li>
+                  <li><b>USDT:</b> <span class='loading line'></span></li>
+                  <li><b>DAI+USDC+USDT:</b> <span class='loading line'></span></li>
+                </ul>
+                <p><b>Fee:</b> <span class='fee-info usdt loading line'></span>%</p>
+                <p><b>Admin fee:</b> <span class='admin-fee-info usdt loading line'></span>%</p>
+              </fieldset>
+              <fieldset class="lp-info-container usdt">
+                <legend>My share:</legend>
+                <ul class='lp-info usdt'>
+                  <li><b>DAI:</b> <span class='loading line'></span></li>
+                  <li><b>USDC:</b> <span class='loading line'></span></li>
+                  <li><b>USDT:</b> <span class='loading line'></span></li>
+                  <li><b>DAI+USDC+USDT:</b> <span class='loading line'></span></li>
+                </ul>
+            </fieldset>
+          </div>
+      </div>
+
+      <div class="window white">
+          <p class='text-center'><a href='https://y.curve.fi'>y.curve.fi</a></p>
+
+          <fieldset>
+              <legend>Average liquidity provider profit [<span class="apr-profit" data-i='2'></span>% APY]</legend>
+              <p id="chart2" data-i='2'></p>
+          </fieldset>
+          <p>Recent daily APY: <span class="daily-apr" data-i='2'></span>%</p>
+          <p>Recent weekly APY: <span class="weekly-apr" data-i='2'></span>%</p>
+
+
+          <div class="blue window half-width info">
+            <fieldset id="lp-info-currency">
+                <legend>Currency reserves</legend>
+                <ul class='balances-info iearn'>
+                  <li><b>DAI:</b> <span class='loading line'></span></li>
+                  <li><b>USDC:</b> <span class='loading line'></span></li>
+                  <li><b>USDT:</b> <span class='loading line'></span></li>
+                  <li><b>TUSD:</b> <span class='loading line'></span></li>
+                  <li><b>DAI+USDC+USDT+TUSD:</b> <span class='loading line'></span></li>
+                </ul>
+                <p><b>Fee:</b> <span class='fee-info iearn loading line'></span>%</p>
+                <p><b>Admin fee:</b> <span class='admin-fee-info iearn loading line'></span>%</p>
+              </fieldset>
+              <fieldset class="lp-info-container iearn">
+                <legend>My share:</legend>
+                <ul class='lp-info iearn'>
+                  <li><b>DAI:</b> <span class='loading line'></span></li>
+                  <li><b>USDC:</b> <span class='loading line'></span></li>
+                  <li><b>USDT:</b> <span class='loading line'></span></li>
+                  <li><b>TUSD:</b> <span class='loading line'></span></li>
+                  <li><b>DAI+USDC+USDT+TUSD:</b> <span class='loading line'></span></li>
+                </ul>
+            </fieldset>
+          </div>
+      </div>
+
+      <div class="window white">
+          <p class='text-center'><a href='https://busd.curve.fi'>busd.curve.fi</a></p>
+
+          <fieldset>
+              <legend>Average liquidity provider profit [<span class="apr-profit" data-i='3'></span>% APY]</legend>
+              <p id="chart3" data-i='3'></p>
+          </fieldset>
+          <p>Recent daily APY: <span class="daily-apr" data-i='3'></span>%</p>
+          <p>Recent weekly APY: <span class="weekly-apr" data-i='3'></span>%</p>
+
+
+          <div class="blue window half-width info">
+            <fieldset id="lp-info-currency">
+                <legend>Currency reserves</legend>
+                <ul class='balances-info busd'>
+                  <li><b>DAI:</b> <span class='loading line'></span></li>
+                  <li><b>USDC:</b> <span class='loading line'></span></li>
+                  <li><b>USDT:</b> <span class='loading line'></span></li>
+                  <li><b>BUSD:</b> <span class='loading line'></span></li>
+                  <li><b>DAI+USDC+USDT+BUSD:</b> <span class='loading line'></span></li>
+                </ul>
+                <p><b>Fee:</b> <span class='fee-info busd loading line'></span>%</p>
+                <p><b>Admin fee:</b> <span class='admin-fee-info busd loading line'></span>%</p>
+              </fieldset>
+              <fieldset class="lp-info-container busd">
+                <legend>My share:</legend>
+                <ul class='lp-info busd'>
+                  <li><b>DAI:</b> <span class='loading line'></span></li>
+                  <li><b>USDC:</b> <span class='loading line'></span></li>
+                  <li><b>USDT:</b> <span class='loading line'></span></li>
+                  <li><b>BUSD:</b> <span class='loading line'></span></li>
+                  <li><b>DAI+USDC+USDT+BUSD:</b> <span class='loading line'></span></li>
+                </ul>
+            </fieldset>
+          </div>
+      </div>
+
+      <div class="window white">
+          <p class='text-center'><a href='https://iearn.finance/pool'>susd</a></p>
+
+          <fieldset>
+              <legend>Average liquidity provider profit [<span class="apr-profit" data-i='4'></span>% APY]</legend>
+              <p id="chart4" data-i='4'></p>
+          </fieldset>
+          <p>Recent daily APY: <span class="daily-apr" data-i='4'></span>%</p>
+          <p>Recent weekly APY: <span class="weekly-apr" data-i='4'></span>%</p>
+
+ 
+          <div class="blue window half-width info">
+            <fieldset id="lp-info-currency">
+                <legend>Currency reserves</legend>
+                <ul class='balances-info susd'>
+                  <li><b>sUSD:</b> <span class='loading line'></span></li>
+                  <li><b>yCurve:</b> <span class='loading line'></span></li>
+                  <li><b>sUSD+yCurve:</b> <span class='loading line'></span></li>
+                </ul>
+                <p><b>Fee:</b> <span class='fee-info busd loading line'></span>%</p>
+                <p><b>Admin fee:</b> <span class='admin-fee-info busd loading line'></span>%</p>
+              </fieldset>
+              <fieldset class="lp-info-container susd">
+                <legend>My share:</legend>
+                <ul class='lp-info busd'>
+                  <li><b>sUSD:</b> <span class='loading line'></span></li>
+                  <li><b>yCurve:</b> <span class='loading line'></span></li>
+                  <li><b>sUSD+yCurve:</b> <span class='loading line'></span></li>
+                </ul>
+            </fieldset>
+          </div>
+      </div>
+
+    </div>
+
+
+
+  </body>
+</html>

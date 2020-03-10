@@ -252,7 +252,7 @@ i:before, i:after { content: "/"; }
     text-align: center;
 }
 
-#chart {
+p[id^='chart'] {
     background-color: white;
     border: 1px solid gray;
 }
@@ -483,4 +483,12 @@ div.info table td {
   to { 
     transform: translateY( -6.0em); 
   }
+}
+
+.text-center {
+  text-align: center;
+}
+
+.lp-info-container {
+  display: none;
 }

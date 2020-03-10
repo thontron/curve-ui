@@ -6,8 +6,8 @@ $(document).click(function(event) {
     cancelablePromise.cancel('cancelDialog');
   }        
 });
-async function init() {
-    init_menu();
+async function init(type) {
+    if(!type) init_menu();
 
     const WalletConnectProvider = window.WalletConnectProvider.default
     const providerOptions = {
@@ -66,7 +66,7 @@ async function init() {
         }
         else
             window.web3 = new Web3(infura_url);*/
-        await init_contracts();
+        if(!type) await init_contracts();
     })
 
 }
