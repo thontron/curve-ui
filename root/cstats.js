@@ -240,10 +240,23 @@ window.addEventListener('load', async () => {
       if (el.href == window.location.href)
           el.classList.add('selected')
   })
-  await init_charts();
-  await init('stats');
-  await init_contracts()
-  await update_fee_info();
+  try {
+      await init_charts();
+      await init('stats');
+      await init_contracts();
+      await update_fee_info();
+  }
+  catch(err) {
+    console.error(err)
+    if(err.reason == 'cancelDialog') {
+        const web3 = new Web3(infura_url);
+        window.web3 = web3
+        
+        await init_charts();
+        await init_contracts();
+        update_fee_info();
+    }
+  }
 });
 
 
