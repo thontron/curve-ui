@@ -121,6 +121,10 @@ function init_menu() {
         if (el.href == window.location.href)
             el.classList.add('selected')
     })
+    $('#poolsdropdown .dropdown a').toArray().forEach(function(el) {
+        if(el.href.slice(0,-1) == window.location.origin)
+            el.classList.add('selected')
+    })
 }
 
 async function update_rates(version = 'new') {
