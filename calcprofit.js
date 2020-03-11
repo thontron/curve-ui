@@ -139,7 +139,7 @@ async function getDeposits() {
     //default_account = '0x39415255619783A2E71fcF7d8f708A951d92e1b6'
     default_account = default_account.substr(2).toLowerCase();
 
-    const poolTokensReceivings = await web3.eth.getPastLogs({
+    let poolTokensReceivings = await web3.eth.getPastLogs({
         fromBlock: '0x909974',
         toBlock: 'latest',
         address: CURVE_TOKEN,
@@ -149,9 +149,19 @@ async function getDeposits() {
             '0x000000000000000000000000' + default_account,
         ],
     });
-    const txs = poolTokensReceivings.map(e => e.transactionHash);
 
     let depositUsdSum = 0;
+
+    var lastBlock = poolTokensReceivings[poolTokensReceivings.length-1].blockNumber
+
+    if(localStorage.getItem('lastBlock')) {
+        poolTokensReceivings = poolTokensReceivings.filter(r=>r.blockNumber > lastBlock);
+        depositUsdSum += +localStorage.getItem('lastDeposits')
+    }
+    localStorage.setItem('lastBlock', lastBlock);
+    
+    const txs = poolTokensReceivings.map(e => e.transactionHash);
+
     console.time('timer')
     for (const hash of txs) {
         const receipt = await web3.eth.getTransactionReceipt(hash);
@@ -168,6 +178,7 @@ async function getDeposits() {
         }
     }
     console.timeEnd('timer')
+    localStorage.setItem('lastDeposits', depositUsdSum);
     return depositUsdSum;
 }
 
@@ -192,8 +203,8 @@ async function getWithdrawals(address) {
         if(!removeliquidity.length) {
             removeliquidity = receipt.logs.filter(log=>log.topics[0] == '0x9878ca375e106f2a43c3b599fc624568131c4c9a4ba66a14563715763be9d59d')
         }
-        let [yDAI, yUSDC, yUSDT, yTUSD] = (web3.eth.abi.decodeParameters(['uint256[4]','uint256[4]', 'uint256'], removeliquidity[0].data))[0]
-        let yTokens = [yDAI, yUSDC, yUSDT, yTUSD];
+        let [yDAI, yUSDC, yUSDT, yBUSD] = (web3.eth.abi.decodeParameters(['uint256[4]','uint256[4]', 'uint256'], removeliquidity[0].data))[0]
+        let yTokens = [yDAI, yUSDC, yUSDT, yBUSD];
         const tokenIndex = Object.values(ADDRESSES).indexOf(address)
         let usd = await getExchangeRate(receipt.blockNumber, underlying_coins[tokenIndex]._address, '', 'deposit')
         let tokens = yTokens[tokenIndex];

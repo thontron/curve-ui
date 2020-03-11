@@ -470,3 +470,21 @@ div.info table td {
     transform: translateY( -6.0em); 
   }
 }
+
+.maxbalance {
+  padding: 0.3em;
+  text-align: right;
+  font-size: 0.95em;
+}
+
+fieldset:nth-child(1) .maxbalance {
+  cursor: pointer;
+}
+
+fieldset:nth-child(1) .maxbalance:hover {
+  text-decoration: underline;
+}
+
+fieldset:nth-child(2) .maxbalance {
+  visibility: hidden;
+}  
