@@ -2,16 +2,27 @@ var from_currency;
 var to_currency;
 
 async function set_from_amount(i) {
-    var default_account = (await web3.eth.getAccounts())[0] ;
+    var default_account = (await web3.eth.getAccounts())[0];
     var el = $('#from_currency');
+    let balance = await underlying_coins[i].methods.balanceOf(default_account).call();
+    let amount = Math.floor(
+            100 * parseFloat(balance) / coin_precisions[i]
+        ) / 100
     if (el.val() == '' || el.val() == 0) {
-        let balance = await underlying_coins[i].methods.balanceOf(default_account).call();
         if(!default_account) balance = 0
-        let amount = Math.floor(
-                100 * parseFloat(balance) / coin_precisions[i]
-            ) / 100
         $('#from_currency').val(amount.toFixed(2));
     }
+    $('fieldset:first .maxbalance span').text(amount.toFixed(2))
+}
+
+async function set_max_balance() {
+    var default_account = (await web3.eth.getAccounts())[0];
+    let balance = await underlying_coins[from_currency].methods.balanceOf(default_account).call();
+    let amount = Math.floor(
+            100 * parseFloat(balance) / coin_precisions[from_currency]
+        ) / 100
+    $('#from_currency').val(amount.toFixed(2));
+    await set_to_amount();
 }
 
 async function highlight_input() {
@@ -32,12 +43,18 @@ let promise = makeCancelable(Promise.resolve());
 async function set_to_amount() {
     promise.cancel();
     promise = setAmountPromise()
-        .then(([dy, dy_, dx_]) => {
+        .then(async ([dy, dy_, dx_]) => {
             $('#to_currency').val(dy);
             var exchange_rate = (dy_ / dx_).toFixed(4);
             if(exchange_rate <= 0.98) $("#to_currency").css('background-color', 'red')
             else $("#to_currency").css('background-color', '#505070')
             if(isNaN(exchange_rate)) exchange_rate = "Not available"
+            var default_account = (await web3.eth.getAccounts())[0];
+            let balance = await underlying_coins[to_currency].methods.balanceOf(default_account).call();
+            let amount = Math.floor(
+                    100 * parseFloat(balance) / coin_precisions[to_currency]
+                ) / 100
+            $('fieldset:nth-child(2) .maxbalance span').text(amount.toFixed(2))
             $('#exchange-rate').text(exchange_rate);
             $('#from_currency').prop('disabled', false);
         })
@@ -60,7 +77,6 @@ function setAmountPromise() {
         if (b >= 0.001) {
             // In c-units
             var dx_ = $('#from_currency').val();
-            console.log(Math.round(dx_ * coin_precisions[i]))
             var dx = cBN(Math.round(dx_ * coin_precisions[i])).toFixed(0);
             var dy_ = parseInt(await swap.methods.get_dy_underlying(i, j, dx).call()) / coin_precisions[j];
             var dy = dy_.toFixed(2);
@@ -145,6 +161,7 @@ async function init_ui() {
 
     $('#from_currency').on('input', debounced(100, set_to_amount));
     $('#from_currency').click(function() {this.select()});
+    $('fieldset:first .maxbalance').click(set_max_balance)
 
     $("#trade").click(handle_trade);
     
