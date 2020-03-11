@@ -35,7 +35,7 @@
             for(let i = 0; i < stats.length; i++) {
                 let json = stats[i];
                 console.log(json);
-                var weekly_apr = json['weekly_apr'];
+                var weekly_apr = json['daily_apr'];
                 $(`.poolsdialog div:nth-of-type(${i+1}) a span.apr span`).text((weekly_apr * 100).toFixed(2));
             }
         });
@@ -88,28 +88,28 @@
                     <a href='https://compound.curve.fi'>0.  
                         <span class='pooltext'>Compound</span> 
                         <span class='pools'>[(c)DAI, (c)USDC]</span>  
-                        <span class='apr'>APY: <span></span>%</span>
+                        <span class='apr'>Daily APY: <span></span>%</span>
                     </a>
                 </div>
                 <div>
                     <a href='https://usdt.curve.fi'>1.  
                         <span class='pooltext'>USDT</span>
                         <span class='pools'>[(c)DAI, (c)USDC, USDT]</span>  
-                        <span class='apr'> APY: <span></span>%</span>
+                        <span class='apr'>Daily APY: <span></span>%</span>
                     </a>
                 </div>
                 <div>
                     <a href='https://y.curve.fi'>2.  
                         <span class='pooltext'>Y</span>
                         <span class='pools'>[(y)DAI, (y)USDC, (y)USDT, (y)TUSD]</span>  
-                        <span class='apr'> APY: <span></span>%</span>
+                        <span class='apr'>Daily APY: <span></span>%</span>
                     </a>
                 </div>
                 <div>
                     <a href='https://busd.curve.fi'>3.  
                         <span class='pooltext'>BUSD</span>
                         <span class='pools'>[(y)DAI, (y)USDC, (y)USDT, (y)BUSD]</span>  
-                        <span class='apr'> APY: <span></span>%</span>
+                        <span class='apr'>Daily APY: <span></span>%</span>
                     </a>
                 </div>
             </fieldset>
