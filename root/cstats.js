@@ -241,8 +241,8 @@ window.addEventListener('load', async () => {
           el.classList.add('selected')
   })
   try {
-      await init_charts();
       await init('stats');
+      await init_charts();
       await init_contracts();
       await update_fee_info();
   }
@@ -258,5 +258,3 @@ window.addEventListener('load', async () => {
     }
   }
 });
-
-
