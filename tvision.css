@@ -518,3 +518,7 @@ fieldset:nth-child(1) .maxbalance {
 fieldset:nth-child(1) .maxbalance:hover {
   text-decoration: underline;
 }
+
+fieldset:nth-child(2) .maxbalance {
+  visibility: hidden;
+}
