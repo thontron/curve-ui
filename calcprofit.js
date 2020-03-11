@@ -53,6 +53,7 @@ async function checkExchangeRateBlocks(block, address, direction, type = 'deposi
 
     let fromBlock = '0x'+parseInt(block-100).toString(16)
     let toBlock = '0x'+parseInt(block).toString(16)
+    fromBlock = '0x909974'
     if(direction == 1) {
         fromBlock = '0x'+parseInt(block).toString(16)
         toBlock = '0x'+parseInt(block+100).toString(16)
@@ -61,7 +62,6 @@ async function checkExchangeRateBlocks(block, address, direction, type = 'deposi
     if(direction == 0) {
         fromBlock = '0x'+parseInt(block-1).toString(16)
         toBlock = '0x'+parseInt(block+1).toString(16)
-        fromBlock = '0x909974'
     }
     let underlying_addresses = underlying_coins.map(c=>c._address)
     let index = underlying_addresses.indexOf(address);
@@ -126,7 +126,6 @@ async function getExchangeRate(blockNumber, address, value, type = 'deposit') {
         exchangeRate = (exchangeRateFuture.blockNumber - exchangeRatePast.blockNumber) * (exchangeRateFuture.exchangeRate - exchangeRatePast.exchangeRate)
         exchangeRate = exchangeRate / (exchangeRateFuture.blockNumber - exchangeRatePast.blockNumber)
         exchangeRate = exchangeRate + (exchangeRatePast.exchangeRate)
-
     }
     else {
         exchangeRate = exchangeRate.exchangeRate;
@@ -151,7 +150,7 @@ async function getDeposits() {
     //default_account = '0x39415255619783A2E71fcF7d8f708A951d92e1b6'
     default_account = default_account.substr(2).toLowerCase();
 
-    const poolTokensReceivings = await web3.eth.getPastLogs({
+    let poolTokensReceivings = await web3.eth.getPastLogs({
         fromBlock: '0x909974',
         toBlock: 'latest',
         address: CURVE_TOKEN,
@@ -161,9 +160,18 @@ async function getDeposits() {
             '0x000000000000000000000000' + default_account,
         ],
     });
-    const txs = poolTokensReceivings.map(e => e.transactionHash);
 
     let depositUsdSum = 0;
+
+    var lastBlock = poolTokensReceivings[poolTokensReceivings.length-1].blockNumber
+
+    if(localStorage.getItem('lastBlock')) {
+        poolTokensReceivings = poolTokensReceivings.filter(r=>r.blockNumber > lastBlock);
+        depositUsdSum += +localStorage.getItem('lastDeposits')
+    }
+    localStorage.setItem('lastBlock', lastBlock);
+    const txs = poolTokensReceivings.map(e => e.transactionHash);
+
     console.time('timer')
     for (const hash of txs) {
         const receipt = await web3.eth.getTransactionReceipt(hash);
@@ -180,6 +188,7 @@ async function getDeposits() {
         }
     }
     console.timeEnd('timer')
+    localStorage.setItem('lastDeposits', depositUsdSum);
     return depositUsdSum;
 }
 
