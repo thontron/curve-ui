@@ -79,13 +79,13 @@ async function init_ui() {
 
                         if (balances[i] * c_rates[i] > 1) {
                             // proportional
-                            var newval = this.value / c_rates[i] * balances[j] / balances[i];
+                            var newval = $('#currency_'+i).val() / c_rates[i] * balances[j] / balances[i];
                             newval = Math.floor(newval * c_rates[j] * 100) / 100;
                             el_j.val(newval);
 
                         } else {
                             // same value as we type
-                            var newval = this.value;
+                            var newval = $('#currency_'+i).val();
                             el_j.val(newval);
                         }
 
