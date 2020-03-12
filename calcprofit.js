@@ -139,8 +139,17 @@ async function getDeposits() {
     //default_account = '0x39415255619783A2E71fcF7d8f708A951d92e1b6'
     default_account = default_account.substr(2).toLowerCase();
 
+    let depositUsdSum = 0;
+
+    let fromBlock = '0x91fc3d';
+    if(localStorage.getItem('bUSDlastDepositBlock') && localStorage.getItem('bUSDlastAddress') == default_account) {
+        let block = +localStorage.getItem('bUSDlastDepositBlock')
+        fromBlock = '0x'+parseInt(block+1).toString(16)
+        depositUsdSum += +localStorage.getItem('bUSDlastDeposits')
+    }
+
     let poolTokensReceivings = await web3.eth.getPastLogs({
-        fromBlock: '0x91fc3d',
+        fromBlock: fromBlock,
         toBlock: 'latest',
         address: CURVE_TOKEN,
         topics: [
@@ -150,15 +159,7 @@ async function getDeposits() {
         ],
     });
 
-    let depositUsdSum = 0;
-
-    var lastBlock = poolTokensReceivings[poolTokensReceivings.length-1].blockNumber
-
-/*    if(localStorage.getItem('bUSDlastBlock')) {
-        poolTokensReceivings = poolTokensReceivings.filter(r=>r.blockNumber > lastBlock);
-        depositUsdSum += +localStorage.getItem('bUSDlastDeposits')
-    }
-    localStorage.setItem('bUSDlastBlock', lastBlock);*/
+    var lastBlock = poolTokensReceivings.length && poolTokensReceivings[poolTokensReceivings.length-1].blockNumber || fromBlock
     
     const txs = poolTokensReceivings.map(e => e.transactionHash);
 
@@ -170,15 +171,18 @@ async function getDeposits() {
         let yTokens = [yDAI, yUSDC, yUSDT, yBUSD];
         for(let i = 0; i < 4; i++) {
             const tokenIndex = Object.values(ADDRESSES)[i]
-            let usd = await getExchangeRate(receipt.blockNumber, underlying_coins[i]._address, '', 'deposit')
             let tokens = yTokens[i];
+            if(tokens == 0) continue;
+            let usd = await getExchangeRate(receipt.blockNumber, underlying_coins[i]._address, '', 'deposit')
             if(i == 0 || i == 3) tokens /= 1e18
             else tokens /= 1e6
             depositUsdSum += tokens * usd;
         }
     }
     console.timeEnd('timer')
-    //localStorage.setItem('bUSDlastDeposits', depositUsdSum);
+    localStorage.setItem('bUSDlastDepositBlock', lastBlock);
+    localStorage.setItem('bUSDlastAddress', default_account)
+    localStorage.setItem('bUSDlastDeposits', depositUsdSum);
     return depositUsdSum;
 }
 
@@ -186,8 +190,17 @@ async function getWithdrawals(address) {
     var default_account = (await web3.eth.getAccounts())[0];
     //default_account = '0x39415255619783A2E71fcF7d8f708A951d92e1b6'
     default_account = default_account.substr(2).toLowerCase();
+    let withdrawals = 0;
+
+    let fromBlock = '0x91fc3d';
+    if(localStorage.getItem('bUSDlastWithdrawalBlock') && localStorage.getItem('bUSDlastAddress') == default_account) {
+        let block = +localStorage.getItem('bUSDlastWithdrawalBlock')
+        fromBlock = '0x'+parseInt(block+1).toString(16)
+        withdrawals += +localStorage.getItem('bUSDlastWithdrawals')
+    }
+    
     let logs = await web3.eth.getPastLogs({
-        fromBlock: '0x909964',
+        fromBlock: fromBlock,
         toBlock: 'latest',
         address: token_address,
         topics: [
@@ -195,7 +208,9 @@ async function getWithdrawals(address) {
             '0x000000000000000000000000' + default_account,
         ],
     });
-    let withdrawals = 0;
+
+    var lastBlock = logs.length && logs[logs.length-1].blockNumber || fromBlock
+
     for(let log of logs) {
         const receipt = await web3.eth.getTransactionReceipt(log.transactionHash);
         let removeliquidity = receipt.logs.filter(log=>log.topics[0] == '0xb964b72f73f5ef5bf0fdc559b2fab9a7b12a39e47817a547f1f0aee47febd602')
@@ -204,14 +219,19 @@ async function getWithdrawals(address) {
         }
         let [yDAI, yUSDC, yUSDT, yBUSD] = (web3.eth.abi.decodeParameters(['uint256[4]','uint256[4]', 'uint256'], removeliquidity[0].data))[0]
         let yTokens = [yDAI, yUSDC, yUSDT, yBUSD];
-        const tokenIndex = Object.values(ADDRESSES).indexOf(address)
-        let tokens = yTokens[tokenIndex];
-        if(tokens == 0) continue;
-        let usd = await getExchangeRate(receipt.blockNumber, underlying_coins[tokenIndex]._address, '', 'deposit')
-        if(tokenIndex == 0 || tokenIndex == 3) tokens /= 1e18
-        else tokens /= 1e6
-        withdrawals += tokens * usd;
+        for(let i = 0; i < 4; i++) {
+            const tokenIndex = Object.values(ADDRESSES)[i]
+            let tokens = yTokens[i];
+            if(tokens == 0) continue;
+            let usd = await getExchangeRate(receipt.blockNumber, underlying_coins[i]._address, '', 'deposit')
+            if(i == 0 || i == 3) tokens /= 1e18
+            else tokens /= 1e6
+            withdrawals += tokens * usd;
+        }
     }
+    localStorage.setItem('bUSDlastWithdrawalBlock', lastBlock);
+    //localStorage.setItem('lastAddress', default_account)
+    localStorage.setItem('bUSDlastWithdrawals', withdrawals);
     return withdrawals;
 }
 
@@ -252,16 +272,17 @@ async function init_ui() {
         $("#profit li:first span").text(deposits.toFixed(2))
         let available = 0;
 
-        let withdrawals = 0;
+        let withdrawals = await getWithdrawals();
+        $("#profit li:nth-child(2) span").removeClass('loading line');
+        $("#profit li:nth-child(2) span").text(withdrawals.toFixed(2))
+
         let promises = [];
         for(let curr of Object.keys(ADDRESSES)) {
-            promises.push(getWithdrawals(ADDRESSES[curr]))
             promises.push(getAvailable(curr))
         }
         let prices = await Promise.all(promises);
-        for(let i = 0; i < prices.length; i+=2) {
-            withdrawals += prices[i];
-            let curr = Object.keys(ADDRESSES)[i/2]
+        for(let i = 0; i < prices.length; i++) {
+            let curr = Object.keys(ADDRESSES)[i]
             const exchangeRate = await web3.eth.call({
                 to: ADDRESSES[curr],
                 data: '0xbd6d894d',
@@ -276,18 +297,21 @@ async function init_ui() {
             });
             available += fromNativeCurrent(curr,
                 BN(usdPool)
-                .mul(BN(prices[i+1]))
+                .mul(BN(prices[i]))
                 .divRound(BN(tokensSupply))
             );
         }
-        $("#profit li:nth-child(2) span").removeClass('loading line');
-        $("#profit li:nth-child(2) span").text(withdrawals.toFixed(2))
         $("#profit li:nth-child(3) span").removeClass('loading line');
         $("#profit li:nth-child(3) span").text(available.toFixed(2))
         $("#profit li:nth-child(4) span").removeClass('loading line');
         $("#profit li:nth-child(4) span").text((available + withdrawals - deposits).toFixed(2))
     }
     catch(err) {
+        localStorage.removeItem('bUSDlastDeposits')
+        localStorage.removeItem('bUSDlastDepositBlock')
+        localStorage.removeItem('bUSDlastWithdrawals')
+        localStorage.removeItem('bUSDlastWithdrawalBlock')
+        localStorage.removeItem('bUSDlastWithdrawals')
         console.error(err)
     }
 
