@@ -1,4 +1,4 @@
-var contracts = {compound, usdt, iearn, busd, susd}
+var contracts = {susd}
 var web3contracts = {};
 var all_coins = {};
 var all_underlying_coins = {};
@@ -32,8 +32,8 @@ async function init_contracts() {
 
 	        let cabi = ['iearn','busd', 'susd'].includes(key) ? contract.yERC20_abi : contract.cERC20_abi;
 	        if(key == 'susd' && i == 1) {
-	        	cabi = contracts.iearn.swap_abi;
-	        	addr = contracts.iearn.swap_address
+	        	cabi = iearn.swap_abi;
+	        	addr = iearn.swap_address
 	        }
 	        all_coins[key].coins[i] = new web3.eth.Contract(cabi, addr);
 	        var underlying_addr = await web3contracts[key].swap.methods.underlying_coins(i).call();
@@ -195,7 +195,7 @@ var chart_options = {
 
 async function init_charts() {
     var options = chart_options;
-    var urls = ['']
+    var urls = ['https://synthetix.curve.fi']
     let stats = await Promise.all(urls.map(url=>$.getJSON(url+'/stats.json')))
     $("p[id^='chart']").removeClass('loading dots')
     for(let i = 0; i < stats.length; i++) {
