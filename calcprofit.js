@@ -90,7 +90,6 @@ async function getExchangeRate(blockNumber, address, value) {
 }
 async function getDeposits() {
     var default_account = (await web3.eth.getAccounts())[0];
-    default_account = '0x39415255619783A2E71fcF7d8f708A951d92e1b6'
     default_account = default_account.substr(2).toLowerCase();
 
     const poolTokensReceivings = await web3.eth.getPastLogs({
@@ -135,7 +134,6 @@ async function getDeposits() {
 
 async function getWithdrawals(address) {
     var default_account = (await web3.eth.getAccounts())[0];
-    default_account = '0x39415255619783A2E71fcF7d8f708A951d92e1b6'
     default_account = default_account.substr(2).toLowerCase();
     const logs = await web3.eth.getPastLogs({
         fromBlock: '0x904a9c',
@@ -165,7 +163,6 @@ async function getWithdrawals(address) {
 
 async function getAvailable(curr) {
     var default_account = (await web3.eth.getAccounts())[0];
-    default_account = '0x39415255619783A2E71fcF7d8f708A951d92e1b6'
     default_account = default_account.substr(2).toLowerCase();
     const tokenAddress = ADDRESSES[curr];
     //balanceOf method
