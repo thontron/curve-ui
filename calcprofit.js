@@ -96,6 +96,7 @@ async function checkExchangeRateBlocks(block, address, direction, type = 'deposi
         if(direction == -1) mint = mints[mints.length-1]
         let tr = await web3.eth.getTransactionReceipt(mint.transactionHash)
         tr = tr.logs.filter(log=>log.address == yaddress)
+        if(!tr.length) return false;
         var sent = tr[0]
         if(type != 'deposit') {
             sent = tr.logs.filter(log => {
@@ -217,8 +218,9 @@ async function getWithdrawals(address) {
         let [yDAI, yUSDC, yUSDT, yTUSD] = (web3.eth.abi.decodeParameters(['uint256[4]','uint256[4]', 'uint256'], removeliquidity[0].data))[0]
         let yTokens = [yDAI, yUSDC, yUSDT, yTUSD];
         const tokenIndex = Object.values(ADDRESSES).indexOf(address)
-        let usd = await getExchangeRate(receipt.blockNumber, underlying_coins[tokenIndex]._address, '', 'deposit')
         let tokens = yTokens[tokenIndex];
+        if(tokens == 0) continue;
+        let usd = await getExchangeRate(receipt.blockNumber, underlying_coins[tokenIndex]._address, '', 'deposit')
         if(tokenIndex == 0 || tokenIndex == 3) tokens /= 1e18
         else tokens /= 1e6
         withdrawals += tokens * usd;
