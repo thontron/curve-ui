@@ -53,7 +53,7 @@ async function checkExchangeRateBlocks(block, address, direction, type = 'deposi
 
     let fromBlock = '0x'+parseInt(block-100).toString(16)
     let toBlock = '0x'+parseInt(block).toString(16)
-    fromBlock = '0x909974'
+    fromBlock = '0x909964'
     if(direction == 1) {
         fromBlock = '0x'+parseInt(block).toString(16)
         toBlock = '0x'+parseInt(block+100).toString(16)
@@ -152,7 +152,7 @@ async function getDeposits() {
     default_account = default_account.substr(2).toLowerCase();
 
     let poolTokensReceivings = await web3.eth.getPastLogs({
-        fromBlock: '0x909974',
+        fromBlock: '0x909964',
         toBlock: 'latest',
         address: CURVE_TOKEN,
         topics: [
