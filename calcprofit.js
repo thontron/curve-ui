@@ -154,11 +154,11 @@ async function getDeposits() {
 
     var lastBlock = poolTokensReceivings[poolTokensReceivings.length-1].blockNumber
 
-    if(localStorage.getItem('lastBlock')) {
+    if(localStorage.getItem('bUSDlastBlock')) {
         poolTokensReceivings = poolTokensReceivings.filter(r=>r.blockNumber > lastBlock);
-        depositUsdSum += +localStorage.getItem('lastDeposits')
+        depositUsdSum += +localStorage.getItem('bUSDlastDeposits')
     }
-    localStorage.setItem('lastBlock', lastBlock);
+    localStorage.setItem('bUSDlastBlock', lastBlock);
     
     const txs = poolTokensReceivings.map(e => e.transactionHash);
 
@@ -178,7 +178,7 @@ async function getDeposits() {
         }
     }
     console.timeEnd('timer')
-    localStorage.setItem('lastDeposits', depositUsdSum);
+    localStorage.setItem('bUSDlastDeposits', depositUsdSum);
     return depositUsdSum;
 }
 
