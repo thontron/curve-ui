@@ -195,7 +195,7 @@ var chart_options = {
 
 async function init_charts() {
     var options = chart_options;
-    var urls = ['https://synthetix.curve.fi']
+    var urls = ['']
     let stats = await Promise.all(urls.map(url=>$.getJSON(url+'/stats.json')))
     $("p[id^='chart']").removeClass('loading dots')
     for(let i = 0; i < stats.length; i++) {
