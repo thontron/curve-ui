@@ -61,7 +61,7 @@ async function checkExchangeRateBlocks(block, address, direction, type = 'deposi
     if(direction == 0) {
         fromBlock = '0x'+parseInt(block-1).toString(16)
         toBlock = '0x'+parseInt(block+1).toString(16)
-        fromBlock = '0x909974'
+        fromBlock = '0x91fc3d'
     }
     let underlying_addresses = underlying_coins.map(c=>c._address)
     let index = underlying_addresses.indexOf(address);
@@ -140,7 +140,7 @@ async function getDeposits() {
     default_account = default_account.substr(2).toLowerCase();
 
     let poolTokensReceivings = await web3.eth.getPastLogs({
-        fromBlock: '0x909974',
+        fromBlock: '0x91fc3d',
         toBlock: 'latest',
         address: CURVE_TOKEN,
         topics: [
@@ -187,7 +187,7 @@ async function getWithdrawals(address) {
     //default_account = '0x39415255619783A2E71fcF7d8f708A951d92e1b6'
     default_account = default_account.substr(2).toLowerCase();
     const logs = await web3.eth.getPastLogs({
-        fromBlock: '0x909974',
+        fromBlock: '0x91fc3d',
         toBlock: 'latest',
         address,
         topics: [
