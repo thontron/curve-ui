@@ -84,7 +84,7 @@ async function getDeposits() {
 
     let depositUsdSum = 0;
 
-    let fromBlock = '0x909964';
+    let fromBlock = '0x91c86f';
     if(localStorage.getItem('ClastDepositBlock') && localStorage.getItem('ClastAddress') == default_account) {
         let block = +localStorage.getItem('ClastDepositBlock')
         fromBlock = '0x'+parseInt(block+1).toString(16)
@@ -244,7 +244,7 @@ async function init_ui() {
             );
         }
         $("#profit li:nth-child(3) span").removeClass('loading line');
-        $("#profit li:nth-child(3) span").text(available/100)
+        $("#profit li:nth-child(3) span").text((available/100).toFixed(2))
         $("#profit li:nth-child(4) span").removeClass('loading line');
         $("#profit li:nth-child(4) span").text((available/100 + withdrawals/100 - deposits/100).toFixed(2))
     }
