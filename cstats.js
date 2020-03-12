@@ -195,7 +195,7 @@ var chart_options = {
 
 async function init_charts() {
     var options = chart_options;
-    var urls = ['https://compound.curve.fi', 'https://usdt.curve.fi', 'https://y.curve.fi', 'https://busd.curve.fi', 'https://synthetix.curve.fi']        
+    var urls = ['']
     let stats = await Promise.all(urls.map(url=>$.getJSON(url+'/stats.json')))
     $("p[id^='chart']").removeClass('loading dots')
     for(let i = 0; i < stats.length; i++) {
@@ -236,10 +236,6 @@ async function init_charts() {
 
 
 window.addEventListener('load', async () => {
-  $("div.top-menu-bar a").toArray().forEach(function(el) {
-      if (el.href == window.location.href)
-          el.classList.add('selected')
-  })
   try {
       await init('stats');
       await init_charts();
@@ -251,7 +247,7 @@ window.addEventListener('load', async () => {
     if(err.reason == 'cancelDialog') {
         const web3 = new Web3(infura_url);
         window.web3 = web3
-        
+
         await init_charts();
         await init_contracts();
         update_fee_info();
