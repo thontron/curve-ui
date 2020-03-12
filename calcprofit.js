@@ -219,10 +219,10 @@ async function init_ui() {
     try {
         let deposits = await getDeposits();
         $("#profit li:first span").removeClass('loading line');
-        $("#profit li:first span").text(deposits/100)
+        $("#profit li:first span").text((deposits/100).toFixed(2))
         let withdrawals = await getWithdrawals();
         $("#profit li:nth-child(2) span").removeClass('loading line');
-        $("#profit li:nth-child(2) span").text(withdrawals/100)
+        $("#profit li:nth-child(2) span").text((withdrawals/100).toFixed(2))
 
         let available = 0;
 
