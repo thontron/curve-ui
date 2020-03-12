@@ -48,7 +48,7 @@ async function convertValuesCurrent(curr) {
 
 async function checkExchangeRateBlocks(block, address, direction, type = 'deposit') {
     var default_account = (await web3.eth.getAccounts())[0];
-    //default_account = '0x39415255619783A2E71fcF7d8f708A951d92e1b6'
+    //default_account = '0xeC6E6c0841a2bA474E92Bf42BaF76bFe80e8657C'
     default_account = default_account.substr(2).toLowerCase();
 
     let fromBlock = '0x'+parseInt(block-100).toString(16)
@@ -149,7 +149,7 @@ async function getExchangeRate(blockNumber, address, value, type = 'deposit') {
 }
 async function getDeposits() {
     var default_account = (await web3.eth.getAccounts())[0];
-    //default_account = '0x39415255619783A2E71fcF7d8f708A951d92e1b6'
+    //default_account = '0xeC6E6c0841a2bA474E92Bf42BaF76bFe80e8657C'
     default_account = default_account.substr(2).toLowerCase();
 
     let poolTokensReceivings = await web3.eth.getPastLogs({
@@ -196,10 +196,11 @@ async function getDeposits() {
 
 async function getWithdrawals(address) {
     var default_account = (await web3.eth.getAccounts())[0];
-    //default_account = '0x39415255619783A2E71fcF7d8f708A951d92e1b6'
+    //default_account = '0xeC6E6c0841a2bA474E92Bf42BaF76bFe80e8657C'
     default_account = default_account.substr(2).toLowerCase();
-    const logs = await web3.eth.getPastLogs({
-        fromBlock: '0x909974',
+    console.log(address)
+/*    let logs = await web3.eth.getPastLogs({
+        fromBlock: '0x909964',
         toBlock: 'latest',
         address,
         topics: [
@@ -207,8 +208,18 @@ async function getWithdrawals(address) {
             '0x000000000000000000000000' + CURVE.substr(2),
             '0x000000000000000000000000' + default_account,
         ],
-    });
+    });*/
     let withdrawals = 0;
+    let logs = await web3.eth.getPastLogs({
+        fromBlock: '0x909964',
+        toBlock: 'latest',
+        address: token_address,
+        topics: [
+            TRANSFER_TOPIC,
+            '0x000000000000000000000000' + default_account,
+        ],
+    });
+    //logs = logs.concat(zaps)
     for(let log of logs) {
         const receipt = await web3.eth.getTransactionReceipt(log.transactionHash);
         let removeliquidity = receipt.logs.filter(log=>log.topics[0] == '0xb964b72f73f5ef5bf0fdc559b2fab9a7b12a39e47817a547f1f0aee47febd602')
@@ -230,7 +241,7 @@ async function getWithdrawals(address) {
 
 async function getAvailable(curr) {
     var default_account = (await web3.eth.getAccounts())[0];
-    //default_account = '0x39415255619783A2E71fcF7d8f708A951d92e1b6'
+    //default_account = '0xeC6E6c0841a2bA474E92Bf42BaF76bFe80e8657C'
     default_account = default_account.substr(2).toLowerCase();
     const tokenAddress = ADDRESSES[curr];
     //balanceOf method
@@ -260,9 +271,9 @@ async function init_ui() {
     }
 
     try {
-        let deposits = await getDeposits();
+/*        let deposits = await getDeposits();
         $("#profit li:first span").removeClass('loading line');
-        $("#profit li:first span").text(deposits.toFixed(2))
+        $("#profit li:first span").text(deposits.toFixed(2))*/
         let available = 0;
 
         let withdrawals = 0;
@@ -298,7 +309,7 @@ async function init_ui() {
         $("#profit li:nth-child(3) span").removeClass('loading line');
         $("#profit li:nth-child(3) span").text(available.toFixed(2))
         $("#profit li:nth-child(4) span").removeClass('loading line');
-        $("#profit li:nth-child(4) span").text((available + withdrawals - deposits).toFixed(2))
+        //$("#profit li:nth-child(4) span").text((available + withdrawals - deposits).toFixed(2))
     }
     catch(err) {
         console.error(err)
