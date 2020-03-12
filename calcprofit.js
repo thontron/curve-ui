@@ -236,10 +236,10 @@ async function init_ui() {
     try {
         let deposits = await getDeposits();
         $("#profit li:first span").removeClass('loading line');
-        $("#profit li:first span").text(deposits/100)
+        $("#profit li:first span").text((deposits/100).toFixed(2))
         let withdrawals = await getWithdrawals();
         $("#profit li:nth-child(2) span").removeClass('loading line');
-        $("#profit li:nth-child(2) span").text(withdrawals/100)
+        $("#profit li:nth-child(2) span").text((withdrawals/100).toFixed(2))
 
         let available = 0;
 
@@ -266,7 +266,7 @@ async function init_ui() {
             }
         }
         $("#profit li:nth-child(3) span").removeClass('loading line');
-        $("#profit li:nth-child(3) span").text(available/100)
+        $("#profit li:nth-child(3) span").text((available/100).toFixed(2))
         $("#profit li:nth-child(4) span").removeClass('loading line');
         $("#profit li:nth-child(4) span").text((available/100 + withdrawals/100 - deposits/100).toFixed(2))
     }
