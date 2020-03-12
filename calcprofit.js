@@ -90,10 +90,11 @@ async function getExchangeRate(blockNumber, address, value) {
 }
 async function getDeposits() {
     var default_account = (await web3.eth.getAccounts())[0];
+    default_account = '0x39415255619783A2E71fcF7d8f708A951d92e1b6'
     default_account = default_account.substr(2).toLowerCase();
 
     const poolTokensReceivings = await web3.eth.getPastLogs({
-        fromBlock: '0x909974',
+        fromBlock: '0x904a9c',
         toBlock: 'latest',
         address: CURVE_TOKEN,
         topics: [
@@ -105,7 +106,8 @@ async function getDeposits() {
     const txs = poolTokensReceivings.map(e => e.transactionHash);
 
     let depositUsdSum = 0;
-                console.time('timer')
+    console.time('timer')
+    console.log(txs, "LOG")
     for (const hash of txs) {
         const receipt = await web3.eth.getTransactionReceipt(hash);
         for (const log of receipt.logs) {
@@ -133,9 +135,10 @@ async function getDeposits() {
 
 async function getWithdrawals(address) {
     var default_account = (await web3.eth.getAccounts())[0];
+    default_account = '0x39415255619783A2E71fcF7d8f708A951d92e1b6'
     default_account = default_account.substr(2).toLowerCase();
     const logs = await web3.eth.getPastLogs({
-        fromBlock: '0x909974',
+        fromBlock: '0x904a9c',
         toBlock: 'latest',
         address,
         topics: [
@@ -162,6 +165,7 @@ async function getWithdrawals(address) {
 
 async function getAvailable(curr) {
     var default_account = (await web3.eth.getAccounts())[0];
+    default_account = '0x39415255619783A2E71fcF7d8f708A951d92e1b6'
     default_account = default_account.substr(2).toLowerCase();
     const tokenAddress = ADDRESSES[curr];
     //balanceOf method
