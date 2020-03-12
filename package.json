@@ -1,0 +1,10 @@
+{
+  "name": "curve-ui",
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-rev-append": "^0.1.8"
+  },
+  "scripts": {
+    "bump": "gulp"
+  }
+}
