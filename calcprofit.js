@@ -90,7 +90,7 @@ async function getDeposits() {
     default_account = default_account.substr(2).toLowerCase();
 
     const poolTokensReceivings = await web3.eth.getPastLogs({
-        fromBlock: '0x909974',
+        fromBlock: '0x91c86f',
         toBlock: 'latest',
         address: CURVE_TOKEN,
         topics: [
@@ -125,7 +125,7 @@ async function getWithdrawals(address) {
     var default_account = (await web3.eth.getAccounts())[0];
     default_account = default_account.substr(2).toLowerCase();
     const logs = await web3.eth.getPastLogs({
-        fromBlock: '0x909974',
+        fromBlock: '0x91c86f',
         toBlock: 'latest',
         address,
         topics: [
