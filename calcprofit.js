@@ -186,13 +186,12 @@ async function getWithdrawals(address) {
     var default_account = (await web3.eth.getAccounts())[0];
     //default_account = '0x39415255619783A2E71fcF7d8f708A951d92e1b6'
     default_account = default_account.substr(2).toLowerCase();
-    const logs = await web3.eth.getPastLogs({
-        fromBlock: '0x91fc3d',
+    let logs = await web3.eth.getPastLogs({
+        fromBlock: '0x909964',
         toBlock: 'latest',
-        address,
+        address: token_address,
         topics: [
             TRANSFER_TOPIC,
-            '0x000000000000000000000000' + CURVE.substr(2),
             '0x000000000000000000000000' + default_account,
         ],
     });
@@ -206,8 +205,9 @@ async function getWithdrawals(address) {
         let [yDAI, yUSDC, yUSDT, yBUSD] = (web3.eth.abi.decodeParameters(['uint256[4]','uint256[4]', 'uint256'], removeliquidity[0].data))[0]
         let yTokens = [yDAI, yUSDC, yUSDT, yBUSD];
         const tokenIndex = Object.values(ADDRESSES).indexOf(address)
-        let usd = await getExchangeRate(receipt.blockNumber, underlying_coins[tokenIndex]._address, '', 'deposit')
         let tokens = yTokens[tokenIndex];
+        if(tokens == 0) continue;
+        let usd = await getExchangeRate(receipt.blockNumber, underlying_coins[tokenIndex]._address, '', 'deposit')
         if(tokenIndex == 0 || tokenIndex == 3) tokens /= 1e18
         else tokens /= 1e6
         withdrawals += tokens * usd;
