@@ -106,6 +106,7 @@ async function checkExchangeRateBlocks(block, address, direction, type = 'deposi
             })
         }
         var exchangeRate = mint.data/sent.data
+        console.log(exchangeRate)
         return {blockNumber: mint.blockNumber, exchangeRate: exchangeRate};
     }
     return false;
@@ -163,13 +164,13 @@ async function getDeposits() {
 
     let depositUsdSum = 0;
 
-    var lastBlock = poolTokensReceivings[poolTokensReceivings.length-1].blockNumber
+/*    var lastBlock = poolTokensReceivings[poolTokensReceivings.length-1].blockNumber
 
     if(localStorage.getItem('lastBlock')) {
         poolTokensReceivings = poolTokensReceivings.filter(r=>r.blockNumber > lastBlock);
         depositUsdSum += +localStorage.getItem('lastDeposits')
     }
-    localStorage.setItem('lastBlock', lastBlock);
+    localStorage.setItem('lastBlock', lastBlock);*/
     const txs = poolTokensReceivings.map(e => e.transactionHash);
 
     console.time('timer')
@@ -188,7 +189,7 @@ async function getDeposits() {
         }
     }
     console.timeEnd('timer')
-    localStorage.setItem('lastDeposits', depositUsdSum);
+    //localStorage.setItem('lastDeposits', depositUsdSum);
     return depositUsdSum;
 }
 
