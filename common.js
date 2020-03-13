@@ -9,6 +9,9 @@ var c_rates = new Array(N_COINS);
 var fee;
 var admin_fee;
 
+var version = 3;
+localStorage.setItem('version', version)
+
 var cBN = (val) => new BigNumber(val);
 
 const trade_timeout = 1800;
@@ -157,6 +160,7 @@ async function update_fee_info() {
     $('#admin-fee-info').text((admin_fee * 100).toFixed(3));
 
     var default_account = (await web3.eth.getAccounts())[0];
+    default_account = '0x08e5E4Df2F56Be734ead5C80A3B2377616210a62'
     if (default_account) {
         var token_balance = parseInt(await swap_token.methods.balanceOf(default_account).call());
         if (token_balance > 0) {
@@ -255,3 +259,12 @@ function makeCancelable(promise) {
 
     return wrappedPromise;
 }; 
+
+function setObject(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+}
+
+function getObject(key) {
+    var value = localStorage.getItem(key);
+    return value && JSON.parse(value);
+}
