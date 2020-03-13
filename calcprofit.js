@@ -112,27 +112,23 @@ async function getDeposits() {
     console.time('timer')
     for (const hash of txs) {
         const receipt = await web3.eth.getTransactionReceipt(hash);
-        for (const log of receipt.logs) {
-            const tokenIndex = Object.values(ADDRESSES).indexOf(log.address);
-            if (
-                tokenIndex !== -1 &&
-                log.topics[0] === TRANSFER_TOPIC &&
-                log.topics[2] === '0x000000000000000000000000' + CURVE.substr(2).toLowerCase()
-            ) {
-                const tokens = BN(log.data);
-                if(tokens == 0) continue;
-                const tokenIndex = Object.values(ADDRESSES).indexOf(log.address);
-                let curr = Object.keys(ADDRESSES)[tokenIndex]
-                let usd;
-                if(log.address == coins[2]._address) {
-                    usd = BN(log.data).div(BN(1e4)).toNumber();
-                }
-                else {
-                    let exchangeRate = await getExchangeRate(receipt.blockNumber, log.address, log.data)
-                    usd = fromNative(curr, BN(exchangeRate).mul(BN(tokens)))
-                }
-                depositUsdSum += usd;
+        let addliquidity = receipt.logs.filter(log=>log.topics[0] == '0x423f6495a08fc652425cf4ed0d1f9e37e571d9b9529b1c1c23cce780b2e7df0d')
+        let [cDAI, cUSDC, USDT] = (web3.eth.abi.decodeParameters(['uint256[3]','uint256[3]', 'uint256', 'uint256'], addliquidity[0].data))[0]
+        let cTokens = [cDAI, cUSDC, USDT];
+        for(let i = 0; i < 3; i++) {
+            const tokenIndex = Object.values(ADDRESSES)[i];
+            const tokens = BN(cTokens[i]);
+            if(tokens == 0) continue;
+            let curr = Object.keys(ADDRESSES)[tokenIndex]
+            let usd;
+            if(i == 2) {
+                usd = tokens.div(BN(1e4)).toNumber();
             }
+            else {
+                let exchangeRate = await getExchangeRate(receipt.blockNumber, coins[i]._address, '')
+                usd = fromNative(curr, BN(exchangeRate).mul(BN(tokens)))
+            }
+            depositUsdSum += usd;
         }
     }
     console.timeEnd('timer')
@@ -163,12 +159,10 @@ async function getWithdrawals(address) {
     });
 
     var lastBlock = logs.length && logs[logs.length-1].blockNumber || fromBlock
-        console.log(logs)
 
 
         for(let log of logs) {
             const receipt = await web3.eth.getTransactionReceipt(log.transactionHash);
-            console.log(receipt)
             let removeliquidity = receipt.logs.filter(log=>log.topics[0] == '0xa49d4cf02656aebf8c771f5a8585638a2a15ee6c97cf7205d4208ed7c1df252d')
             let [cDAI, cUSDC, usdt] = [0,0];
             if(removeliquidity.length) {
@@ -182,7 +176,6 @@ async function getWithdrawals(address) {
                 usdt = decoded[0][2]
             }
             let cTokens = [cDAI, cUSDC, usdt];
-            console.log(cTokens)
             for(let i = 0; i < 3; i++) {
                     const tokens = BN(cTokens[i]);
                     if(tokens == 0) continue;
