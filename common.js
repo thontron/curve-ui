@@ -186,11 +186,12 @@ async function update_fee_info() {
 async function calc_slippage(deposit) {
     var real_values = [...$("[id^=currency_]")].map((x,i) => +($(x).val()));
     var Sr = real_values.reduce((a,b) => a+b, 0);
-    var values = real_values.map((x,i) => cBN(Math.floor(x / c_rates[i]).toString()).toString(10));
-    var ones = c_rates.map((rate, i) => cBN(Math.floor(1.0 / rate / N_COINS).toString()).toString(10));
+
+    var values = real_values.map((x,i) => cBN(Math.floor(x / c_rates[i]).toString()).toFixed(0));
     var token_amount = await swap.methods.calc_token_amount(values, deposit).call();
-    var ideal_token_amount = parseInt(await swap.methods.calc_token_amount(ones, deposit).call()) * Sr;
-    var token_supply = parseInt(await swap_token.methods.totalSupply().call());
+    var virtual_price = await swap.methods.get_virtual_price().call();
+    var Sv = virtual_price * token_amount / 1e36;
+
     for(let i = 0; i < N_COINS; i++) {
         let coin_balance = parseInt(await swap.methods.balances(i).call()) * c_rates[i];
         if(!deposit) {
@@ -203,12 +204,11 @@ async function calc_slippage(deposit) {
         }
     }
     if (deposit)
-        slippage = token_amount / ideal_token_amount
+        slippage = Sv / Sr
     else
-        slippage = ideal_token_amount / token_amount;
+        slippage = Sr / Sv;
     slippage = slippage - 1;
     slippage = slippage || 0
-    console.log(slippage)
     if(slippage < -0.005) {
         $("#bonus-window").hide();
         $("#highslippage-warning").removeClass('info-message').addClass('simple-error');
