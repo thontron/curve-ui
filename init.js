@@ -3,7 +3,7 @@ $(document).click(function(event) {
   $target = $(event.target);
   console.log(web3)
   if(!$target.closest('.web3connect-provider-wrapper').length && 
-  $('.web3connect-provider-wrapper').is(":visible") && cancelablePromise && window.web3.version != '1.0.0-beta.34') {
+  $('.web3connect-provider-wrapper').is(":visible") && cancelablePromise && windows.web3 && window.web3.version != '1.0.0-beta.34') {
     cancelablePromise.cancel('cancelDialog');
   }        
 });
