@@ -118,8 +118,8 @@ async function init_ui() {
 
 window.addEventListener('load', async () => {
     try {
-        $("#max_balances").prop('disabled', true)
-        $("#add_liquidity").prop('disabled', true)
+        $("#max-balances").prop('disabled', true)
+        $("#add-liquidity").prop('disabled', true)
 
         await init();
         update_fee_info();
@@ -127,8 +127,8 @@ window.addEventListener('load', async () => {
         await calc_slippage(true);
         
         await init_ui();
-        $("#max_balances").prop('disabled', false)
-        $("#add_liquidity").prop('disabled', false)
+        $("#max-balances").prop('disabled', false)
+        $("#add-liquidity").prop('disabled', false)
 
     }
     catch(err) {
@@ -144,7 +144,6 @@ window.addEventListener('load', async () => {
             await calc_slippage(true);
 
             await init_ui();
-            $("#from_currency").attr('disabled', false)
         }
     }
 });
