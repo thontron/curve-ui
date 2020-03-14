@@ -160,7 +160,6 @@ async function update_fee_info() {
     $('#admin-fee-info').text((admin_fee * 100).toFixed(3));
 
     var default_account = (await web3.eth.getAccounts())[0];
-    default_account = '0x08e5E4Df2F56Be734ead5C80A3B2377616210a62'
     if (default_account) {
         var token_balance = parseInt(await swap_token.methods.balanceOf(default_account).call());
         if (token_balance > 0) {
