@@ -1,5 +1,5 @@
 //adding Sentry as soon as possible
-/*Sentry.init({ 
+Sentry.init({ 
   dsn: 'https://5494f535e0244513a301f2912f5d899f@sentry.io/4169463',
   integrations: [
     new Sentry.Integrations.CaptureConsole({
@@ -7,7 +7,7 @@
     })
   ],
 });
-*/
+
 var N_COINS = 2;
 var coin_precisions = [1e18, 1e6];
 var old_swap_address = '0x2e60CF74d81ac34eB21eEff58Db4D385920ef419';
