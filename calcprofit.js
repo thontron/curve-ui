@@ -109,7 +109,7 @@ async function checkExchangeRateBlocks(block, address, direction, type = 'deposi
             tr = tr.logs.filter(log=>log.address == yaddress)
         }
         else {
-            tr = tr.logs.filter(log=>log.address == address)
+            tr = tr.logs.filter(log=>log.address == address && log.topics[2] == '0x000000000000000000000000' + yaddress.substr(2).toLowerCase())
         }
         if(!tr.length) return false;
         var sent = tr[0]
@@ -249,7 +249,7 @@ async function getWithdrawals(address) {
 
     var lastBlock = logs.length && logs[logs.length-1].blockNumber || fromBlock
 
-    if(localStorage.getItem('bUSDwversion') == version && localStorage.getItem('bUSDlastWithdrawalBlock') && localStorage.getItem('bUSDlastAddress') == default_account) {
+    if(localStorage.getItem('bUSDwversion') == version && localStorage.getItem('bUSDlastWithdrawalBlock') && localStorage.getItem('wbUSDlastAddress') == default_account) {
         logs = logs.filter(l=>l.blockNumber > lastBlock);
         withdrawals += +localStorage.getItem('bUSDlastWithdrawals')
     }
@@ -280,7 +280,7 @@ async function getWithdrawals(address) {
         }
     }
     localStorage.setItem('bUSDlastWithdrawalBlock', lastBlock)
-    localStorage.setItem('bUSDlastAddress', default_account)
+    localStorage.setItem('wbUSDlastAddress', default_account)
     localStorage.setItem('bUSDlastWithdrawals', withdrawals)
     localStorage.setItem('bUSDwversion', version)
     return withdrawals;
@@ -366,6 +366,8 @@ async function init_ui() {
         localStorage.removeItem('bUSDlastWithdrawals')
         localStorage.removeItem('bUSDlastWithdrawalBlock')
         localStorage.removeItem('bUSDlastWithdrawals')
+        localStorage.removeItem('bUSDlastAddress')
+        localStorage.removeItem('wbUSDlastAddress')
         localStorage.removeItem('dversion')
         localStorage.removeItem('pversion')
         console.error(err)
