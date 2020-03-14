@@ -504,3 +504,22 @@ div.info table td {
   border: none;
   margin: 0.5em;
 }
+
+.icon {
+  width: 1.5em;
+  height: 1.5em;
+}
+
+.ethicon {
+  filter: invert(0.4) sepia(1) saturate(0.8) hue-rotate(223deg);
+}
+
+.poolsdialog.donations > div {
+  margin-bottom: 3px;
+}
+
+.poolsdialog.donations > div > a {
+  display: flex;
+  align-items: center;
+  white-space: pre-wrap;
+}
