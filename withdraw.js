@@ -133,10 +133,16 @@ async function init_ui() {
 
 window.addEventListener('DOMContentLoaded', async () => {
     try {
+        $("#max_balances").prop('disabled', true)
+        $("#add_liquidity").prop('disabled', true)
+
         await init();
         await update_rates();
         await update_balances();
         await init_ui();
+
+        $("#max_balances").prop('disabled', false)
+        $("#add_liquidity").prop('disabled', false)
     }
     catch(err) {
         console.error(err)
