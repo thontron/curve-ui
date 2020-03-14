@@ -1,4 +1,5 @@
 var sync_balances;
+let slippagePromise = makeCancelable(Promise.resolve());
 
 async function handle_sync_balances() {
     sync_balances = $('#sync-balances').prop('checked');
@@ -65,7 +66,9 @@ async function init_ui() {
         }
 
         $('#currency_' + i).on('input', debounced(100, async function() {
-            await calc_slippage(true)
+            slippagePromise.cancel();
+            slippagePromise = makeCancelable(calc_slippage(true))
+            await slippagePromise;
 
             var el = $('#currency_' + i);
             if (el.val() > wallet_balances[i] * c_rates[i])
