@@ -98,7 +98,7 @@ async function checkExchangeRateBlocks(block, address, direction, type = 'deposi
             ],
         });
     }
-    //log.data is yDAI, yUSDC, yUSDT, yBUSD
+    //log.data is yDAI, yUSDC, yUSDT, yTUSD
 
     if(mints.length) {
         let mint = mints[0]
@@ -206,12 +206,12 @@ async function getDeposits() {
         const receipt = await web3.eth.getTransactionReceipt(hash);
         let timestamp = (await web3.eth.getBlock(receipt.blockNumber)).timestamp;
         console.log(timestamp)
-        let [yDAI, yUSDC, yUSDT, yBUSD] = [0, 0, 0, 0]
+        let [yDAI, yUSDC, yUSDT, yTUSD] = [0, 0, 0, 0]
         console.log(receipt.logs)
         let addliquidity = receipt.logs.filter(log=>log.topics[0] == '0x3f1915775e0c9a38a57a7bb7f1f9005f486fb904e1f84aa215364d567319a58d')
         if(addliquidity.length) {        
-            let [yDAI, yUSDC, yUSDT, yBUSD] = (web3.eth.abi.decodeParameters(['uint256[4]','uint256[4]', 'uint256', 'uint256'], addliquidity[0].data))[0]
-            let yTokens = [yDAI, yUSDC, yUSDT, yBUSD];
+            let [yDAI, yUSDC, yUSDT, yTUSD] = (web3.eth.abi.decodeParameters(['uint256[4]','uint256[4]', 'uint256', 'uint256'], addliquidity[0].data))[0]
+            let yTokens = [yDAI, yUSDC, yUSDT, yTUSD];
             depositUsdSum += await calculateAmount(receipt.blockNumber, yTokens, 'deposit');
         }
         else {
@@ -259,15 +259,15 @@ async function getWithdrawals(address) {
         let timestamp = (await web3.eth.getBlock(receipt.blockNumber)).timestamp;
         let removeliquidity = receipt.logs.filter(log=>log.topics[0] == '0xb964b72f73f5ef5bf0fdc559b2fab9a7b12a39e47817a547f1f0aee47febd602')
         if(removeliquidity.length) {
-            let [yDAI, yUSDC, yUSDT, yBUSD] = (web3.eth.abi.decodeParameters(['uint256[4]','uint256[4]', 'uint256'], removeliquidity[0].data))[0]
-            let yTokens = [yDAI, yUSDC, yUSDT, yBUSD];
+            let [yDAI, yUSDC, yUSDT, yTUSD] = (web3.eth.abi.decodeParameters(['uint256[4]','uint256[4]', 'uint256'], removeliquidity[0].data))[0]
+            let yTokens = [yDAI, yUSDC, yUSDT, yTUSD];
             withdrawals += await calculateAmount(receipt.blockNumber, yTokens);
             continue;
         }
         removeliquidity = receipt.logs.filter(log=>log.topics[0] == '0x9878ca375e106f2a43c3b599fc624568131c4c9a4ba66a14563715763be9d59d')
         if(removeliquidity.length) {
-            let [yDAI, yUSDC, yUSDT, yBUSD] = (web3.eth.abi.decodeParameters(['uint256[4]','uint256[4]', 'uint256'], removeliquidity[0].data))[0]
-            let yTokens = [yDAI, yUSDC, yUSDT, yBUSD];
+            let [yDAI, yUSDC, yUSDT, yTUSD] = (web3.eth.abi.decodeParameters(['uint256[4]','uint256[4]', 'uint256'], removeliquidity[0].data))[0]
+            let yTokens = [yDAI, yUSDC, yUSDT, yTUSD];
             withdrawals += await calculateAmount(receipt.blockNumber, yTokens, 'withdrawal');
         }
         else {
