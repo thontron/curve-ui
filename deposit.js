@@ -15,7 +15,6 @@ async function handle_sync_balances() {
 
         $(".currencies input").prop('disabled', true);
         for (let i = 0; i < N_COINS; i++) {
-            console.log(wallet_balances[i], c_rates[i], wallet_balances[i]*c_rates[i], "INPUT VALS")
             var val = Math.floor(wallet_balances[i] * c_rates[i] * 100) / 100;
             val = val.toFixed(2)
             $('#currency_' + i).val(val);
@@ -68,7 +67,7 @@ async function init_ui() {
             await calc_slippage(true)
 
             var el = $('#currency_' + i);
-            if (this.value > wallet_balances[i] * c_rates[i])
+            if (el.val() > wallet_balances[i] * c_rates[i])
                 el.css('background-color', 'red')
             else
                 el.css('background-color', 'blue');
