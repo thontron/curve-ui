@@ -8,6 +8,8 @@ const CURVE_TOKEN = token_address;
 const TRANSFER_TOPIC =
     '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 
+let priceData;
+
 function fromNative(curr, value) {
     return value.divRound(BN(1e16)).toNumber()
 }
@@ -26,6 +28,11 @@ function fromNativeCurrent(curr, value) {
     if(curr == 'USDT') {
         return value.divRound(BN(1e4)).toNumber();
     }
+}
+
+function findClosest(timestamp) {
+    let dates = priceData.data.find(d=>d[0] - timestamp > 0);
+    return dates;
 }
 
 async function checkExchangeRateBlocks(block, address, direction) {
@@ -91,10 +98,10 @@ async function calculateAmount(blockNumber, cTokens) {
         let curr = Object.keys(ADDRESSES)[i]
         let usd;
         if(i == 2) {
-            usd = BN(log.data).div(BN(1e4)).toNumber();
+            usd = BN(tokens).div(BN(1e4)).toNumber();
         }
         else {
-            let exchangeRate = await getExchangeRate(block, coins[i]._address, '')
+            let exchangeRate = await getExchangeRate(blockNumber, coins[i]._address, '')
             usd = fromNative(curr, BN(exchangeRate).mul(BN(tokens)))
         }
         amount += usd;
@@ -109,7 +116,7 @@ async function getDeposits() {
     let depositUsdSum = 0;
 
     let fromBlock = '0x904a9c';
-    if(localStorage.getItem('usdTlastDepositBlock') && localStorage.getItem('usdTlastAddress') == default_account) {
+    if(localStorage.getItem('uversion') == version && localStorage.getItem('usdTlastDepositBlock') && localStorage.getItem('usdTlastAddress') == default_account) {
         let block = +localStorage.getItem('usdTlastDepositBlock')
         fromBlock = '0x'+parseInt(block+1).toString(16)
         depositUsdSum += +localStorage.getItem('usdTlastDeposits')
@@ -133,12 +140,13 @@ async function getDeposits() {
     console.time('timer')
     for (const hash of txs) {
         const receipt = await web3.eth.getTransactionReceipt(hash);
+        let timestamp = (await web3.eth.getBlock(receipt.blockNumber)).timestamp;
         let [cDAI, cUSDC, USDT] = [0, 0, 0]
         let addliquidity = receipt.logs.filter(log=>log.topics[0] == '0x423f6495a08fc652425cf4ed0d1f9e37e571d9b9529b1c1c23cce780b2e7df0d')
         if(addliquidity.length) {        
             let [cDAI, cUSDC, USDT] = (web3.eth.abi.decodeParameters(['uint256[3]','uint256[3]', 'uint256', 'uint256'], addliquidity[0].data))[0]
             let cTokens = [cDAI, cUSDC, USDT];
-            depositUsdSum += calculateAmount(receipt.blockNumber, cTokens)
+            depositUsdSum += await calculateAmount(receipt.blockNumber, cTokens)
         }
         else {
             let transfer = receipt.logs.filter(log=>log.topics[0] == TRANSFER_TOPIC && log.topics[2] == '0x000000000000000000000000' + default_account)
@@ -151,6 +159,7 @@ async function getDeposits() {
     localStorage.setItem('usdTlastDepositBlock', lastBlock);
     localStorage.setItem('usdTlastAddress', default_account)
     localStorage.setItem('usdTlastDeposits', depositUsdSum);
+    localStorage.setItem('uversion', version)
     return depositUsdSum;
 }
 
@@ -159,7 +168,7 @@ async function getWithdrawals(address) {
     default_account = default_account.substr(2).toLowerCase();
     let withdrawals = 0;
     let fromBlock = '0x904a9c';
-    if(localStorage.getItem('usdTlastWithdrawalBlock') && localStorage.getItem('usdTlastAddress') == default_account) {
+    if(localStorage.getItem('uwversion') == version && localStorage.getItem('usdTlastWithdrawalBlock') && localStorage.getItem('usdTlastAddress') == default_account) {
         let block = +localStorage.getItem('usdTlastWithdrawalBlock')
         fromBlock = '0x'+parseInt(block+1).toString(16)
         withdrawals += +localStorage.getItem('usdTlastWithdrawals')
@@ -179,27 +188,32 @@ async function getWithdrawals(address) {
 
         for(let log of logs) {
             const receipt = await web3.eth.getTransactionReceipt(log.transactionHash);
+            let timestamp = (await web3.eth.getBlock(receipt.blockNumber)).timestamp;
+            console.log(receipt.logs)
             let removeliquidity = receipt.logs.filter(log=>log.topics[0] == '0xa49d4cf02656aebf8c771f5a8585638a2a15ee6c97cf7205d4208ed7c1df252d')
             let [cDAI, cUSDC, usdt] = [0,0];
             if(removeliquidity.length) {
                 let cTokens = (web3.eth.abi.decodeParameters(['uint256[3]','uint256[3]', 'uint256'], removeliquidity[0].data))[0]
-                withdrawals += calculateAmount(receipt.blockNumber, cTokens[0]);
+                withdrawals += await calculateAmount(receipt.blockNumber, cTokens[0]);
                 continue;
             }
             removeliquidity = receipt.logs.filter(log=>log.topics[0] == '0x173599dbf9c6ca6f7c3b590df07ae98a45d74ff54065505141e7de6c46a624c2')
             if(removeliquidity.length) {
                 let cTokens = web3.eth.abi.decodeParameters(['uint256[3]','uint256[3]', 'uint256', 'uint256'], removeliquidity[0].data)
-                withdrawals += calculateAmount(receipt.blockNumber, cTokens[0])
+                withdrawals += await calculateAmount(receipt.blockNumber, cTokens[0])
             }
             else {
-                let transfer = receipt.logs.filter(log=>log.topics[0] == TRANSFER_TOPIC && log.topics[2] == '0x000000000000000000000000' + default_account)
+                let transfer = receipt.logs.filter(log=>log.topics[0] == TRANSFER_TOPIC && log.topics[1] == '0x000000000000000000000000' + default_account)
                 let tokens = +transfer[0].data
                 let exchangeRate = findClosest(timestamp)[1]
+                console.log(tokens*exchangeRate/1e16)
                 withdrawals += tokens*exchangeRate/1e16  
             }
+            console.log(withdrawals, "WITHDRAWALS")
         }
     localStorage.setItem('usdTlastWithdrawalBlock', lastBlock);
     localStorage.setItem('usdTlastWithdrawals', withdrawals);
+    localStorage.setItem('uwversion', version)
     return withdrawals;
 }
 
@@ -227,6 +241,7 @@ async function getAvailable(curr) {
 }
 
 async function init_ui() {
+    priceData = await $.getJSON('https://compound.curve.fi/stats.json')
     for(let i = 0; i < N_COINS; i++) {
         let symbol = await coins[i].methods.symbol().call()
         ADDRESSES[symbol] = coins[i]._address;
@@ -270,6 +285,14 @@ async function init_ui() {
         $("#profit li:nth-child(4) span").text((available/100 + withdrawals/100 - deposits/100).toFixed(2))
     }
     catch(err) {
+        localStorage.removeItem('usdTlastDepositBlock')
+        localStorage.removeItem('usdTlastDeposits')
+        localStorage.removeItem('usdTlastWithdrawals')
+        localStorage.removeItem('usdTlastWithdrawalBlock')
+        localStorage.removeItem('usdTlastWithdrawalBlock')
+        localStorage.removeItem('usdTlastAddress')
+        localStorage.removeItem('uversion')
+        localStorage.removeItem('uwversion')
         console.error(err)
     }
 
@@ -291,6 +314,6 @@ window.addEventListener('load', async () => {
         update_fee_info();
         BN = web3.utils.toBN;
 
-        await init_ui();        
+        await init_ui();
     }
 });
