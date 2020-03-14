@@ -81,6 +81,27 @@ async function getExchangeRate(blockNumber, address, value) {
     
     return exchangeRate;
 }
+
+async function calculateAmount(blockNumber, cTokens) {
+    let amount = 0;
+    for(let i = 0; i < 3; i++) {
+        const tokens = BN(cTokens[i]);
+        if(tokens == 0) continue;
+        const tokenIndex = Object.values(ADDRESSES)[i]
+        let curr = Object.keys(ADDRESSES)[i]
+        let usd;
+        if(i == 2) {
+            usd = BN(log.data).div(BN(1e4)).toNumber();
+        }
+        else {
+            let exchangeRate = await getExchangeRate(block, coins[i]._address, '')
+            usd = fromNative(curr, BN(exchangeRate).mul(BN(tokens)))
+        }
+        amount += usd;
+    }
+    return amount;
+}
+
 async function getDeposits() {
     var default_account = (await web3.eth.getAccounts())[0];
     default_account = default_account.substr(2).toLowerCase();
@@ -112,23 +133,18 @@ async function getDeposits() {
     console.time('timer')
     for (const hash of txs) {
         const receipt = await web3.eth.getTransactionReceipt(hash);
+        let [cDAI, cUSDC, USDT] = [0, 0, 0]
         let addliquidity = receipt.logs.filter(log=>log.topics[0] == '0x423f6495a08fc652425cf4ed0d1f9e37e571d9b9529b1c1c23cce780b2e7df0d')
-        let [cDAI, cUSDC, USDT] = (web3.eth.abi.decodeParameters(['uint256[3]','uint256[3]', 'uint256', 'uint256'], addliquidity[0].data))[0]
-        let cTokens = [cDAI, cUSDC, USDT];
-        for(let i = 0; i < 3; i++) {
-            const tokenIndex = Object.values(ADDRESSES)[i];
-            const tokens = BN(cTokens[i]);
-            if(tokens == 0) continue;
-            let curr = Object.keys(ADDRESSES)[tokenIndex]
-            let usd;
-            if(i == 2) {
-                usd = tokens.div(BN(1e4)).toNumber();
-            }
-            else {
-                let exchangeRate = await getExchangeRate(receipt.blockNumber, coins[i]._address, '')
-                usd = fromNative(curr, BN(exchangeRate).mul(BN(tokens)))
-            }
-            depositUsdSum += usd;
+        if(addliquidity.length) {        
+            let [cDAI, cUSDC, USDT] = (web3.eth.abi.decodeParameters(['uint256[3]','uint256[3]', 'uint256', 'uint256'], addliquidity[0].data))[0]
+            let cTokens = [cDAI, cUSDC, USDT];
+            depositUsdSum += calculateAmount(receipt.blockNumber, cTokens)
+        }
+        else {
+            let transfer = receipt.logs.filter(log=>log.topics[0] == TRANSFER_TOPIC && log.topics[2] == '0x000000000000000000000000' + default_account)
+            let tokens = +transfer[0].data
+            let exchangeRate = findClosest(timestamp)[1]
+            depositUsdSum += tokens*exchangeRate/1e16
         }
     }
     console.timeEnd('timer')
@@ -166,30 +182,20 @@ async function getWithdrawals(address) {
             let removeliquidity = receipt.logs.filter(log=>log.topics[0] == '0xa49d4cf02656aebf8c771f5a8585638a2a15ee6c97cf7205d4208ed7c1df252d')
             let [cDAI, cUSDC, usdt] = [0,0];
             if(removeliquidity.length) {
-                [cDAI, cUSDC, usdt] = (web3.eth.abi.decodeParameters(['uint256[3]','uint256[3]', 'uint256'], removeliquidity[0].data))[0]
+                let cTokens = (web3.eth.abi.decodeParameters(['uint256[3]','uint256[3]', 'uint256'], removeliquidity[0].data))[0]
+                withdrawals += calculateAmount(receipt.blockNumber, cTokens[0]);
+                continue;
+            }
+            removeliquidity = receipt.logs.filter(log=>log.topics[0] == '0x173599dbf9c6ca6f7c3b590df07ae98a45d74ff54065505141e7de6c46a624c2')
+            if(removeliquidity.length) {
+                let cTokens = web3.eth.abi.decodeParameters(['uint256[3]','uint256[3]', 'uint256', 'uint256'], removeliquidity[0].data)
+                withdrawals += calculateAmount(receipt.blockNumber, cTokens[0])
             }
             else {
-                removeliquidity = receipt.logs.filter(log=>log.topics[0] == '0x173599dbf9c6ca6f7c3b590df07ae98a45d74ff54065505141e7de6c46a624c2')
-                let decoded = web3.eth.abi.decodeParameters(['uint256[3]','uint256[3]', 'uint256', 'uint256'], removeliquidity[0].data)
-                cDAI = decoded[0][0]
-                cUSDC = decoded[0][1]
-                usdt = decoded[0][2]
-            }
-            let cTokens = [cDAI, cUSDC, usdt];
-            for(let i = 0; i < 3; i++) {
-                    const tokens = BN(cTokens[i]);
-                    if(tokens == 0) continue;
-                    const tokenIndex = Object.values(ADDRESSES)[i]
-                    let curr = Object.keys(ADDRESSES)[i]
-                    let usd;
-                    if(log.address == coins[2]._address) {
-                        usd = BN(log.data).div(BN(1e4)).toNumber();
-                    }
-                    else {
-                        let exchangeRate = await getExchangeRate(receipt.blockNumber, coins[i]._address, log.data)
-                        usd = fromNative(curr, BN(exchangeRate).mul(BN(tokens)))
-                    }
-                    withdrawals += usd;
+                let transfer = receipt.logs.filter(log=>log.topics[0] == TRANSFER_TOPIC && log.topics[2] == '0x000000000000000000000000' + default_account)
+                let tokens = +transfer[0].data
+                let exchangeRate = findClosest(timestamp)[1]
+                withdrawals += tokens*exchangeRate/1e16  
             }
         }
     localStorage.setItem('usdTlastWithdrawalBlock', lastBlock);
