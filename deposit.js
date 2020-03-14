@@ -111,14 +111,18 @@ async function init_ui() {
 
 window.addEventListener('DOMContentLoaded', async () => {
     try {
+        $("#max-balances").prop('disabled', true);
+        $("#add-liquidity").prop('disabled', true);
+
         await init();
         update_fee_info();
         await handle_sync_balances();
         await calc_slippage(true);
         
         await init_ui();
-        $("#from_currency").attr('disabled', false)
 
+        $("#max-balances").prop('disabled', false);
+        $("#add-liquidity").prop('disabled', false);
     }
     catch(err) {
         console.error(err)
@@ -132,7 +136,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             await calc_slippage(true);
 
             await init_ui();
-            $("#from_currency").attr('disabled', false)
         }
     }
 
