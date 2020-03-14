@@ -25,11 +25,15 @@
     <script>
         var activePoolLink = 0;
         window.addEventListener('load', async () => {
-        $("div.top-menu-bar a").toArray().forEach(function(el) {
-            if (el.href == window.location.href)
-                el.classList.add('selected')
-        })
-        $('.poolsdialog > div').eq(activePoolLink).addClass('selected')
+            $("div.top-menu-bar a").toArray().forEach(function(el) {
+                if (el.href == window.location.href)
+                    el.classList.add('selected')
+            })
+            $('#poolsdropdown .dropdown a').toArray().forEach(function(el) {
+                if(el.href.slice(0,-1) == window.location.origin)
+                    el.classList.add('selected')
+            })
+            $('.poolsdialog > div').eq(activePoolLink).addClass('selected')
         });
         document.addEventListener('keydown', e => {
             if(e.code == 'ArrowUp' && activePoolLink != 0) {
@@ -73,7 +77,7 @@
       <a href="/stats.html">Stats</a>
       <a href="/profit.html">Profit</a>
       <a href="/faq.html">FAQ</a>
-      <a href="/donations.html">Donations</a>
+      <a href="/donations.html">Donate</a>
       <a href="https://github.com/curvefi/curve-contract/tree/pool_y">git@</a>
     </div>
     <div id="screen">
@@ -82,19 +86,16 @@
         </div>
 
         <div class="window white">
-            <fieldset class='poolsdialog'>
-                <legend>Curve pools</legend>
+            <fieldset class='poolsdialog donations'>
+                <legend>Donations</legend>
                 <div>
-                    <a href='https://compound.curve.fi'>0.  Compound</a>
+                    <a href='https://gitcoin.co/grants/453/curve-related-vyper-research?tab=description'>0.  <img class='icon' src="./favicon-32x32.png" alt="🌀 Curve">  Curve-related Vyper research</a>
                 </div>
                 <div>
-                    <a href='https://usdt.curve.fi'>1.  USDT</a>
+                    <a href='https://etherscan.io/address/0x28b88cfD875C883cDb61938C97B8d1baabf31c88'>1.  <img class='icon ethicon' src='./ethereum-brands.svg' />  0x28b88cfD875C883cDb61938C97B8d1baabf31c88</a>
                 </div>
                 <div>
-                    <a href='https://y.curve.fi'>2.  Y</a>
-                </div>
-                <div>
-                    <a href='https://busd.curve.fi'>3.  bUSD</a>
+                    <a href='https://www.blockchain.com/btc/address/1C5UfsRKCzEbDbQxKLN7Jx8HFA1ff6dfp4'>2.  <img class='icon btcicon' src='./btc-brands.svg' />  1C5UfsRKCzEbDbQxKLN7Jx8HFA1ff6dfp4</a>
                 </div>
             </fieldset>
         </div>
