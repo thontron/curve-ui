@@ -118,13 +118,17 @@ async function init_ui() {
 
 window.addEventListener('load', async () => {
     try {
+        $("#max_balances").prop('disabled', true)
+        $("#add_liquidity").prop('disabled', true)
+
         await init();
         update_fee_info();
         await handle_sync_balances();
         await calc_slippage(true);
         
         await init_ui();
-        $("#from_currency").attr('disabled', false)
+        $("#max_balances").prop('disabled', false)
+        $("#add_liquidity").prop('disabled', false)
 
     }
     catch(err) {
