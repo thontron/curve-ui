@@ -66,7 +66,7 @@ async function init_ui() {
             await calc_slippage(true);
 
             var el = $('#currency_' + i);
-            if (this.value > wallet_balances[i] * c_rates[i])
+            if (el.val() > wallet_balances[i] * c_rates[i])
                 el.css('background-color', 'red')
             else
                 el.css('background-color', 'blue');
