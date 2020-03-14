@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:title" content="y.curve.fi" />
+    <meta property="og:url" content="https://y.curve.fi" />
+    <meta property="og:type" content="website" />
+    <meta property="og:description" content="A curve.fi yTokens portal for swapping DAI/USDC/USDT/TUSD" />
+    <meta property="og:image" content="./assets/yCurve.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="compound.curve.fi" />
+    <meta name="twitter:site" content="@CurveFinance" />
+    <meta name="twitter:creator" content="@CurveFinance" />
+    <meta name="twitter:description" content="A curve.fi yTokens portal for swapping DAI/USDC/USDT/TUSD"/>
+    <meta name="twitter:url" content="https://y.curve.fi" />
+    <meta name="twitter:image" content="./assets/yCurve.png" />
+    <title>Curve.fi :: Yield</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?rev=21bf4389b9b74ab0f6cac72ef908addb">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?rev=f30faa950b2b49eeffcaad8d774f6b10">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="stylesheet" href="tvision.css?rev=13780e2c3edc180f71e286327f8618d2" />
+    <script src="/jquery.min.js"></script>
+    <script>
+        var activePoolLink = 0;
+        window.addEventListener('load', async () => {
+        $("div.top-menu-bar a").toArray().forEach(function(el) {
+            if (el.href == window.location.href)
+                el.classList.add('selected')
+        })
+        $('.poolsdialog > div').eq(activePoolLink).addClass('selected')
+        });
+        document.addEventListener('keydown', e => {
+            if(e.code == 'ArrowUp' && activePoolLink != 0) {
+                $('.poolsdialog > div').eq(activePoolLink).removeClass('selected')
+                $('.poolsdialog > div').eq(--activePoolLink).addClass('selected')
+            }
+            if(e.code == 'ArrowDown' && activePoolLink < 3) {
+                $('.poolsdialog > div').eq(activePoolLink).removeClass('selected')
+                $('.poolsdialog > div').eq(++activePoolLink).addClass('selected')
+            }
+            if(e.code.includes('Digit')) {
+                var digit = e.code.slice(-1);
+                if(digit > 3) return;
+                $('.poolsdialog > div').eq(activePoolLink).removeClass('selected')
+                activePoolLink = digit
+                $('.poolsdialog > div').eq(activePoolLink).addClass('selected')
+            }
+            if(e.code == 'Enter') {
+                window.location.href = $('.poolsdialog > div').eq(activePoolLink).find('a').attr('href')
+            }
+        })
+    </script>
+  </head>
+  <body>
+    <div class="top-menu-bar">
+      <label for="hamburger" class='border-menu'></label>
+      <input type="checkbox" id="hamburger"/>
+      
+      <div id='poolsdropdown'>
+        <a href='https://www.curve.fi'>☰</a>
+        <div class='dropdown'>
+            <a href='https://compound.curve.fi'>Compound</a>
+            <a href='https://usdt.curve.fi'>USDT</a>
+            <a href='https://y.curve.fi'>Y</a>
+            <a href='https://busd.curve.fi'>bUSD</a>
+        </div>
+      </div>
+      <a href="/">Buy and sell</a>
+      <a href="/deposit.html">Deposit</a>
+      <a href="/withdraw.html">Withdraw</a>
+      <a href="/stats.html">Stats</a>
+      <a href="/profit.html">Profit</a>
+      <a href="/faq.html">FAQ</a>
+      <a href="/donations.html">Donations</a>
+      <a href="https://github.com/curvefi/curve-contract/tree/pool_y">git@</a>
+    </div>
+    <div id="screen">
+        <div class="blue window">
+            <h1><img src="./logo.svg" alt="🌀 Curve" height="50"></h1>
+        </div>
+
+        <div class="window white">
+            <fieldset class='poolsdialog'>
+                <legend>Curve pools</legend>
+                <div>
+                    <a href='https://compound.curve.fi'>0.  Compound</a>
+                </div>
+                <div>
+                    <a href='https://usdt.curve.fi'>1.  USDT</a>
+                </div>
+                <div>
+                    <a href='https://y.curve.fi'>2.  Y</a>
+                </div>
+                <div>
+                    <a href='https://busd.curve.fi'>3.  bUSD</a>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+  </body>
+</html>
