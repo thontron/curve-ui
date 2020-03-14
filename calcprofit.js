@@ -72,17 +72,32 @@ async function checkExchangeRateBlocks(block, address, direction, type = 'deposi
     let underlying_addresses = underlying_coins.map(c=>c._address)
     let index = underlying_addresses.indexOf(address);
     let yaddress = Object.values(ADDRESSES)[index];
-    let mints = await web3.eth.getPastLogs({
-        fromBlock: fromBlock,
-        toBlock: toBlock,
-        address: address,
-        //web3.utils.sha3('Transfer(address,address,uint256)')
-        topics: [
-            '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
-            [],
-            '0x000000000000000000000000' + yaddress.substr(2).toLowerCase()
-        ],
-    });
+    let mints;
+    if(type == 'deposit') {
+        mints = await web3.eth.getPastLogs({
+            fromBlock: fromBlock,
+            toBlock: toBlock,
+            address: address,
+            //web3.utils.sha3('Transfer(address,address,uint256)')
+            topics: [
+                '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+                [],
+                '0x000000000000000000000000' + yaddress.substr(2).toLowerCase()
+            ],
+        });
+    }
+    else {
+        mints = await web3.eth.getPastLogs({
+            fromBlock: fromBlock,
+            toBlock: toBlock,
+            address: yaddress,
+            //web3.utils.sha3('Transfer(address,address,uint256)')
+            topics: [
+                '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+                '0x0000000000000000000000000000000000000000000000000000000000000000'
+            ],
+        });
+    }
     //log.data is yDAI, yUSDC, yUSDT, yBUSD
 
     if(mints.length) {
@@ -90,74 +105,19 @@ async function checkExchangeRateBlocks(block, address, direction, type = 'deposi
         if(direction == -1) mint = mints[mints.length-1]
         console.log(mint)
         let tr = await web3.eth.getTransactionReceipt(mint.transactionHash)
-        tr = tr.logs.filter(log=>log.address == yaddress)
+        if(type=='deposit') {
+            tr = tr.logs.filter(log=>log.address == yaddress)
+        }
+        else {
+            tr = tr.logs.filter(log=>log.address == address)
+        }
         if(!tr.length) return false;
         var sent = tr[0]
 
         console.log(mint, "MINTED", sent, "SENT")
 
         var exchangeRate = mint.data/sent.data
-        console.log(exchangeRate)
-        return {blockNumber: mint.blockNumber, exchangeRate: exchangeRate};
-    }
-    return false;
-}
-
-async function checkExchangeRateBlocksWithdrawal(block, address, direction, type = 'deposit') {
-    var default_account = (await web3.eth.getAccounts())[0];
-    default_account = default_account.substr(2).toLowerCase();
-
-    let fromBlock = '0x'+parseInt(block-100).toString(16)
-    let toBlock = '0x'+parseInt(block).toString(16)
-    fromBlock = '0x909964'
-    if(direction == 1) {
-        fromBlock = '0x'+parseInt(block).toString(16)
-        toBlock = '0x'+parseInt(block+100).toString(16)
-        toBlock = 'latest'
-    }
-    if(direction == 0) {
-        fromBlock = '0x'+parseInt(block-1).toString(16)
-        toBlock = '0x'+parseInt(block+1).toString(16)
-    }
-    let underlying_addresses = underlying_coins.map(c=>c._address)
-    let index = underlying_addresses.indexOf(address);
-    let yaddress = Object.values(ADDRESSES)[index];
-    let mints = await web3.eth.getPastLogs({
-        fromBlock: fromBlock,
-        toBlock: toBlock,
-        address: yaddress,
-        //web3.utils.sha3('Transfer(address,address,uint256)')
-        topics: [
-            '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
-            '0x0000000000000000000000000000000000000000000000000000000000000000'
-        ],
-    });
-    //log.data is yDAI, yUSDC, yUSDT, yBUSD
-
-/*    mints = await web3.eth.getPastLogs({
-        fromBlock: fromBlock,
-        toBlock: toBlock,
-        address: address,
-        //web3.utils.sha3('Transfer(address,address,uint256)')
-        topics: [
-            '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
-            [],
-            '0x000000000000000000000000' + default_account
-        ],
-    });*/
-
-    if(mints.length) {
-        let mint = mints[0]
-        if(direction == -1) mint = mints[mints.length-1]
-        console.log(mint)
-        let tr = await web3.eth.getTransactionReceipt(mint.transactionHash)
-        tr = tr.logs.filter(log=>log.address == address)
-        if(!tr.length) return false;
-        var sent = tr[0]
-       
-        console.log(+mint.data, "MINTED", +sent.data, "SENT")
-
-        var exchangeRate = sent.data/mint.data
+        if(type == 'withdrawal') exchangeRate = sent.data/mint.data;
         console.log(exchangeRate)
         return {blockNumber: mint.blockNumber, exchangeRate: exchangeRate};
     }
@@ -165,17 +125,14 @@ async function checkExchangeRateBlocksWithdrawal(block, address, direction, type
 }
 
 async function getExchangeRate(blockNumber, address, value, type = 'deposit') {
-    //let funcs = {checkExchangeRateBlocks, checkExchangeRateBlocksWithdrawal};
-    let func = checkExchangeRateBlocks
-    if(type == 'withdrawal') func = checkExchangeRateBlocksWithdrawal
-    let exchangeRate = await func(blockNumber, address, 0, type);
+    let exchangeRate = await checkExchangeRateBlocks(blockNumber, address, 0, type);
     let exchangeRatePast, exchangeRateFuture;
     if(exchangeRate === false) {
         let i = j = blockNumber;
-        while((exchangeRatePast = await func(i, address, -1, type)) === false) {
+        while((exchangeRatePast = await checkExchangeRateBlocks(i, address, -1, type)) === false) {
             i-=100;
         }
-        while((exchangeRateFuture = await func(j, address, 1, type)) === false) {
+        while((exchangeRateFuture = await checkExchangeRateBlocks(j, address, 1, type)) === false) {
             j+=100;
         }
 
@@ -201,6 +158,21 @@ async function getExchangeRate(blockNumber, address, value, type = 'deposit') {
     const usd = exchangeRate * tokens
     return usd;
 }
+
+async function calculateAmount(blockNumber, yTokens, type) {
+    let amount = 0;
+    for(let i = 0; i < 4; i++) {
+        let tokens = yTokens[i];
+        if(tokens == 0) continue;
+        let usd = await getExchangeRate(blockNumber, underlying_coins[i]._address, '', type)
+        if(i == 0 || i == 3) tokens /= 1e18
+        else tokens /= 1e6
+        console.log(tokens, "TOKENS", usd, "EXCHANGE RATE", tokens * usd, "USD")
+        amount += tokens * usd;
+    }
+    return amount;
+}
+
 async function getDeposits() {
     var default_account = (await web3.eth.getAccounts())[0];
     default_account = default_account.substr(2).toLowerCase();
@@ -223,10 +195,10 @@ async function getDeposits() {
 
     var lastBlock = poolTokensReceivings.length && poolTokensReceivings[poolTokensReceivings.length-1].blockNumber || fromBlock
 
-    /*if(localStorage.getItem('lastDepositBlock') && localStorage.getItem('lastAddress') == default_account) {
+    if(localStorage.getItem('bUSDdversion') == version && localStorage.getItem('bUSDlastDepositBlock') && localStorage.getItem('bUSDlastAddress') == default_account) {
         poolTokensReceivings = poolTokensReceivings.filter(r=>r.blockNumber > lastBlock);
-        depositUsdSum += +localStorage.getItem('lastDeposits')
-    }*/
+        depositUsdSum += +localStorage.getItem('bUSDlastDeposits')
+    }
     const txs = poolTokensReceivings.map(e => e.transactionHash);
 
     console.time('timer')
@@ -240,16 +212,7 @@ async function getDeposits() {
         if(addliquidity.length) {        
             let [yDAI, yUSDC, yUSDT, yBUSD] = (web3.eth.abi.decodeParameters(['uint256[4]','uint256[4]', 'uint256', 'uint256'], addliquidity[0].data))[0]
             let yTokens = [yDAI, yUSDC, yUSDT, yBUSD];
-            for(let i = 0; i < 4; i++) {
-                const tokenIndex = Object.values(ADDRESSES)[i]
-                let tokens = yTokens[i];
-                if(tokens == 0) continue;
-                let usd = await getExchangeRate(receipt.blockNumber, underlying_coins[i]._address, '', 'deposit')
-                if(i == 0 || i == 3) tokens /= 1e18
-                else tokens /= 1e6
-                console.log(tokens, "TOKENS", usd, "EXCHANGE RATE", tokens * usd, "USD")
-                depositUsdSum += tokens * usd;
-            }
+            depositUsdSum += await calculateAmount(receipt.blockNumber, yTokens, 'deposit');
         }
         else {
             let transfer = receipt.logs.filter(log=>log.topics[0] == TRANSFER_TOPIC && log.topics[2] == '0x000000000000000000000000' + default_account)
@@ -260,7 +223,10 @@ async function getDeposits() {
         }
     }
     console.timeEnd('timer')
-
+    localStorage.setItem('bUSDlastDepositBlock', lastBlock)
+    localStorage.setItem('bUSDlastAddress', default_account)
+    localStorage.setItem('bUSDlastDeposits', depositUsdSum)
+    localStorage.setItem('bUSDdversion', version)
     return depositUsdSum;
 }
 
@@ -268,16 +234,6 @@ async function getWithdrawals(address) {
     var default_account = (await web3.eth.getAccounts())[0];
     default_account = default_account.substr(2).toLowerCase();
     console.log(address)
-/*    let logs = await web3.eth.getPastLogs({
-        fromBlock: '0x909964',
-        toBlock: 'latest',
-        address,
-        topics: [
-            TRANSFER_TOPIC,
-            '0x000000000000000000000000' + CURVE.substr(2),
-            '0x000000000000000000000000' + default_account,
-        ],
-    });*/
     let withdrawals = 0;
     let fromBlock = '0x909964';
 
@@ -293,7 +249,11 @@ async function getWithdrawals(address) {
 
     var lastBlock = logs.length && logs[logs.length-1].blockNumber || fromBlock
 
-    //logs = logs.concat(zaps)
+    if(localStorage.getItem('bUSDwversion') == version && localStorage.getItem('bUSDlastWithdrawalBlock') && localStorage.getItem('bUSDlastAddress') == default_account) {
+        logs = logs.filter(l=>l.blockNumber > lastBlock);
+        withdrawals += +localStorage.getItem('bUSDlastWithdrawals')
+    }
+
     for(let log of logs) {
         const receipt = await web3.eth.getTransactionReceipt(log.transactionHash);
         let timestamp = (await web3.eth.getBlock(receipt.blockNumber)).timestamp;
@@ -301,32 +261,14 @@ async function getWithdrawals(address) {
         if(removeliquidity.length) {
             let [yDAI, yUSDC, yUSDT, yBUSD] = (web3.eth.abi.decodeParameters(['uint256[4]','uint256[4]', 'uint256'], removeliquidity[0].data))[0]
             let yTokens = [yDAI, yUSDC, yUSDT, yBUSD];
-            for(let i = 0; i < 4; i++) {
-                const tokenIndex = Object.values(ADDRESSES)[i]
-                    let tokens = yTokens[i];
-                    if(tokens == 0) continue;
-                    let usd = await getExchangeRate(receipt.blockNumber, underlying_coins[i]._address, '', 'withdrawal')
-                    if(i == 0 || i == 3) tokens /= 1e18
-                    else tokens /= 1e6
-                    console.log(tokens, "TOKENS", usd, "USD", tokens*usd, "EXCHANGE RATE", i)
-                    withdrawals += tokens * usd;
-            }
+            withdrawals += await calculateAmount(receipt.blockNumber, yTokens);
             continue;
         }
         removeliquidity = receipt.logs.filter(log=>log.topics[0] == '0x9878ca375e106f2a43c3b599fc624568131c4c9a4ba66a14563715763be9d59d')
         if(removeliquidity.length) {
             let [yDAI, yUSDC, yUSDT, yBUSD] = (web3.eth.abi.decodeParameters(['uint256[4]','uint256[4]', 'uint256'], removeliquidity[0].data))[0]
             let yTokens = [yDAI, yUSDC, yUSDT, yBUSD];
-            for(let i = 0; i < 4; i++) {
-                const tokenIndex = Object.values(ADDRESSES)[i]
-                    let tokens = yTokens[i];
-                    if(tokens == 0) continue;
-                    let usd = await getExchangeRate(receipt.blockNumber, underlying_coins[i]._address, '', 'withdrawal')
-                    if(i == 0 || i == 3) tokens /= 1e18
-                    else tokens /= 1e6
-                    console.log(tokens, "TOKENS", usd, "USD", tokens*usd, "EXCHANGE RATE", i)
-                    withdrawals += tokens * usd;
-            }
+            withdrawals += await calculateAmount(receipt.blockNumber, yTokens, 'withdrawal');
         }
         else {
             let transfer = receipt.logs.filter(log=>log.topics[0] == TRANSFER_TOPIC && log.topics[1] == '0x000000000000000000000000' + default_account)
@@ -337,6 +279,10 @@ async function getWithdrawals(address) {
             return withdrawals
         }
     }
+    localStorage.setItem('bUSDlastWithdrawalBlock', lastBlock)
+    localStorage.setItem('bUSDlastAddress', default_account)
+    localStorage.setItem('bUSDlastWithdrawals', withdrawals)
+    localStorage.setItem('bUSDwversion', version)
     return withdrawals;
 }
 
@@ -365,6 +311,8 @@ async function getAvailable(curr) {
 
 
 async function init_ui() {
+    console.log(localStorage.getItem('bUSDdversion'), version)
+    
     priceData = await $.getJSON('https://y.curve.fi/stats.json')
 
     for(let i = 0; i < N_COINS; i++) {
@@ -413,11 +361,13 @@ async function init_ui() {
         $("#profit li:nth-child(4) span").text((available + withdrawals - deposits).toFixed(2))
     }
     catch(err) {
-        localStorage.removeItem('lastDeposits')
-        localStorage.removeItem('lastDepositBlock')
-        localStorage.removeItem('lastWithdrawals')
-        localStorage.removeItem('lastWithdrawalBlock')
-        localStorage.removeItem('lastWithdrawals')
+        localStorage.removeItem('bUSDlastDeposits')
+        localStorage.removeItem('bUSDlastDepositBlock')
+        localStorage.removeItem('bUSDlastWithdrawals')
+        localStorage.removeItem('bUSDlastWithdrawalBlock')
+        localStorage.removeItem('bUSDlastWithdrawals')
+        localStorage.removeItem('dversion')
+        localStorage.removeItem('pversion')
         console.error(err)
     }
 

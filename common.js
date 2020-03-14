@@ -9,6 +9,9 @@ var c_rates = new Array(N_COINS);
 var fee;
 var admin_fee;
 
+var version = 2;
+localStorage.setItem('bUSDversion', version)
+
 var cBN = (val) => new BigNumber(val);
 
 const trade_timeout = 1800;
