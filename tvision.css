@@ -307,6 +307,9 @@ div.info table td {
 }
 
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+  .top-menu-bar {
+    height: 30px;
+  }
   #lp-info-container {
     margin-top: 1em;
   }
