@@ -242,6 +242,9 @@ window.addEventListener('load', async () => {
   })
   try {
       await init('stats');
+      let total = await totalBalances();
+      $('#total-balances').removeClass('loading line')
+      $('#total-balances').text(formatNumber(total.toFixed(0)) + '$');
       await init_charts();
       await init_contracts();
       await update_fee_info();
@@ -251,7 +254,9 @@ window.addEventListener('load', async () => {
     if(err.reason == 'cancelDialog') {
         const web3 = new Web3(infura_url);
         window.web3 = web3
-        
+        let total = await totalBalances();
+        $('#total-balances').removeClass('loading line')
+        $('#total-balances').text(formatNumber(total.toFixed(0)) + '$');
         await init_charts();
         await init_contracts();
         update_fee_info();

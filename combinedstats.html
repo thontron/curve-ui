@@ -32,9 +32,9 @@
     <script src="./web3providers/fortmatic.min.js"></script>
     <script src="./abis.js?rev=dde505540e9503f31c675c50194cb5d3"></script>
     <script src="./chart.js?rev=11f2e459eed8ddb0abdf4102cda6ec8d"></script>
-    <script src="./common.js?rev=10522c58862b3715d90809064cf73eb4"></script>
+    <script src="./common.js?rev=ec0b74df0fe9a8cda37215c749377f7c"></script>
     <script src="./init.js?rev=1e36bae1e110d19a673e67ff626a9493"></script>
-    <script src='./cstats.js?rev=d0209d8cbc1f71632a79b65b1cee5545'></script>
+    <script src='./cstats.js?rev=399753ff8a12c12f862e173626806319'></script>
   </head>
   <body>
     <div class="top-menu-bar">
@@ -51,6 +51,13 @@
     <div id="screen">
       <div class="blue window">
           <h1><img src="./logo.svg" alt="🌀 Curve" height="50"></h1>
+      </div>
+
+      <div class="window white">
+        <fieldset>
+          <legend>Total pool deposits</legend>
+          <div class='loading line' id='total-balances'></div>
+        </fieldset>
       </div>
 
       <div class="window white">
