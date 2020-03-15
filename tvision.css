@@ -516,6 +516,10 @@ fieldset:nth-child(2) .maxbalance {
   word-break: break-word;
 }
 
+.donations a {
+  word-break: normal;
+}
+
 .blue.window.info, .donations .text {
   word-break: break-word;
 }
