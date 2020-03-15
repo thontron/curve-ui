@@ -71,13 +71,39 @@ async function checkExchangeRateBlocks(block, address, direction) {
 async function getExchangeRate(blockNumber, address, value) {
     let exchangeRate = await checkExchangeRateBlocks(blockNumber, address, 0);
     let exchangeRatePast, exchangeRateFuture;
+    let currentBlock = await web3.eth.getBlockNumber();
+    let pastCurrentBlock = false;
     if(exchangeRate === false) {
         let i = j = blockNumber;
         while((exchangeRatePast = await checkExchangeRateBlocks(i, address, -1)) === false) {
             i-=100;
         }
         while((exchangeRateFuture = await checkExchangeRateBlocks(j, address, 1)) === false) {
+            if(j > currentBlock) {
+                pastCurrentBlock = true;
+                break;
+            }
             j+=100;
+        }
+
+        while(pastCurrentBlock) {
+            let i = blockNumber - 200;
+            let j = blockNumber - 100;
+            while((exchangeRatePast = await checkExchangeRateBlocks(i, address, -1)) === false) {
+                i-=200;
+            }
+            while((exchangeRateFuture = await checkExchangeRateBlocks(j, address, -1)) === false) {
+                if(j > currentBlock) {
+                    pastCurrentBlock = true;
+                    break;
+                }
+                j-=100;
+            }
+            if(exchangeRatePast.blockNumber && exchangeRateFuture.blockNumber) pastCurrentBlock = false;
+        }
+
+        if(exchangeRatePast.blockNumber == exchangeRateFuture.blockNumber) {
+            return exchangeRatePast.exchangeRate;
         }
 
         exchangeRate = BN(exchangeRateFuture.blockNumber - exchangeRatePast.blockNumber).mul(exchangeRateFuture.exchangeRate.sub(exchangeRatePast.exchangeRate))
