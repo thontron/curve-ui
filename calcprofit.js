@@ -123,10 +123,7 @@ async function getDeposits() {
         let cUSDC = 0;
         let addliquidity = receipt.logs.filter(log=>log.topics[0] == '0x26f55a85081d24974e85c6c00045d0f0453991e95873f52bff0d21af4079a768')
         if(addliquidity.length) {
-            let decoded = (web3.eth.abi.decodeParameters(['uint256[2]','uint256[2]', 'uint256', 'uint256'], addliquidity[0].data))[0]
-            cDAI = decoded[0]
-            cUSDC = decoded[1]
-            let cTokens = [cDAI, cUSDC];
+            let cTokens = (web3.eth.abi.decodeParameters(['uint256[2]','uint256[2]', 'uint256', 'uint256'], addliquidity[0].data))[0]
             for(let i = 0; i < 2; i++) {
                 const tokenIndex = Object.values(ADDRESSES)[i];
                 const tokens = BN(cTokens[i])
