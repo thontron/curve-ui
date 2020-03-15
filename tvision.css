@@ -357,6 +357,7 @@ div.info table td {
     cursor: pointer;
     height: 20px;
     padding: 6px;
+    text-align: left;
 }
 .border-menu:before { 
     border-bottom: 10px double black;
@@ -522,4 +523,13 @@ div.info table td {
   display: flex;
   align-items: center;
   white-space: pre-wrap;
+}
+
+.blue.window.info, .donations .text {
+  word-break: break-word;
+}
+
+.donations .icon {
+  margin-left: 1em;
+  margin-right: 1em;
 }
