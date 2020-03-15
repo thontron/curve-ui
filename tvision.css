@@ -307,6 +307,9 @@ div.info table td {
 }
 
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+  .top-menu-bar > #poolsdropdown {
+    display: none;
+  }
   #lp-info-container {
     margin-top: 1em;
   }
@@ -343,6 +346,7 @@ div.info table td {
     cursor: pointer;
     height: 20px;
     padding: 6px;
+    text-align: left;
 }
 .border-menu:before { 
     border-bottom: 10px double black;
@@ -377,7 +381,7 @@ div.info table td {
   text-decoration: none;
 }
 
-.top-menu-bar > #poolsdropdown {
+#poolsdropdown {
   display: inline-block;
   cursor: pointer;
   position: relative;
@@ -510,4 +514,13 @@ fieldset:nth-child(2) .maxbalance {
 
 .blue.window.info, .donations {
   word-break: break-word;
+}
+
+.blue.window.info, .donations .text {
+  word-break: break-word;
+}
+
+.donations .icon {
+  margin-left: 1em;
+  margin-right: 1em;
 }
