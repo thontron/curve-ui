@@ -160,6 +160,10 @@ async function getExchangeRate(blockNumber, address, value, type = 'deposit') {
             if(exchangeRatePast.blockNumber && exchangeRateFuture.blockNumber) pastCurrentBlock = false;
         }
 
+        if(exchangeRatePast.blockNumber == exchangeRateFuture.blockNumber) {
+            return exchangeRatePast.exchangeRate;
+        }
+
         exchangeRate = (exchangeRateFuture.blockNumber - exchangeRatePast.blockNumber) * (exchangeRateFuture.exchangeRate - exchangeRatePast.exchangeRate)
         exchangeRate = exchangeRate / (exchangeRateFuture.blockNumber - exchangeRatePast.blockNumber)
         exchangeRate = exchangeRate + (exchangeRatePast.exchangeRate)
