@@ -127,20 +127,47 @@ async function checkExchangeRateBlocks(block, address, direction, type = 'deposi
 async function getExchangeRate(blockNumber, address, value, type = 'deposit') {
     let exchangeRate = await checkExchangeRateBlocks(blockNumber, address, 0, type);
     let exchangeRatePast, exchangeRateFuture;
+    let currentBlock = await web3.eth.getBlockNumber();
+    let pastCurrentBlock = false;
     if(exchangeRate === false) {
         let i = j = blockNumber;
         while((exchangeRatePast = await checkExchangeRateBlocks(i, address, -1, type)) === false) {
             i-=100;
         }
         while((exchangeRateFuture = await checkExchangeRateBlocks(j, address, 1, type)) === false) {
+            if(j > currentBlock) {
+                pastCurrentBlock = true;
+                break;
+            }
             j+=100;
         }
 
+        while(pastCurrentBlock) {
+            let i = blockNumber - 200;
+            let j = blockNumber - 100;
+            while((exchangeRatePast = await checkExchangeRateBlocks(i, address, -1, type)) === false) {
+                i-=200;
+            }
+            while((exchangeRateFuture = await checkExchangeRateBlocks(j, address, -1, type)) === false) {
+                if(j > currentBlock) {
+                    pastCurrentBlock = true;
+                    break;
+                }
+                j-=100;
+            }
+            if(exchangeRatePast.blockNumber && exchangeRateFuture.blockNumber) pastCurrentBlock = false;
+        }
+
+        console.log(exchangeRatePast, exchangeRateFuture, "EX RATE")
+        if(exchangeRatePast.blockNumber == exchangeRateFuture.blockNumber) {
+            return exchangeRatePast.exchangeRate;
+        }
         exchangeRate = (exchangeRateFuture.blockNumber - exchangeRatePast.blockNumber) * (exchangeRateFuture.exchangeRate - exchangeRatePast.exchangeRate)
         exchangeRate = exchangeRate / (exchangeRateFuture.blockNumber - exchangeRatePast.blockNumber)
         exchangeRate = exchangeRate + (exchangeRatePast.exchangeRate)
     }
     else {
+
         exchangeRate = exchangeRate.exchangeRate;
     }
 
@@ -181,6 +208,12 @@ async function getDeposits() {
     
     let fromBlock = '0x909964';
 
+    if(localStorage.getItem('bUSDdversion') == version && localStorage.getItem('bUSDlastDepositBlock') && localStorage.getItem('bUSDlastAddress') == default_account) {
+        let block = +localStorage.getItem('bUSDlastDepositBlock')
+        fromBlock = '0x'+parseInt(block+1).toString(16)
+        depositUsdSum += +localStorage.getItem('bUSDlastDeposits')
+    }
+
     let poolTokensReceivings = await web3.eth.getPastLogs({
         fromBlock: fromBlock,
         toBlock: 'latest',
@@ -195,10 +228,6 @@ async function getDeposits() {
 
     var lastBlock = poolTokensReceivings.length && poolTokensReceivings[poolTokensReceivings.length-1].blockNumber || fromBlock
 
-    if(localStorage.getItem('bUSDdversion') == version && localStorage.getItem('bUSDlastDepositBlock') && localStorage.getItem('bUSDlastAddress') == default_account) {
-        poolTokensReceivings = poolTokensReceivings.filter(r=>r.blockNumber > lastBlock);
-        depositUsdSum += +localStorage.getItem('bUSDlastDeposits')
-    }
     const txs = poolTokensReceivings.map(e => e.transactionHash);
 
     console.time('timer')
@@ -237,6 +266,12 @@ async function getWithdrawals(address) {
     let withdrawals = 0;
     let fromBlock = '0x909964';
 
+    if(localStorage.getItem('bUSDwversion') == version && localStorage.getItem('bUSDlastWithdrawalBlock') && localStorage.getItem('wbUSDlastAddress') == default_account) {
+        let block = +localStorage.getItem('bUSDlastWithdrawalBlock')
+        fromBlock = '0x'+parseInt(block+1).toString(16)
+        withdrawals += +localStorage.getItem('bUSDlastWithdrawals')
+    }
+
     let logs = await web3.eth.getPastLogs({
         fromBlock: fromBlock,
         toBlock: 'latest',
@@ -247,12 +282,9 @@ async function getWithdrawals(address) {
         ],
     });
 
+
     var lastBlock = logs.length && logs[logs.length-1].blockNumber || fromBlock
 
-    if(localStorage.getItem('bUSDwversion') == version && localStorage.getItem('bUSDlastWithdrawalBlock') && localStorage.getItem('wbUSDlastAddress') == default_account) {
-        logs = logs.filter(l=>l.blockNumber > lastBlock);
-        withdrawals += +localStorage.getItem('bUSDlastWithdrawals')
-    }
 
     for(let log of logs) {
         const receipt = await web3.eth.getTransactionReceipt(log.transactionHash);
