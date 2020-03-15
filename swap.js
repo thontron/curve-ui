@@ -125,11 +125,13 @@ async function handle_trade() {
         var dx = Math.floor($('#from_currency').val() * coin_precisions[i]);
         var min_dy = Math.floor($('#to_currency').val() * 0.99 * coin_precisions[j]);
         dx = cBN(dx.toString()).toString(10);
+        console.log(i, dx, max_allowance, "ENSURE UNDERLYING ALLOWANCE")
         if ($('#inf-approval').prop('checked'))
             await ensure_underlying_allowance(i, max_allowance)
         else
             await ensure_underlying_allowance(i, dx);
         min_dy = cBN(min_dy.toString()).toString(10);
+        console.log(i, j, dx, min_dy, "EXCHANGE UNDERLYING")
         await swap.methods.exchange_underlying(i, j, dx, min_dy).send({
             from: default_account,
             gas: 1600000});

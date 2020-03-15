@@ -106,12 +106,14 @@ async function handle_remove_liquidity() {
         if (share_val == '---') {
             var token_amount = await swap.methods.calc_token_amount(amounts, false).call();
             token_amount = cBN(Math.floor(token_amount * 1.01).toString()).toString(10)
+            console.log(amounts, token_amount, "REMOVE LUQUIDITY IMBALANCE")
             await swap.methods.remove_liquidity_imbalance(amounts, token_amount).send({from: default_account, gas: 1000000});
         }
         else {
             var amount = cBN(Math.floor(share_val / 100 * token_balance).toString()).toString(10);
             if (share_val == 100)
                 amount = await swap_token.methods.balanceOf(default_account).call();
+            console.log(amount, min_amounts, "REMOVE LIQUIDITY")
             await swap.methods.remove_liquidity(amount, min_amounts).send({from: default_account, gas: 600000});
         }
 

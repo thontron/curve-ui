@@ -39,6 +39,7 @@ async function handle_add_liquidity() {
             amounts[i] = cBN(Math.floor(amounts[i] / c_rates[i]).toString()).toString(10); // -> c-tokens
         }
     }
+    console.log(amounts, "ENSURE ALLOWANCE")
     if ($('#inf-approval').prop('checked'))
         await ensure_allowance(false)
     else
@@ -48,6 +49,7 @@ async function handle_add_liquidity() {
         token_amount = await swap.methods.calc_token_amount(amounts, true).call();
         token_amount = cBN(Math.floor(token_amount * 0.99).toString()).toString(10);
     }
+    console.log(amounts, token_amount, "ADD LIQUIDITY")
     await swap.methods.add_liquidity(amounts, token_amount).send({
         from: default_account,
         gas: 1300000});
