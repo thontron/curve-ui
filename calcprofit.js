@@ -99,7 +99,7 @@ async function checkExchangeRateBlocks(block, address, direction, type = 'deposi
         });
     }
     //log.data is yDAI, yUSDC, yUSDT, yTUSD
-
+    console.log(mints)
     if(mints.length) {
         let mint = mints[0]
         if(direction == -1) mint = mints[mints.length-1]
@@ -129,13 +129,35 @@ async function checkExchangeRateBlocks(block, address, direction, type = 'deposi
 async function getExchangeRate(blockNumber, address, value, type = 'deposit') {
     let exchangeRate = await checkExchangeRateBlocks(blockNumber, address, 0, type);
     let exchangeRatePast, exchangeRateFuture;
+    let currentBlock = await web3.eth.getBlockNumber();
+    let pastCurrentBlock = false;
     if(exchangeRate === false) {
         let i = j = blockNumber;
         while((exchangeRatePast = await checkExchangeRateBlocks(i, address, -1, type)) === false) {
             i-=100;
         }
         while((exchangeRateFuture = await checkExchangeRateBlocks(j, address, 1, type)) === false) {
+            if(j > currentBlock) {
+                pastCurrentBlock = true;
+                break;
+            }
             j+=100;
+        }
+
+        while(pastCurrentBlock) {
+            let i = blockNumber - 200;
+            let j = blockNumber - 100;
+            while((exchangeRatePast = await checkExchangeRateBlocks(i, address, -1, type)) === false) {
+                i-=200;
+            }
+            while((exchangeRateFuture = await checkExchangeRateBlocks(j, address, -1, type)) === false) {
+                if(j > currentBlock) {
+                    pastCurrentBlock = true;
+                    break;
+                }
+                j-=100;
+            }
+            if(exchangeRatePast.blockNumber && exchangeRateFuture.blockNumber) pastCurrentBlock = false;
         }
 
         exchangeRate = (exchangeRateFuture.blockNumber - exchangeRatePast.blockNumber) * (exchangeRateFuture.exchangeRate - exchangeRatePast.exchangeRate)
@@ -166,6 +188,7 @@ async function calculateAmount(blockNumber, yTokens, type) {
     for(let i = 0; i < 4; i++) {
         let tokens = yTokens[i];
         if(tokens == 0) continue;
+        console.log(i)
         let usd = await getExchangeRate(blockNumber, underlying_coins[i]._address, '', type)
         if(i == 0 || i == 3) tokens /= 1e18
         else tokens /= 1e6
@@ -183,6 +206,13 @@ async function getDeposits() {
     
     let fromBlock = '0x909964';
 
+    if(localStorage.getItem('dversion') == version && localStorage.getItem('lastDepositBlock') && localStorage.getItem('lastAddress') == default_account) {
+        let block = +localStorage.getItem('lastDepositBlock')
+        fromBlock = '0x'+parseInt(block+1).toString(16)
+        depositUsdSum += +localStorage.getItem('lastDeposits')
+        console.log("HERe")
+    }
+
     let poolTokensReceivings = await web3.eth.getPastLogs({
         fromBlock: fromBlock,
         toBlock: 'latest',
@@ -194,13 +224,10 @@ async function getDeposits() {
         ],
     });
 
+    console.log(poolTokensReceivings)
 
     var lastBlock = poolTokensReceivings.length && poolTokensReceivings[poolTokensReceivings.length-1].blockNumber || fromBlock
 
-    if(localStorage.getItem('dversion') == version && localStorage.getItem('lastDepositBlock') && localStorage.getItem('lastAddress') == default_account) {
-        poolTokensReceivings = poolTokensReceivings.filter(r=>r.blockNumber > lastBlock);
-        depositUsdSum += +localStorage.getItem('lastDeposits')
-    }
     const txs = poolTokensReceivings.map(e => e.transactionHash);
 
     console.time('timer')
@@ -239,6 +266,12 @@ async function getWithdrawals(address) {
     let withdrawals = 0;
     let fromBlock = '0x909964';
 
+    if(localStorage.getItem('wversion') == version && localStorage.getItem('lastWithdrawalBlock') && localStorage.getItem('wlastAddress') == default_account) {
+        let block = +localStorage.getItem('lastWithdrawalBlock')
+        fromBlock = '0x'+parseInt(block+1).toString(16)
+        withdrawals += +localStorage.getItem('lastWithdrawals')
+    }
+
     let logs = await web3.eth.getPastLogs({
         fromBlock: fromBlock,
         toBlock: 'latest',
@@ -250,11 +283,6 @@ async function getWithdrawals(address) {
     });
 
     var lastBlock = logs.length && logs[logs.length-1].blockNumber || fromBlock
-
-    if(localStorage.getItem('wversion') == version && localStorage.getItem('lastWithdrawalBlock') && localStorage.getItem('wlastAddress') == default_account) {
-        logs = logs.filter(l=>l.blockNumber > lastBlock);
-        withdrawals += +localStorage.getItem('lastWithdrawals')
-    }
 
     for(let log of logs) {
         const receipt = await web3.eth.getTransactionReceipt(log.transactionHash);
