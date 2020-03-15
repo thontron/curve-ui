@@ -307,8 +307,8 @@ div.info table td {
 }
 
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
-  .top-menu-bar {
-    height: 30px;
+  .top-menu-bar > #poolsdropdown {
+    display: none;
   }
   #lp-info-container {
     margin-top: 1em;
@@ -381,7 +381,7 @@ div.info table td {
   text-decoration: none;
 }
 
-.top-menu-bar > #poolsdropdown {
+#poolsdropdown {
   display: inline-block;
   cursor: pointer;
   position: relative;
@@ -510,6 +510,10 @@ fieldset:nth-child(2) .maxbalance {
   display: flex;
   align-items: center;
   white-space: pre-wrap;
+}
+
+.donations a {
+  word-break: normal;
 }
 
 .blue.window.info, .donations .text {
