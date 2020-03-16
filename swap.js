@@ -67,7 +67,7 @@ function setAmountPromise() {
         if (b >= 0.001) {
             // In c-units
             var dx_ = $('#from_currency').val();
-            var dx = cBN(Math.round(dx_ * coin_precisions[i]).toString()).toString(10);
+            var dx = cBN(Math.round(dx_ * coin_precisions[i]).toString()).toFixed(0,1);
             var dy_ = parseInt(await swap.methods.get_dy_underlying(i, j, dx).call()) / coin_precisions[j];
             var dy = dy_.toFixed(2);
             resolve([dy, dy_, dx_])
@@ -124,13 +124,13 @@ async function handle_trade() {
     if (b >= 0.001) {
         var dx = Math.floor($('#from_currency').val() * coin_precisions[i]);
         var min_dy = Math.floor($('#to_currency').val() * 0.99 * coin_precisions[j]);
-        dx = cBN(dx.toString()).toString(10);
+        dx = cBN(dx.toString()).toFixed(0,1);
         console.log(i, dx, max_allowance, "ENSURE UNDERLYING ALLOWANCE")
         if ($('#inf-approval').prop('checked'))
             await ensure_underlying_allowance(i, max_allowance)
         else
             await ensure_underlying_allowance(i, dx);
-        min_dy = cBN(min_dy.toString()).toString(10);
+        min_dy = cBN(min_dy.toString()).toFixed(0,1);
         console.log(i, j, dx, min_dy, "EXCHANGE UNDERLYING")
         await swap.methods.exchange_underlying(i, j, dx, min_dy).send({
             from: default_account,
