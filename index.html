@@ -119,7 +119,20 @@
                         </li>
                     </ul>
                 </fieldset>
+                <div class='clearfix'></div>
                 <p class='exchange-rate'>Exchange rate (including fees): <span id="exchange-rate"></span></p>
+                 <div id='max_slippage'><span>Max slippage:</span> 
+                    <input id="slippage05" type="radio" name="slippage" value='0.005'>
+                    <label for="slippage05">0.5%</label>
+
+                    <input id="slippage1" type="radio" name="slippage" checked value='0.01'>
+                    <label for="slippage1">1%</label>
+
+                    <input id="custom_slippage" type="radio" name="slippage" value='-'>
+                    <label for="custom_slippage">
+                        <input type="text" id="custom_slippage_input" disabled name="custom_slippage_input"> %
+                    </label>
+                </div>
                 <ul>
                     <li>
                         <input id="inf-approval" type="checkbox" name="inf-approval" checked>
