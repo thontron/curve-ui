@@ -547,7 +547,7 @@ fieldset:nth-child(2) .maxbalance {
 }
 
 .donations a {
-  word-break: normal;
+  word-break: normal;x
 }
 
 .blue.window.info, .donations .text {
@@ -557,4 +557,44 @@ fieldset:nth-child(2) .maxbalance {
 .donations .icon {
   margin-left: 1em;
   margin-right: 1em;
+}
+
+#custom_slippage_input {
+  width: 2.5em;
+}
+
+#max_slippage {
+  margin-bottom: 10px;
+}
+
+#max_slippage span {
+  padding-left: 4px;
+}
+
+#custom_slippage_input {
+  margin-left: -0.5em;
+}
+
+.exchange-rate {
+  margin-top: 3px;
+  margin-bottom: 10px;
+}
+
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+  p.exchange-rate {
+    text-align: left;
+  }
+  #max_slippage {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  #max_slippage > * {
+    width: 100%;
+  }
 }
