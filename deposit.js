@@ -59,10 +59,11 @@ async function init_ui() {
     let infapproval = true;
     for (let i = 0; i < N_COINS; i++) {
         var default_account = (await web3.eth.getAccounts())[0];
-        if (cBN(await coins[i].methods.allowance(default_account, swap_address).call()) <= max_allowance.div(cBN(2)))
+        if (cBN(await coins[i].methods.allowance(default_account, swap_address).call()).lte(max_allowance.div(cBN(2))))
             infapproval = false;        
 
         $('#currency_' + i).on('input', debounced(100, async function() {
+            console.log('input')
             await calc_slippage(true);
 
             var el = $('#currency_' + i);
