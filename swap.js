@@ -77,7 +77,7 @@ function setAmountPromise() {
         if (b >= 0.001) {
             // In c-units
             var dx_ = $('#from_currency').val();
-            var dx = cBN(Math.round(dx_ * coin_precisions[i])).toFixed(0);
+            var dx = cBN(Math.round(dx_ * coin_precisions[i])).toFixed(0,1);
             var dy_ = parseInt(await swap.methods.get_dy_underlying(i, j, dx).call()) / coin_precisions[j];
             var dy = dy_.toFixed(2);
             resolve([dy, dy_, dx_])

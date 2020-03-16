@@ -15,7 +15,7 @@ const max_allowance = cBN(2).pow(cBN(256)).minus(cBN(1));
 
 function approve(contract, amount, account) {
     return new Promise(resolve => {
-                contract.methods.approve(swap_address, amount.toString(10))
+                contract.methods.approve(swap_address, cBN(amount).toFixed(0,1))
                 .send({from: account, gas: 100000})
                 .once('transactionHash', function(hash) {resolve(true);});
             });
@@ -70,7 +70,7 @@ async function ensure_underlying_allowance(i, _amount) {
 
     if ((current_allowance.isGreaterThan(cBN(0))) & (current_allowance.isLessThan(amount)))
         await approve(underlying_coins[i], 0, default_account);
-    return await approve(underlying_coins[i], amount.toString(10), default_account);
+    return await approve(underlying_coins[i], cBN(amount).toFixed(0,1), default_account);
 }
 
 // XXX not needed anymore
@@ -226,7 +226,7 @@ async function calc_slippage(deposit) {
     var real_values = [...$("[id^=currency_]")].map((x,i) => +($(x).val()));
     var Sr = real_values.reduce((a,b) => a+b, 0);
 
-    var values = real_values.map((x,i) => cBN(Math.floor(x / c_rates[i]).toString()).toFixed(0));
+    var values = real_values.map((x,i) => cBN(Math.floor(x / c_rates[i]).toString()).toFixed(0,1));
     var token_amount = await swap.methods.calc_token_amount(values, deposit).call();
     var virtual_price = await swap.methods.get_virtual_price().call();
     var Sv = virtual_price * token_amount / 1e36;
