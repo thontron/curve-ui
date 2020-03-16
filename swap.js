@@ -121,9 +121,13 @@ async function handle_trade() {
     var i = from_currency;
     var j = to_currency;
     var b = parseInt(await swap.methods.balances(i).call()) / c_rates[i];
+    var max_slippage = $("#max_slippage > input[type='radio']:checked").val();
+    if(max_slippage == '-') {
+        max_slippage = $("#custom_slippage_input").val() / 100;
+    }
     if (b >= 0.001) {
         var dx = Math.floor($('#from_currency').val() * coin_precisions[i]);
-        var min_dy = Math.floor($('#to_currency').val() * 0.99 * coin_precisions[j]);
+        var min_dy = Math.floor($('#to_currency').val() * (1-max_slippage) * coin_precisions[j]);
         dx = cBN(dx.toString()).toFixed(0,1);
         if ($('#inf-approval').prop('checked'))
             await ensure_underlying_allowance(i, max_allowance)
@@ -140,6 +144,13 @@ async function handle_trade() {
     }
 }
 
+function change_max_slippage() {
+    if(this.id == 'custom_slippage')
+        $('#custom_slippage_input').prop('disabled', false)
+    else
+        $('#custom_slippage_input').prop('disabled', true)
+}
+
 async function init_ui() {
     $('input[type=radio][name=from_cur]').change(from_cur_handler);
     $('input[type=radio][name=to_cur]').change(to_cur_handler);
@@ -150,6 +161,7 @@ async function init_ui() {
     $('#from_currency').on('input', debounced(100, set_to_amount));
     $('#from_currency').click(function() {this.select()});
     $('fieldset:first .maxbalance').click(set_max_balance);
+    $("#max_slippage input[type='radio']").click(change_max_slippage);
 
     $("#trade").click(handle_trade);
     
