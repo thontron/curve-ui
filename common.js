@@ -19,7 +19,7 @@ const max_allowance = cBN(2).pow(cBN(256)).minus(cBN(1));
 
 function approve(contract, amount, account) {
     return new Promise(resolve => {
-                contract.methods.approve(swap_address, amount.toString(10))
+                contract.methods.approve(swap_address, cBN(amount).toFixed(0,1))
                 .send({from: account, gas: 100000})
                 .once('transactionHash', function(hash) {resolve(true);});
             });
@@ -66,7 +66,7 @@ async function ensure_underlying_allowance(i, _amount) {
 
     if ((current_allowance.isGreaterThan(cBN(0))) & (current_allowance.isLessThan(amount)))
         await approve(underlying_coins[i], 0, default_account);
-    return await approve(underlying_coins[i], amount.toString(10), default_account);
+    return await approve(underlying_coins[i], cBN(amount).toFixed(0,1), default_account);
 }
 
 // XXX not needed anymore
@@ -75,7 +75,7 @@ async function ensure_token_allowance() {
     var default_account = (await web3.eth.getAccounts())[0];
     if (parseInt(await swap_token.methods.allowance(default_account, swap_address).call()) == 0)
         return new Promise(resolve => {
-            swap_token.methods.approve(swap_address, cBN(max_allowance).toString(10))
+            swap_token.methods.approve(swap_address, cBN(max_allowance).toFixed(0,1))
             .send({from: default_account, gas: 100000})
             .once('transactionHash', function(hash) {resolve(true);});
         })
