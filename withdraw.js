@@ -45,6 +45,8 @@ function handle_change_amounts(i) {
             var default_account = (await web3.eth.getAccounts())[0];
             var maxAvailableAmount = parseInt(await swap_token.methods.balanceOf(default_account).call());
 
+            console.log(availableAmount, maxAvailableAmount)
+
             if(availableAmount > maxAvailableAmount) {
                 $('[id^=currency_]').css('background-color', 'red');
             }
@@ -109,7 +111,11 @@ async function handle_remove_liquidity() {
             amount = await swap_token.methods.balanceOf(default_account).call();
         await swap.methods.remove_liquidity(amount, min_amounts).send({from: default_account, gas: 600000});
     }
-
+    if(share_val != '---') {
+        for (let i = 0; i < N_COINS; i++) {
+            handle_change_amounts(i)();
+        }
+    }
     await update_balances();
     update_fee_info();
 }
