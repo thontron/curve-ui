@@ -39,7 +39,6 @@ async function handle_add_liquidity() {
             amounts[i] = cBN(Math.floor(amounts[i] / c_rates[i]).toString()).toFixed(0,1); // -> c-tokens
         }
     }
-    console.log(amounts, "ENSURE ALLOWANCE")
     if ($('#inf-approval').prop('checked'))
         await ensure_allowance(false)
     else
@@ -49,7 +48,6 @@ async function handle_add_liquidity() {
         token_amount = await swap.methods.calc_token_amount(amounts, true).call();
         token_amount = cBN(Math.floor(token_amount * 0.99).toString()).toFixed(0,1);
     }
-    console.log(amounts, token_amount, "ADD LIQUIDITY")
     await swap.methods.add_liquidity(amounts, token_amount).send({
         from: default_account,
         gas: 1300000});
@@ -61,7 +59,7 @@ async function init_ui() {
     let infapproval = true;
     for (let i = 0; i < N_COINS; i++) {
         var default_account = (await web3.eth.getAccounts())[0];
-        if (cBN(await coins[i].methods.allowance(default_account, swap_address).call()) <= max_allowance.div(cBN(2))) {
+        if (cBN(await coins[i].methods.allowance(default_account, swap_address).call()).lte(max_allowance.div(cBN(2)))) {
             infapproval = false;
         }
 
