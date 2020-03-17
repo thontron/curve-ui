@@ -9,7 +9,7 @@ var c_rates = new Array(N_COINS);
 var fee;
 var admin_fee;
 
-var version = 14;
+var version = 15;
 localStorage.setItem('bUSDversion', version)
 
 var cBN = (val) => new BigNumber(val);
