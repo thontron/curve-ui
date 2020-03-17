@@ -237,7 +237,6 @@ async function getWithdrawals(address) {
             withdrawals += tokens*exchangeRate/1e16
             localStorage.setItem('ClastWithdrawalBlock', lastBlock);
             localStorage.setItem('ClastWithdrawals', withdrawals);
-            return withdrawals
         }
 
 
