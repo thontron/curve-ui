@@ -39,6 +39,8 @@ async function init() {
       providerOptions // required
     });
 
+    window.web3Connect = web3Connect
+
     const provider = web3Connect.connect();
     cancelablePromise = makeCancelable(provider);
     return cancelablePromise.then(async (provider) => {    
