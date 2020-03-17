@@ -1,5 +1,6 @@
 var gulp = require('gulp')
 var rev = require('gulp-rev-append');
+var replace = require('gulp-replace');
 
 gulp.task('bump', function() {
   return gulp.src('./*.html')
