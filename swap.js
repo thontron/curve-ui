@@ -9,7 +9,7 @@ async function set_from_amount(i) {
             100 * parseFloat(balance) / coin_precisions[i]
         ) / 100
     if (el.val() == '' || el.val() == 0) {
-        if(!default_account) balance = 0
+        if(!default_account) amount = 0
         $('#from_currency').val(amount.toFixed(2));
     }
     $('fieldset:first .maxbalance span').text(amount.toFixed(2))
