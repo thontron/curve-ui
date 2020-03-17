@@ -118,7 +118,7 @@ async function getDeposits() {
     let depositUsdSum = 0;
 
     let fromBlock = '0x91c86f';
-    if(localStorage.getItem('ClastDepositBlock') && localStorage.getItem('ClastAddress') == default_account) {
+    if(localStorage.getItem('pversion') == version && localStorage.getItem('ClastDepositBlock') && localStorage.getItem('ClastAddress') == default_account) {
         let block = +localStorage.getItem('ClastDepositBlock')
         fromBlock = '0x'+parseInt(block+1).toString(16)
         depositUsdSum += +localStorage.getItem('ClastDeposits')
@@ -169,10 +169,10 @@ async function getDeposits() {
         }
     }
     console.timeEnd('timer')
-    console.log("HERE")
     localStorage.setItem('ClastDepositBlock', lastBlock);
     localStorage.setItem('ClastAddress', default_account)
     localStorage.setItem('ClastDeposits', depositUsdSum);
+    localStorage.setItem('pversion', version);
     return depositUsdSum;
 }
 
@@ -195,7 +195,7 @@ async function getWithdrawals(address) {
     default_account = default_account.substr(2).toLowerCase();
     let withdrawals = 0;
     let fromBlock = '0x91c86f';
-    if(localStorage.getItem('ClastWithdrawalBlock') && localStorage.getItem('ClastAddress') == default_account) {
+    if(localStorage.getItem('pwversion') == version && localStorage.getItem('ClastWithdrawalBlock') && localStorage.getItem('ClastAddress') == default_account) {
         let block = +localStorage.getItem('ClastWithdrawalBlock')
         fromBlock = '0x'+parseInt(block+1).toString(16)
         withdrawals += +localStorage.getItem('ClastWithdrawals')
@@ -243,6 +243,7 @@ async function getWithdrawals(address) {
     }
     localStorage.setItem('ClastWithdrawalBlock', lastBlock);
     localStorage.setItem('ClastWithdrawals', withdrawals);
+    localStorage.setItem('pwversion', version);
     return withdrawals;
 }
 
@@ -310,6 +311,14 @@ async function init_ui() {
     }
     catch(err) {
         console.error(err)
+        localStorage.removeItem('ClastDepositBlock');
+        localStorage.removeItem('ClastDeposits');
+        localStorage.removeItem('ClastWithdrawals');
+        localStorage.removeItem('ClastWithdrawalBlock');
+        localStorage.removeItem('ClastAddress');
+        localStorage.removeItem('pversion');
+        localStorage.removeItem('pwversion');
+        localStorage.removeItem('ClastDeposits');
     }
 
 }

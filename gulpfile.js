@@ -13,9 +13,19 @@ gulp.task('bumpRoot', function() {
     .pipe(gulp.dest('./root/'));
 });
 
-gulp.task('default', gulp.series('bump','bumpRoot'))
+gulp.task('bumpVersion', function() {
+	return gulp.src('./common.js')
+		.pipe(replace(/var version = (.*);/, (match, p1) => {
+			console.log(p1)
+			p1 = +p1 + 1;
+			return `var version = ${p1};`;
+		}))
+		.pipe(gulp.dest('.'))
+})
 
-gulp.task('copyRoot', function() {
+gulp.task('default', gulp.series('bump','bumpRoot', 'bumpVersion'))
+
+/*gulp.task('copyRoot', function() {
 	var files = [
 		"./tvision.css",
 		"./jquery.min.js",
@@ -33,4 +43,4 @@ gulp.task('copyRoot', function() {
 	]
 	return gulp.src(files , { base: './' })
 		.pipe(gulp.dest('./root'));
-});
+});*/
