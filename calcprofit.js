@@ -310,7 +310,6 @@ async function getWithdrawals(address) {
             let exchangeRate = findClosest(timestamp)[1]
             console.log(tokens, exchangeRate, "TRANSFER WITHDRAWALS")
             withdrawals += tokens*exchangeRate/1e18
-            return withdrawals
         }
     }
     localStorage.setItem('lastWithdrawalBlock', lastBlock)
