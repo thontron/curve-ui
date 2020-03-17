@@ -8,8 +8,12 @@ async function update_balances() {
             wallet_balances[i] = parseInt(await coins[i].methods.balanceOf(default_account).call());
         token_balance = parseInt(await old_swap_token.methods.balanceOf(default_account).call());
     }
-    for (let i = 0; i < N_COINS; i++)
+    else
+        token_balance = 0;
+    for (let i = 0; i < N_COINS; i++) {
         balances[i] = parseInt(await old_swap.methods.balances(i).call());
+        if(!default_account) balances[i] = 0
+    }
     token_supply = parseInt(await old_swap_token.methods.totalSupply().call());
 }
 
