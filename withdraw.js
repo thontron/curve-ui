@@ -151,7 +151,7 @@ window.addEventListener('load', async () => {
     catch(err) {
         console.error(err)
         if(err.reason == 'cancelDialog') {
-            const web3 = new Web3(infura_url);
+            const web3 = new newWeb3(infura_url);
             window.web3provider = web3provider
             window.web3 = web3
 
