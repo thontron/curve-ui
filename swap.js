@@ -2,7 +2,7 @@ var from_currency;
 var to_currency;
 
 async function set_from_amount(i) {
-    var default_account = (await web3.eth.getAccounts())[0];
+    var default_account = (await web3provider.eth.getAccounts())[0];
     var el = $('#from_currency');
     let balance = await underlying_coins[i].methods.balanceOf(default_account).call();
     let amount = Math.floor(
@@ -16,7 +16,7 @@ async function set_from_amount(i) {
 }
 
 async function set_max_balance() {
-    var default_account = (await web3.eth.getAccounts())[0];
+    var default_account = (await web3provider.eth.getAccounts())[0];
     let balance = await underlying_coins[from_currency].methods.balanceOf(default_account).call();
     let amount = Math.floor(
             100 * parseFloat(balance) / coin_precisions[from_currency]
@@ -27,7 +27,7 @@ async function set_max_balance() {
 
 
 async function highlight_input() {
-    var default_account = (await web3.eth.getAccounts())[0];
+    var default_account = (await web3provider.eth.getAccounts())[0];
     var el = $('#from_currency');
     var balance = parseFloat(await underlying_coins[from_currency].methods.balanceOf(default_account).call()) / coin_precisions[from_currency];
     if (el.val() > balance)
@@ -83,7 +83,7 @@ function setAmountPromise() {
 async function from_cur_handler() {
     from_currency = $('input[type=radio][name=from_cur]:checked').val();
     to_currency = $('input[type=radio][name=to_cur]:checked').val();
-    var default_account = (await web3.eth.getAccounts())[0];
+    var default_account = (await web3provider.eth.getAccounts())[0];
 
     if (cBN(await underlying_coins[from_currency].methods.allowance(default_account, swap_address).call()).gt(max_allowance.div(cBN(2))))
         $('#inf-approval').prop('checked', true)
@@ -118,7 +118,7 @@ async function to_cur_handler() {
 }
 
 async function handle_trade() {
-    var default_account = (await web3.eth.getAccounts())[0];
+    var default_account = (await web3provider.eth.getAccounts())[0];
     var i = from_currency;
     var j = to_currency;
     var b = parseInt(await swap.methods.balances(i).call()) / c_rates[i];
@@ -185,6 +185,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         console.error(err)
         if(err.reason == 'cancelDialog') {
             const web3 = new Web3(infura_url);
+            window.web3provider = web3
             window.web3 = web3
 
             await init_contracts();

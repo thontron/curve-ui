@@ -27,7 +27,7 @@ function approve(contract, amount, account) {
 
 
 async function ensure_allowance(amounts) {
-    var default_account = (await web3.eth.getAccounts())[0];
+    var default_account = (await web3provider.eth.getAccounts())[0];
     var allowances = new Array(N_COINS);
     for (let i=0; i < N_COINS; i++)
         allowances[i] = await coins[i].methods.allowance(default_account, swap_address).call();
@@ -55,7 +55,7 @@ async function ensure_allowance(amounts) {
 }
 
 async function ensure_underlying_allowance(i, _amount) {
-    var default_account = (await web3.eth.getAccounts())[0];
+    var default_account = (await web3provider.eth.getAccounts())[0];
     var amount = cBN(_amount);
     var current_allowance = cBN(await underlying_coins[i].methods.allowance(default_account, swap_address).call());
 
@@ -72,7 +72,7 @@ async function ensure_underlying_allowance(i, _amount) {
 // XXX not needed anymore
 // Keeping for old withdraw, to be removed whenever the chance is
 async function ensure_token_allowance() {
-    var default_account = (await web3.eth.getAccounts())[0];
+    var default_account = (await web3provider.eth.getAccounts())[0];
     if (parseInt(await swap_token.methods.allowance(default_account, swap_address).call()) == 0)
         return new Promise(resolve => {
             swap_token.methods.approve(swap_address, cBN(max_allowance).toFixed(0,1))
@@ -86,7 +86,7 @@ async function ensure_token_allowance() {
 
 async function init_contracts() {
     try {
-        let networkId = await web3.eth.net.getId();
+        let networkId = await web3provider.eth.net.getId();
         if(networkId != 1) {
             $('#error-window').text('Error: wrong network type. Please switch to mainnet');
             $('#error-window').show();
@@ -98,14 +98,14 @@ async function init_contracts() {
         $('#error-window').show();
     }
 
-    swap = new web3.eth.Contract(swap_abi, swap_address);
-    swap_token = new web3.eth.Contract(ERC20_abi, token_address);
+    swap = new web3provider.eth.Contract(swap_abi, swap_address);
+    swap_token = new web3provider.eth.Contract(ERC20_abi, token_address);
 
     for (let i = 0; i < N_COINS; i++) {
         var addr = await swap.methods.coins(i).call();
-        coins[i] = new web3.eth.Contract(yERC20_abi, addr);
+        coins[i] = new web3provider.eth.Contract(yERC20_abi, addr);
         var underlying_addr = await swap.methods.underlying_coins(i).call();
-        underlying_coins[i] = new web3.eth.Contract(ERC20_abi, underlying_addr);
+        underlying_coins[i] = new web3provider.eth.Contract(ERC20_abi, underlying_addr);
     }
 }
 
@@ -157,7 +157,7 @@ async function update_fee_info() {
     $('#fee-info').text((fee * 100).toFixed(3));
     $('#admin-fee-info').text((admin_fee * 100).toFixed(3));
 
-    var default_account = (await web3.eth.getAccounts())[0];
+    var default_account = (await web3provider.eth.getAccounts())[0];
     if (default_account) {
         var token_balance = parseInt(await swap_token.methods.balanceOf(default_account).call());
         if (token_balance > 0) {
