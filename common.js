@@ -139,7 +139,7 @@ async function update_fee_info() {
     await update_rates();
     var total = 0;
     var promises = [];
-    let infuraProvider = new Web3(infura_url)
+    let infuraProvider = new newWeb3(infura_url)
     swapInfura = new infuraProvider.eth.Contract(swap_abi, swap_address);
     for (let i = 0; i < N_COINS; i++) {
         promises.push(swapInfura.methods.balances(i).call());

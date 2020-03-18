@@ -415,7 +415,7 @@ window.addEventListener('load', async () => {
         await init_ui();
     }
     catch(err) {
-        const web3 = new Web3(infura_url);
+        const web3 = new newWeb3(infura_url);
         window.web3provider = web3
         window.web3 = web3
 
