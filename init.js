@@ -57,7 +57,7 @@ async function init() {
             location.reload()
         })
 
-        const web3 = new Web3(provider);
+        const web3 = new newWeb3(provider);
         window.web3provider = web3
         window.web3 = web3
 
