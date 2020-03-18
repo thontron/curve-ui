@@ -3,7 +3,7 @@ var sync_balances;
 async function handle_sync_balances() {
     sync_balances = $('#sync-balances').prop('checked');
     var max_balances = $('#max-balances').prop('checked');
-    var default_account = (await web3.eth.getAccounts())[0];
+    var default_account = (await web3provider.eth.getAccounts())[0];
 
     await update_rates();
 
@@ -26,7 +26,7 @@ async function handle_sync_balances() {
 }
 
 async function handle_add_liquidity() {
-    var default_account = (await web3.eth.getAccounts())[0];
+    var default_account = (await web3provider.eth.getAccounts())[0];
     var max_balances = $("#max-balances").is(':checked')
     var amounts = $("[id^=currency_]").toArray().map(x => $(x).val());
     for (let i = 0; i < N_COINS; i++) {
@@ -58,7 +58,7 @@ async function handle_add_liquidity() {
 async function init_ui() {
     let infapproval = true;
     for (let i = 0; i < N_COINS; i++) {
-        var default_account = (await web3.eth.getAccounts())[0];
+        var default_account = (await web3provider.eth.getAccounts())[0];
         if (cBN(await coins[i].methods.allowance(default_account, swap_address).call()).lte(max_allowance.div(cBN(2))))
             infapproval = false;        
 
@@ -129,6 +129,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         console.error(err)
         if(err.reason == 'cancelDialog') {
             const web3 = new Web3(infura_url);
+            window.web3provider = web3;
             window.web3 = web3
 
             await init_contracts();
