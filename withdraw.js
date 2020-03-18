@@ -2,7 +2,7 @@ var token_balance;
 var token_supply;
 
 async function update_balances() {
-    var default_account = (await web3.eth.getAccounts())[0];
+    var default_account = (await web3provider.eth.getAccounts())[0];
     if (default_account) {
         for (let i = 0; i < N_COINS; i++)
             wallet_balances[i] = parseInt(await coins[i].methods.balanceOf(default_account).call());
@@ -45,7 +45,7 @@ return async function() {
         try {
             var availableAmount =  await swap.methods.calc_token_amount(values, false).call()
             availableAmount = availableAmount / (1 - fee * N_COINS / (4 * (N_COINS - 1)))
-            var default_account = (await web3.eth.getAccounts())[0];
+            var default_account = (await web3provider.eth.getAccounts())[0];
             var maxAvailableAmount = parseInt(await swap_token.methods.balanceOf(default_account).call());
 
             if(availableAmount > maxAvailableAmount) {
@@ -102,7 +102,7 @@ async function handle_remove_liquidity() {
             amounts[i] = cBN(Math.floor(amounts[i] / c_rates[i]).toString()).toFixed(0,1); // -> c-tokens
         var min_amounts = amounts.map(x => cBN(Math.floor(0.97 * x).toString()).toFixed(0,1));
         var txhash;
-        var default_account = (await web3.eth.getAccounts())[0];
+        var default_account = (await web3provider.eth.getAccounts())[0];
         if (share_val == '---') {
             var token_amount = await swap.methods.calc_token_amount(amounts, false).call();
             token_amount = cBN(Math.floor(token_amount * 1.01).toString()).toFixed(0,1)
@@ -152,6 +152,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         console.error(err);
         if(err.reason == 'cancelDialog') {
             const web3 = new Web3(infura_url);
+            window.web3provider = web3;
             window.web3 = web3
 
             await init_contracts();
