@@ -191,7 +191,7 @@ async function calculateAmount(cTokens, block) {
 }
 
 async function getWithdrawals(address) {
-    var default_account = (await provider.eth.getAccounts())[0];
+    var default_account = (await web3provider.eth.getAccounts())[0];
     default_account = default_account.substr(2).toLowerCase();
     let withdrawals = 0;
     let fromBlock = '0x91c86f';
