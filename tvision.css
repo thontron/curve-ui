@@ -239,6 +239,12 @@ li {
     margin: 0;
     padding: 0.5em 0;
   }
+  .poolsdialog a {
+    text-align: center;
+  }
+  .poolsdialog .pools {
+    width: 100%;
+  }
 }
 
 div.add-liquidity input {
