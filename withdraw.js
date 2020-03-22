@@ -99,9 +99,14 @@ async function handle_remove_liquidity() {
     var share_val = share.val();
     var deadline = Math.floor((new Date()).getTime() / 1000) + trade_timeout;
     var amounts = $("[id^=currency_]").toArray().map(x => $(x).val());
-    for (let i = 0; i < N_COINS; i++)
+    var min_amounts = []
+    for (let i = 0; i < N_COINS; i++) {
         amounts[i] = cBN(Math.floor(amounts[i] / c_rates[i]).toString()).toFixed(0,1); // -> c-tokens
-    var min_amounts = amounts.map(x => cBN(Math.floor(0.97 * x).toString()).toFixed(0,1));
+        min_amounts[i] = cBN(0.97).multipliedBy(share_val/100).multipliedBy(cBN(balances[i]))
+            .multipliedBy(cBN(token_balance))
+            .div(cBN(token_supply))
+            .toFixed(0,1)
+    }
     var txhash;
     var default_account = (await web3provider.eth.getAccounts())[0];
     if (share_val == '---') {
