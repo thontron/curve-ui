@@ -106,7 +106,7 @@ async function checkExchangeRateBlocks(block, address, direction, type = 'deposi
         console.log(mint)
         let tr = await web3provider.eth.getTransactionReceipt(mint.transactionHash)
         if(type=='deposit') {
-            tr = tr.logs.filter(log=>log.address == yaddress)
+            tr = tr.logs.filter(log=>log.address == yaddress && log.topics[1] == '0x0000000000000000000000000000000000000000000000000000000000000000')
         }
         else {
             tr = tr.logs.filter(log=>{
