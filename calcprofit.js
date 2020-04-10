@@ -109,7 +109,7 @@ async function checkExchangeRateBlocks(block, address, direction, type = 'deposi
             tr = tr.logs.filter(log=>log.address == yaddress && log.topics[1] == '0x0000000000000000000000000000000000000000000000000000000000000000')
         }
         else {
-            tr = tr.logs.filter(log=>log.address == address && log.topics[2] == '0x000000000000000000000000' + yaddress.substr(2).toLowerCase())
+            tr = tr.logs.filter(log=>log.address == address && log.topics[0] == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef' && log.topics[2] == '0x000000000000000000000000' + yaddress.substr(2).toLowerCase())
         }
         if(!tr.length) return false;
         var sent = tr[0]
