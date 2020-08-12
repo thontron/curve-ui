@@ -3,18 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta property="og:title" content="busdcompound.curve.fi" />
-    <meta property="og:url" content="https://compound.curve.fi" />
-    <meta property="og:type" content="website" />
-    <meta property="og:description" content="A curve.fi portal for swapping cDAI/cUSDC" />
-    <meta property="og:image" content="./assets/compoundcurve_preview.png" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="compound.curve.fi" />
-    <meta name="twitter:site" content="@CurveFinance" />
-    <meta name="twitter:creator" content="@CurveFinance" />
-    <meta name="twitter:description" content="A curve.fi portal for swapping cDAI/cUSDC"/>
-    <meta name="twitter:url" content="https://compound.curve.fi" />
-    <meta name="twitter:image" content="./assets/compoundcurve_preview.png" />
     <title>Curve.fi :: Compounded</title>
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?rev=21bf4389b9b74ab0f6cac72ef908addb">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?rev=193353be20b284e80619a260968db7aa">
@@ -25,12 +13,6 @@
     </script>
     <script src='https://browser.sentry-cdn.com/5.13.0/captureconsole.min.js'></script>
     <script src="/jquery.min.js"></script>
-    <script src="/web3.min.js?rev=083d8cd8f08de8604dfb58307689719a"></script>
-    <script src="/web3connect.min.js"></script>
-    <script src="/web3providers/walletConnect.min.js"></script>
-    <script src="/web3providers/authereum.min.js"></script>
-    <script src="/web3providers/burnerConnect.min.js"></script>
-    <script src="/web3providers/fortmatic.min.js"></script>
     <script src="/notify.min.js"></script>
     <script src="/bigNumber.min.js"></script>
     <script src="/abis.js?rev=687cb76f57feaf62a4c401e535b7d092"></script>
@@ -46,10 +28,7 @@
       <div id='poolsdropdown'>
         <a href='https://www.curve.fi'>☰</a>
         <div class='dropdown'>
-            <a href='https://compound.curve.fi'>Compound</a>
-            <a href='https://usdt.curve.fi'>USDT</a>
-            <a href='https://y.curve.fi'>Y</a>
-            <a href='https://busd.curve.fi'>bUSD</a>
+            <a href='https://daostreet.com'>WIP</a>
         </div>
       </div>
 
@@ -66,7 +45,7 @@
     </div>
     <div id="screen">
         <div class="blue window">
-            <h1><img src="/logo.svg" alt="🌀 Curve" height="50"></h1>
+            <h1>Betavexity</h1>
         </div>
         <div class="error window half-width info" id="error-window"></div>
 
@@ -75,11 +54,11 @@
                 <legend>Currencies:</legend>
                 <ul>
                     <li>
-                        <label for="currency_0">cbitUSD (in bitUSD)</label>
+                        <label for="currency_0">ybitUSD (in bitUSD)</label>
                         <input type="text" id="currency_0" disabled name="from_cur" value="0.00">
                     </li>
                     <li>
-                        <label for="currency_1">cUSDC (in USDC)</label>
+                        <label for="currency_1">yUSDC (in USDC)</label>
                         <input type="text" id="currency_1" disabled name="from_cur" value="0.00">
                     </li>
                 </ul>
@@ -87,7 +66,7 @@
             <ul>
                 <li>
                     <input id="sync-balances" type="checkbox" name="sync-balances" checked>
-                    <label for="sync-balances">Add all coins in a balanced proportion</label>
+                    <label for="sync-balances">Add coins in a balanced proportion</label>
                 </li>
                 <li>
                     <input id="max-balances" type="checkbox" name="max-balances" checked>
@@ -95,7 +74,7 @@
                 </li>
                 <li>
                     <input id="inf-approval" type="checkbox" name="inf-approval" checked>
-                    <label for="inf-approval">Infinite approval - trust this contract forever</label>
+                    <label for="inf-approval">Perpetual approval - trust this contract forever</label>
                 </li>
             </ul>
 
@@ -110,11 +89,15 @@
 
     <div class="blue window half-width info">
       <fieldset id="lp-info-currency">
-        <legend>Currency reserves</legend>
+        <legend>Stake Board</legend>
         <ul id='balances-info'>
-            <li><b>bitUSD:</b> <span></span></li>
-            <li><b>USDC:</b> <span></span></li>
-            <li><b>bitUSD+USDC:</b> <span></span></li>
+            <li><b>#bitCNY</b> <span class='loading line'></span>
+            <li><b>#Honest.CNY</b> <span class='loading line'></span>
+            <li><b>#bitUSD</b> <span class='loading line'></span>
+            <li><b>#Honest.USD</b> <span class='loading line'></span>
+            <li><b>#BTS +2.5%  
+            <li><b>#TWENTIX</b> +2.614%
+            <li><b>#WEYOUME</b> +3.3179% 
         </ul>
         <p><b>Fee:</b> <span id='fee-info'></span>%</p>
         <p><b>Admin fee:</b> <span id='admin-fee-info'></span>%</p>
